@@ -3,19 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Primary colors */
+  --primary-orange: 255, 96, 0;    /* Vibrant orange from the explosion */
+  --primary-red: 255, 59, 48;      /* Darker orange-red accent */
+  
+  /* Background colors */
+  --bg-dark: 18, 18, 18;          /* Main dark background */
+  --bg-darker: 10, 10, 10;        /* Darker elements */
+  --bg-light: 30, 30, 30;         /* Lighter dark elements */
+  
+  /* Text colors */
+  --text-primary: 255, 255, 255;   /* White text */
+  --text-secondary: 160, 160, 160; /* Dimmed text */
+  --text-accent: 255, 96, 0;       /* Orange accent text */
+  
+  /* Border colors */
+  --border-dark: 38, 38, 38;      /* Subtle borders */
+  --border-light: 48, 48, 48;     /* Highlighted borders */
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: rgb(var(--text-primary));
+  background: rgb(var(--bg-dark));
 }
 
 @layer components {
@@ -24,14 +33,89 @@ body {
   }
   
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-colors;
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
   }
   
   .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
+    @apply bg-[rgb(var(--primary-orange))] text-white 
+           hover:bg-[rgb(var(--primary-red))] 
+           focus:ring-2 focus:ring-[rgb(var(--primary-orange))] focus:ring-opacity-50;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+    @apply bg-[rgb(var(--bg-light))] text-[rgb(var(--text-primary))]
+           hover:bg-[rgb(var(--border-light))]
+           border border-[rgb(var(--border-dark))];
   }
+
+  /* Modern card style */
+  .card {
+    @apply bg-[rgb(var(--bg-light))] 
+           border border-[rgb(var(--border-dark))]
+           rounded-lg p-6
+           transition-all duration-200
+           hover:border-[rgb(var(--border-light))];
+  }
+
+  /* Modern input style */
+  .input {
+    @apply bg-[rgb(var(--bg-darker))]
+           border border-[rgb(var(--border-dark))]
+           text-[rgb(var(--text-primary))]
+           rounded-md px-4 py-2
+           focus:outline-none
+           focus:border-[rgb(var(--primary-orange))]
+           transition-colors duration-200;
+  }
+
+  /* Section headers */
+  .section-title {
+    @apply text-2xl font-bold text-[rgb(var(--text-primary))]
+           border-b border-[rgb(var(--border-dark))]
+           pb-4 mb-6;
+  }
+
+  /* Navigation link styles */
+  .nav-link {
+    @apply text-[rgb(var(--text-secondary))]
+           hover:text-[rgb(var(--text-primary))]
+           hover:bg-[rgb(var(--bg-light))]
+           transition-colors duration-200
+           rounded-md px-3 py-2;
+  }
+
+  .nav-link-active {
+    @apply text-[rgb(var(--primary-orange))]
+           bg-[rgb(var(--bg-light))];
+  }
+
+  /* Accent text */
+  .text-accent {
+    @apply text-[rgb(var(--primary-orange))];
+  }
+}
+
+/* Custom scrollbar for modern look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--bg-darker));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-light));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--primary-orange));
+}
+
+/* Selection color */
+::selection {
+  background: rgba(var(--primary-orange), 0.3);
+  color: rgb(var(--text-primary));
 } 

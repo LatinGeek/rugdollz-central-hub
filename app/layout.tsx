@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-[rgb(var(--bg-dark))]">
           <div className="flex h-screen">
             <Navigation />
             {/* Main content */}
