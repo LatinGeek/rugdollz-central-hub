@@ -114,9 +114,13 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
       <ProfileHeader walletAddress={address} />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <Emblems emblems={sampleEmblems} />
-        <Highlights nfts={sampleNFTs} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <Emblems emblems={sampleEmblems} />
+        </div>
+        <div>
+          <Highlights nfts={sampleNFTs} />
+        </div>
       </div>
     </div>
   )
