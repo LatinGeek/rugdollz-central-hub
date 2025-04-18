@@ -93,7 +93,7 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
           {entry.content.length > 150 && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm text-[rgb(var(--accent))] hover:text-[rgb(var(--accent-dark))] mt-1"
+              className="text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] mt-1"
             >
               {isExpanded ? 'Show less' : 'Read more'}
             </button>
