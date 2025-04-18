@@ -8,18 +8,27 @@ interface NFT {
 }
 
 interface HighlightsProps {
+  title?: string
   nfts: NFT[]
+  onNFTClick?: (nft: NFT) => void
+  className?: string
 }
 
-export function Highlights({ nfts }: HighlightsProps) {
+export function Highlights({ 
+  title = "HIGHLIGHTS", 
+  nfts, 
+  onNFTClick,
+  className = ""
+}: HighlightsProps) {
   return (
-    <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-6">
-      <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">HIGHLIGHTS</h2>
+    <div className={`bg-[rgb(var(--bg-dark))] rounded-xl p-6 ${className}`}>
+      <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">{title}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {nfts.map((nft) => (
           <div
             key={nft.id}
-            className="group relative aspect-square rounded-xl overflow-hidden bg-[rgb(var(--bg-darker))]"
+            className="group relative aspect-square rounded-xl overflow-hidden bg-[rgb(var(--bg-darker))] cursor-pointer"
+            onClick={() => onNFTClick?.(nft)}
           >
             <img
               src={nft.imageUrl}
