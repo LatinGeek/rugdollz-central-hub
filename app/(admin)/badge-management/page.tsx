@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { AdminFileUpload } from '@/app/components/admin/AdminFileUpload'
 import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
+import { AdminModal } from '@/app/components/admin/AdminModal'
+import { AdminForm } from '@/app/components/admin/AdminForm'
+import { AdminListItem } from '@/app/components/admin/AdminListItem'
 
 interface Emblem {
   id: string
@@ -157,62 +159,18 @@ export default function BadgeManagementPage() {
           <div className="p-6">
             <div className="space-y-4">
               {emblems.map((emblem) => (
-                <div
+                <AdminListItem
                   key={emblem.id}
-                  className="flex items-center gap-4 p-4 rounded-lg border border-[rgb(var(--border-dark))] bg-[rgb(var(--bg-darker))]"
-                >
-                  <div
-                    className={`w-16 h-16 flex items-center justify-center rounded-lg flex-shrink-0 ${
-                      emblem.isActive
-                        ? 'bg-[rgb(var(--accent))] bg-opacity-20'
-                        : 'bg-[rgb(var(--bg-darker))] grayscale'
-                    }`}
-                  >
-                    <div 
-                      className="w-12 h-12 flex items-center justify-center"
-                      dangerouslySetInnerHTML={{ __html: emblem.icon }}
-                    />
-                  </div>
-                  
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-medium text-[rgb(var(--text-primary))]">
-                        {emblem.name}
-                      </h3>
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${
-                        emblem.isActive
-                          ? 'bg-green-500/20 text-green-500'
-                          : 'bg-red-500/20 text-red-500'
-                      }`}>
-                        {emblem.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-                      {emblem.description}
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setSelectedEmblem(emblem)}
-                      className="p-2 bg-[rgb(var(--primary))] text-white rounded-lg hover:bg-[rgb(var(--primary))]/90 transition-colors"
-                      aria-label="Edit emblem"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteEmblem(emblem.id)}
-                      className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                      aria-label="Delete emblem"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+                  icon={emblem.icon}
+                  title={emblem.name}
+                  description={emblem.description}
+                  status={{
+                    label: emblem.isActive ? 'Active' : 'Inactive',
+                    isActive: emblem.isActive
+                  }}
+                  onEdit={() => setSelectedEmblem(emblem)}
+                  onDelete={() => handleDeleteEmblem(emblem.id)}
+                />
               ))}
             </div>
           </div>
@@ -220,10 +178,84 @@ export default function BadgeManagementPage() {
       </div>
 
       {/* Create/Edit Modal */}
-      {(isCreating || selectedEmblem) && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          onClick={() => {
+      <AdminModal
+        isOpen={isCreating || !!selectedEmblem}
+        onClose={() => {
+          if (isCreating) {
+            setIsCreating(false)
+            setNewEmblem({
+              name: '',
+              icon: '',
+              isActive: true,
+              description: ''
+            })
+          } else {
+            setSelectedEmblem(null)
+          }
+        }}
+        title={isCreating ? 'Create New Badge' : 'Edit Badge'}
+      >
+        <AdminForm
+          title={isCreating ? 'Create New Badge' : 'Edit Badge'}
+          fields={[
+            {
+              label: 'Name',
+              name: 'name',
+              type: 'text',
+              value: isCreating ? newEmblem.name : selectedEmblem?.name || '',
+              onChange: (value) => {
+                if (isCreating) {
+                  setNewEmblem({ ...newEmblem, name: value })
+                } else if (selectedEmblem) {
+                  setSelectedEmblem({ ...selectedEmblem, name: value })
+                }
+              }
+            },
+            {
+              label: 'Description',
+              name: 'description',
+              type: 'text',
+              value: isCreating ? newEmblem.description || '' : selectedEmblem?.description || '',
+              onChange: (value) => {
+                if (isCreating) {
+                  setNewEmblem({ ...newEmblem, description: value })
+                } else if (selectedEmblem) {
+                  setSelectedEmblem({ ...selectedEmblem, description: value })
+                }
+              }
+            },
+            {
+              label: 'Icon',
+              name: 'icon',
+              type: 'file',
+              value: isCreating ? newEmblem.icon || '' : selectedEmblem?.icon || '',
+              onChange: (value) => {
+                if (isCreating) {
+                  setNewEmblem({ ...newEmblem, icon: value })
+                } else if (selectedEmblem) {
+                  setSelectedEmblem({ ...selectedEmblem, icon: value })
+                }
+              }
+            },
+            {
+              label: 'Status',
+              name: 'status',
+              type: 'select',
+              value: isCreating ? (newEmblem.isActive ? 'active' : 'inactive') : (selectedEmblem?.isActive ? 'active' : 'inactive'),
+              onChange: (value) => {
+                if (isCreating) {
+                  setNewEmblem({ ...newEmblem, isActive: value === 'active' })
+                } else if (selectedEmblem) {
+                  setSelectedEmblem({ ...selectedEmblem, isActive: value === 'active' })
+                }
+              },
+              options: [
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' }
+              ]
+            }
+          ]}
+          onCancel={() => {
             if (isCreating) {
               setIsCreating(false)
               setNewEmblem({
@@ -236,120 +268,16 @@ export default function BadgeManagementPage() {
               setSelectedEmblem(null)
             }
           }}
-        >
-          <div 
-            className="bg-[rgb(var(--bg-dark))] rounded-lg p-6 w-full max-w-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-xl font-bold mb-4 text-[rgb(var(--text-primary))]">
-              {isCreating ? 'Create New Badge' : 'Edit Badge'}
-            </h2>
-            
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-[rgb(var(--text))]">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={isCreating ? newEmblem.name : selectedEmblem?.name || ''}
-                  onChange={(e) => {
-                    if (isCreating) {
-                      setNewEmblem({ ...newEmblem, name: e.target.value })
-                    } else if (selectedEmblem) {
-                      setSelectedEmblem({ ...selectedEmblem, name: e.target.value })
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-[rgb(var(--background))] border border-[rgb(var(--border))] rounded-md text-[rgb(var(--text))] focus:border-[rgb(var(--primary))] focus:ring-[rgb(var(--primary))]"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-[rgb(var(--text))]">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={isCreating ? newEmblem.description : selectedEmblem?.description || ''}
-                  onChange={(e) => {
-                    if (isCreating) {
-                      setNewEmblem({ ...newEmblem, description: e.target.value })
-                    } else if (selectedEmblem) {
-                      setSelectedEmblem({ ...selectedEmblem, description: e.target.value })
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-[rgb(var(--background))] border border-[rgb(var(--border))] rounded-md text-[rgb(var(--text))] focus:border-[rgb(var(--primary))] focus:ring-[rgb(var(--primary))]"
-                />
-              </div>
-
-              <AdminFileUpload
-                label="Icon"
-                value={isCreating ? (newEmblem.icon || '') : (selectedEmblem?.icon || '')}
-                onChange={(value) => {
-                  if (isCreating) {
-                    setNewEmblem({ ...newEmblem, icon: value })
-                  } else if (selectedEmblem) {
-                    setSelectedEmblem({ ...selectedEmblem, icon: value })
-                  }
-                }}
-              />
-
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-[rgb(var(--text))]">
-                  Status
-                </label>
-                <select
-                  value={isCreating ? (newEmblem.isActive ? 'active' : 'inactive') : (selectedEmblem?.isActive ? 'active' : 'inactive')}
-                  onChange={(e) => {
-                    if (isCreating) {
-                      setNewEmblem({ ...newEmblem, isActive: e.target.value === 'active' })
-                    } else if (selectedEmblem) {
-                      setSelectedEmblem({ ...selectedEmblem, isActive: e.target.value === 'active' })
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-[rgb(var(--background))] border border-[rgb(var(--border))] rounded-md text-[rgb(var(--text))] focus:border-[rgb(var(--primary))] focus:ring-[rgb(var(--primary))]"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => {
-                    if (isCreating) {
-                      setIsCreating(false)
-                      setNewEmblem({
-                        name: '',
-                        icon: '',
-                        isActive: true,
-                        description: ''
-                      })
-                    } else {
-                      setSelectedEmblem(null)
-                    }
-                  }}
-                  className="px-4 py-2 bg-[rgb(var(--bg-darker))] text-[rgb(var(--text))] rounded-lg hover:bg-[rgb(var(--bg-darker))]/90 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    if (isCreating) {
-                      handleCreateEmblem()
-                    } else if (selectedEmblem) {
-                      handleUpdateEmblem(selectedEmblem)
-                    }
-                  }}
-                  className="px-4 py-2 bg-[rgb(var(--primary))] text-white rounded-lg hover:bg-[rgb(var(--primary))]/90 transition-colors"
-                >
-                  {isCreating ? 'Create' : 'Save'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          onSubmit={() => {
+            if (isCreating) {
+              handleCreateEmblem()
+            } else if (selectedEmblem) {
+              handleUpdateEmblem(selectedEmblem)
+            }
+          }}
+          submitLabel={isCreating ? 'Create' : 'Save'}
+        />
+      </AdminModal>
     </div>
   )
 } 
