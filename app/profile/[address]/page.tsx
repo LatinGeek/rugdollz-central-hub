@@ -108,6 +108,7 @@ interface ProfilePageProps {
 }
 
 export default function ProfilePage({ params }: ProfilePageProps) {
+  // Unwrap the params Promise using React.use()
   const { address } = use(params)
 
   return (

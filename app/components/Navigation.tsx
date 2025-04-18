@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
+const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
+
 const navigation = [
   { name: 'Home', href: '/home' },
   { name: 'Store', href: '/store' },
-  { name: 'User Profile', href: '/profile' },
+  { name: 'User Profile', href: `/profile/${HARDCODED_ADDRESS}` },
   { name: 'NFT Customization', href: '/nft-customization' },
   { name: 'NFT Lore', href: '/nft-lore' },
   { name: 'Lore Discovery', href: '/lore-discovery' },
