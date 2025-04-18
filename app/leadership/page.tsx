@@ -6,9 +6,9 @@ import { LeaderboardCard } from '@/app/components/leadership/LeaderboardCard'
 // Sample data for different timeframes
 const generateUserData = (timeframe: 'all' | 'month' | 'week') => {
   const basePoints = {
-    all: Array.from({ length: 30 }, (_, i) => Math.floor(Math.random() * 10000) + 1000),
-    month: Array.from({ length: 30 }, (_, i) => Math.floor(Math.random() * 5000) + 500),
-    week: Array.from({ length: 30 }, (_, i) => Math.floor(Math.random() * 2000) + 200)
+    all: Array.from({ length: 30 }, () => Math.floor(Math.random() * 10000) + 1000),
+    month: Array.from({ length: 30 }, () => Math.floor(Math.random() * 5000) + 500),
+    week: Array.from({ length: 30 }, () => Math.floor(Math.random() * 2000) + 200)
   }
 
   return Array.from({ length: 30 }, (_, i) => ({
@@ -39,11 +39,12 @@ export default function LeadershipPage() {
   }, [timeframe])
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-[rgb(var(--text-primary))] mb-4">
+    <div className="min-h-screen bg-gradient-to-b from-[rgb(var(--bg-darker))] to-[rgb(var(--bg-primary))]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header with animated gradient */}
+        <div className="text-center mb-16 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--accent))]/20 to-transparent blur-3xl -z-10" />
+          <h1 className="text-5xl font-bold text-[rgb(var(--text-primary))] mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))]">
             Leaderboard
           </h1>
           <p className="text-lg text-[rgb(var(--text-secondary))] max-w-2xl mx-auto">
@@ -51,17 +52,17 @@ export default function LeadershipPage() {
           </p>
         </div>
 
-        {/* Timeframe Selector */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-lg bg-[rgb(var(--bg-primary))] p-1">
+        {/* Timeframe Selector with modern design */}
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex rounded-xl bg-[rgb(var(--bg-primary))] p-1 shadow-lg">
             {(['all', 'month', 'week'] as const).map((time) => (
               <button
                 key={time}
                 onClick={() => setTimeframe(time)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
+                className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300
                   ${timeframe === time
-                    ? 'bg-[rgb(var(--accent))] text-white'
-                    : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-secondary))]'
+                    ? 'bg-[rgb(var(--accent))] text-white shadow-lg'
+                    : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-secondary))] hover:scale-105'
                   }`}
               >
                 {time.charAt(0).toUpperCase() + time.slice(1)}
@@ -70,36 +71,58 @@ export default function LeadershipPage() {
           </div>
         </div>
 
-        {/* Top 3 Users */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Top 3 Users with enhanced design */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {sortedUsers.slice(0, 3).map((user) => (
-            <div key={user.id} className="relative">
-              <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center
-                ${user.rank === 1 ? 'bg-yellow-400' : user.rank === 2 ? 'bg-gray-400' : 'bg-amber-600'}
-                text-white font-bold text-xl shadow-lg`}>
+            <div 
+              key={user.id} 
+              className="relative transform transition-all duration-500 hover:scale-105 hover:z-10"
+            >
+              {/* Rank Badge with gradient */}
+              <div className={`absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full flex items-center justify-center
+                ${user.rank === 1 
+                  ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' 
+                  : user.rank === 2 
+                  ? 'bg-gradient-to-br from-gray-400 to-gray-600'
+                  : 'bg-gradient-to-br from-amber-600 to-amber-800'}
+                text-white font-bold text-2xl shadow-xl z-50`}>
                 {user.rank}
               </div>
-              <div className="bg-[rgb(var(--bg-primary))] rounded-lg p-6 pt-8 text-center">
-                <img 
-                  src={user.avatar} 
-                  alt={user.name}
-                  className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-[rgb(var(--accent))]"
-                />
-                <h3 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-2">{user.name}</h3>
-                <div className="text-[rgb(var(--accent))] font-semibold text-lg mb-4">
+              
+              {/* User Card with glass effect */}
+              <div className="bg-[rgb(var(--bg-light))] rounded-2xl p-8 pt-12 text-center 
+                shadow-xl hover:shadow-2xl transition-all duration-300 h-full">
+                <div className="relative mx-auto w-32 h-32 mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
+                    rounded-full blur-xl opacity-30" />
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name}
+                    className="w-full h-full rounded-full object-cover border-4 border-[rgb(var(--accent))] 
+                      shadow-lg relative z-10"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">{user.name}</h3>
+                <div className="text-[rgb(var(--accent))] font-semibold text-xl mb-6">
                   {user.points.toLocaleString()} points
                 </div>
-                <div className="flex justify-center gap-4 text-sm text-[rgb(var(--text-secondary))]">
-                  <div>Level {user.level}</div>
-                  <div>{user.achievements} achievements</div>
+                <div className="flex justify-center gap-6 text-sm">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[rgb(var(--text-secondary))]">Level</span>
+                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{user.level}</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[rgb(var(--text-secondary))]">Achievements</span>
+                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{user.achievements}</span>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Leaderboard List */}
-        <div className="space-y-4">
+        {/* Leaderboard List with enhanced spacing */}
+        <div className="space-y-6 max-w-4xl mx-auto">
           {sortedUsers.map((user) => (
             <LeaderboardCard
               key={user.id}

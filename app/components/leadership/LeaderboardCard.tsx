@@ -20,19 +20,31 @@ interface LeaderboardCardProps {
 
 export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
   return (
-    <div className={`relative group ${isCurrentUser ? 'bg-[rgb(var(--accent-light))]' : 'bg-[rgb(var(--bg-primary))]'} 
-      rounded-lg p-4 transition-all duration-300 hover:shadow-lg`}>
-      {/* Rank Badge */}
-      <div className={`absolute -left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center
-        ${user.rank <= 3 ? 'bg-[rgb(var(--accent))]' : 'bg-[rgb(var(--bg-secondary))]'} 
-        text-white font-bold shadow-lg`}>
+    <div className={`relative group ${isCurrentUser 
+      ? 'bg-gradient-to-r from-[rgb(var(--accent-light))] to-[rgb(var(--accent-light))]/80' 
+      : user.rank <= 3 
+      ? 'bg-[rgb(var(--bg-light))]'
+      : 'bg-[rgb(var(--bg-dark))]'} 
+      rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
+      
+      {/* Rank Badge with gradient */}
+      <div className={`absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center
+        ${user.rank === 1 
+          ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' 
+          : user.rank === 2 
+          ? 'bg-gradient-to-br from-gray-400 to-gray-600'
+          : user.rank === 3
+          ? 'bg-gradient-to-br from-amber-600 to-amber-800'
+          : 'bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))]'} 
+        text-white font-bold text-lg shadow-lg z-10`}>
         {user.rank}
       </div>
 
-      <div className="flex items-center gap-4 ml-6">
-        {/* Avatar */}
+      <div className="flex items-center gap-6 ml-8">
+        {/* Avatar with glow effect */}
         <div className="relative flex-shrink-0">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[rgb(var(--accent))]">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[rgb(var(--accent))] 
+            shadow-lg group-hover:shadow-xl transition-all duration-300">
             {user.avatar ? (
               <img 
                 src={user.avatar} 
@@ -46,52 +58,63 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
               />
             )}
           </div>
-          {/* Level Badge */}
-          <div className="absolute -bottom-1 -right-1 bg-[rgb(var(--accent))] text-white text-xs 
-            font-bold rounded-full w-5 h-5 flex items-center justify-center border border-white">
+          {/* Level Badge with enhanced design */}
+          <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
+            text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center 
+            border-2 border-white shadow-md">
             {user.level}
           </div>
         </div>
 
-        {/* User Info */}
+        {/* User Info with improved layout */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className={`font-semibold truncate ${isCurrentUser ? 'text-[rgb(var(--accent))]' : 'text-[rgb(var(--text-primary))]'}`}>
+          <div className="flex items-center gap-3">
+            <h3 className={`font-bold text-lg truncate ${isCurrentUser 
+              ? 'text-[rgb(var(--accent))]' 
+              : 'text-[rgb(var(--text-primary))]'}`}>
               {user.name}
             </h3>
             {isCurrentUser && (
-              <span className="text-xs bg-[rgb(var(--accent))] text-white px-2 py-0.5 rounded-full flex-shrink-0">
+              <span className="text-xs bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
+                text-white px-2.5 py-1 rounded-full flex-shrink-0 shadow-md">
                 You
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-4 mt-1">
-            <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-6 mt-2">
+            <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Points:</span>
-              <span className="font-medium text-[rgb(var(--accent))]">{user.points.toLocaleString()}</span>
+              <span className="font-semibold text-[rgb(var(--accent))] text-lg">
+                {user.points.toLocaleString()}
+              </span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Achievements:</span>
-              <span className="font-medium text-[rgb(var(--accent))]">{user.achievements}</span>
+              <span className="font-semibold text-[rgb(var(--accent))] text-lg">
+                {user.achievements}
+              </span>
             </div>
             {user.streak > 0 && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <span className="text-sm text-[rgb(var(--text-secondary))]">Streak:</span>
-                <span className="font-medium text-[rgb(var(--accent))]">{user.streak} days</span>
+                <span className="font-semibold text-[rgb(var(--accent))] text-lg">
+                  {user.streak} days
+                </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-32 hidden md:block flex-shrink-0">
-          <div className="h-2 bg-[rgb(var(--bg-secondary))] rounded-full overflow-hidden">
+        {/* Progress Bar with enhanced design */}
+        <div className="w-40 hidden md:block flex-shrink-0">
+          <div className="h-2.5 bg-[rgb(var(--bg-light))] rounded-full overflow-hidden shadow-inner">
             <div 
-              className="h-full bg-[rgb(var(--accent))] rounded-full transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
+                rounded-full transition-all duration-500"
               style={{ width: `${(user.points / 10000) * 100}%` }}
             />
           </div>
-          <div className="text-xs text-[rgb(var(--text-secondary))] text-right mt-1">
+          <div className="text-xs text-[rgb(var(--text-secondary))] text-right mt-1.5">
             {Math.round((user.points / 10000) * 100)}% to next level
           </div>
         </div>
