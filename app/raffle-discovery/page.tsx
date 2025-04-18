@@ -36,7 +36,12 @@ const sampleRaffles = [
     endDate: '2025-04-17T00:00:00Z',
     participants: 150,
     maxParticipants: 200,
-    status: 'ended' as const
+    status: 'ended' as const,
+    winner: {
+      id: 'user123',
+      name: 'CryptoMaster',
+      avatar: 'https://i.pravatar.cc/150?img=3'
+    }
   },
   {
     id: '4',

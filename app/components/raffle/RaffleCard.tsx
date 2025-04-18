@@ -12,6 +12,11 @@ interface Raffle {
   endDate: string
   participants: number
   maxParticipants: number
+  winner?: {
+    id: string
+    name: string
+    avatar?: string
+  }
 }
 
 interface RaffleCardProps {
@@ -32,7 +37,25 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
       return (
         <div className="text-red-500 text-right">
           <div className="text-sm font-medium">Ended</div>
-          <div className="text-xs">Final results coming soon</div>
+          {raffle.winner ? (
+            <div className="text-xs flex items-center justify-end gap-2 mt-1">
+              <span>Winner:</span>
+              {raffle.winner.avatar ? (
+                <img 
+                  src={raffle.winner.avatar} 
+                  alt={raffle.winner.name}
+                  className="w-4 h-4 rounded-full"
+                />
+              ) : (
+                <div className="w-4 h-4 rounded-full bg-[rgb(var(--accent))] flex items-center justify-center text-[8px] text-white">
+                  {raffle.winner.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="font-medium">{raffle.winner.name}</span>
+            </div>
+          ) : (
+            <div className="text-xs">Final results coming soon</div>
+          )}
         </div>
       )
     }
