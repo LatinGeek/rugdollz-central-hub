@@ -55,7 +55,7 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
   const handleVote = (vote: 'up' | 'down') => {
     // If user clicks the same vote again, remove their vote
     if (entry.userVote === vote) {
-      onVote(entry.id, null)
+      onVote(entry.id, entry.userVote === 'up' ? 'down' : 'up')
     } else {
       onVote(entry.id, vote)
     }

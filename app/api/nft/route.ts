@@ -1,52 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
-  try {
-    // Get all NFTs
-    return NextResponse.json({ message: 'Get all NFTs' })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch NFTs' },
-      { status: 500 }
-    )
-  }
+export async function GET() {
+  // Get all NFTs
+  return NextResponse.json({ message: 'Get all NFTs' })
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const body = await request.json()
     // Create new NFT
-    return NextResponse.json({ message: 'Create NFT', data: body })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to create NFT' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Create NFT' })
+  } catch {
+    return NextResponse.json({ message: 'Failed to create NFT' }, { status: 400 })
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function PUT() {
   try {
-    const body = await request.json()
     // Update NFT
-    return NextResponse.json({ message: 'Update NFT', data: body })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to update NFT' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Update NFT' })
+  } catch {
+    return NextResponse.json({ message: 'Failed to update NFT' }, { status: 400 })
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
-    const body = await request.json()
     // Delete NFT
-    return NextResponse.json({ message: 'Delete NFT', data: body })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to delete NFT' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Delete NFT' })
+  } catch {
+    return NextResponse.json({ message: 'Failed to delete NFT' }, { status: 400 })
   }
 } 

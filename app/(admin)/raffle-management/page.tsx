@@ -124,19 +124,6 @@ export default function RaffleManagementPage() {
     setSelectedRaffle(null)
   }
 
-  const getStatusColor = (status: Raffle['status']) => {
-    switch (status) {
-      case 'programmed':
-        return 'text-blue-500'
-      case 'started':
-        return 'text-green-500'
-      case 'ended':
-        return 'text-red-500'
-      default:
-        return 'text-gray-500'
-    }
-  }
-
   const formFields = [
     {
       label: 'Title',

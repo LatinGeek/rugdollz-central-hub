@@ -202,12 +202,13 @@ export default function BadgeManagementPage() {
               label: 'Name',
               name: 'name',
               type: 'text',
-              value: isCreating ? newEmblem.name : selectedEmblem?.name || '',
+              value: isCreating ? newEmblem.name || '' : selectedEmblem?.name || '',
               onChange: (value) => {
+                const name = value as string;
                 if (isCreating) {
-                  setNewEmblem({ ...newEmblem, name: value })
+                  setNewEmblem({ ...newEmblem, name })
                 } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, name: value })
+                  setSelectedEmblem({ ...selectedEmblem, name: value as string })
                 }
               }
             },
@@ -217,23 +218,25 @@ export default function BadgeManagementPage() {
               type: 'text',
               value: isCreating ? newEmblem.description || '' : selectedEmblem?.description || '',
               onChange: (value) => {
+                const description = value as string;
                 if (isCreating) {
-                  setNewEmblem({ ...newEmblem, description: value })
+                  setNewEmblem({ ...newEmblem, description })
                 } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, description: value })
+                  setSelectedEmblem({ ...selectedEmblem, description })
                 }
               }
             },
             {
               label: 'Icon',
               name: 'icon',
-              type: 'file',
+              type: 'text', // Changed from 'file' to 'text' to match the allowed types
               value: isCreating ? newEmblem.icon || '' : selectedEmblem?.icon || '',
               onChange: (value) => {
+                const icon = value as string;
                 if (isCreating) {
-                  setNewEmblem({ ...newEmblem, icon: value })
+                  setNewEmblem({ ...newEmblem, icon })
                 } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, icon: value })
+                  setSelectedEmblem({ ...selectedEmblem, icon })
                 }
               }
             },

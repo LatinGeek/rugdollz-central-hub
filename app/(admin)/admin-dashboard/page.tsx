@@ -81,7 +81,7 @@ export default function AdminDashboard() {
           <div className="py-4">
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Admin Dashboard</h1>
             <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
-              Monitor and manage your platform's activity
+              Monitor and manage your platform&apos;s activity
             </p>
           </div>
         </div>

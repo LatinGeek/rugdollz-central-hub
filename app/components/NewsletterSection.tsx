@@ -20,12 +20,12 @@ export function NewsletterSection() {
           <h2 className="text-3xl font-extrabold text-[rgb(var(--text-primary))] sm:text-4xl">
             Stay Updated
           </h2>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-[rgb(var(--text-secondary))]">
-            Subscribe to our newsletter for the latest updates on new collections, games, and events.
+          <p className="text-gray-400 mb-6">
+            Stay updated with the latest news, events, and exclusive offers from RugDollz&#39; Central Hub.
           </p>
           {isSubscribed ? (
             <div className="mt-8 text-green-500">
-              Thanks for subscribing! We'll keep you updated.
+              Thanks for subscribing! We&apos;ll keep you updated.
             </div>
           ) : (
             <form className="mt-8 sm:flex justify-center" onSubmit={handleSubmit}>
