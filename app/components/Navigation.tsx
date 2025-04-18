@@ -13,6 +13,9 @@ const navigation = [
   { name: 'Lore Discovery', href: '/lore-discovery' },
   { name: 'Raffle Discovery', href: '/raffle-discovery' },
   { name: 'Leadership', href: '/leadership' },
+]
+
+const adminNavigation = [
   { name: 'Admin Dashboard', href: '/admin-dashboard' },
   { name: 'Badge Management', href: '/badge-management' },
   { name: 'Raffle Management', href: '/raffle-management' },
@@ -21,6 +24,11 @@ const navigation = [
 export function Navigation() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
+
+  const isAdminPath = pathname.startsWith('/admin') || 
+                     pathname.startsWith('/badge-management') || 
+                     pathname.startsWith('/raffle-management')
 
   return (
     <>
@@ -48,6 +56,53 @@ export function Navigation() {
                   </Link>
                 )
               })}
+
+              {/* Admin Menu */}
+              <div className="mt-4">
+                <button
+                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                  className={`w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                    isAdminPath
+                      ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
+                      : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]'
+                  }`}
+                >
+                  <span>Admin Dashboard</span>
+                  <svg
+                    className={`ml-2 h-4 w-4 transition-transform ${isAdminMenuOpen ? 'rotate-90' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+                {isAdminMenuOpen && (
+                  <div className="ml-4 mt-1 space-y-1">
+                    {adminNavigation.map((item) => {
+                      const isActive = pathname === item.href
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className={`block px-2 py-2 text-sm font-medium rounded-md ${
+                            isActive
+                              ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
+                              : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]'
+                          }`}
+                        >
+                          {item.name}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
         </div>
@@ -108,6 +163,54 @@ export function Navigation() {
                 </Link>
               )
             })}
+
+            {/* Mobile Admin Menu */}
+            <div className="mt-4">
+              <button
+                onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+                className={`w-full flex items-center px-3 py-2 text-base font-medium rounded-md ${
+                  isAdminPath
+                    ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
+                    : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]'
+                }`}
+              >
+                <span>Admin Dashboard</span>
+                <svg
+                  className={`ml-2 h-4 w-4 transition-transform ${isAdminMenuOpen ? 'rotate-90' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+              {isAdminMenuOpen && (
+                <div className="ml-4 mt-1 space-y-1">
+                  {adminNavigation.map((item) => {
+                    const isActive = pathname === item.href
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`block px-3 py-2 text-base font-medium rounded-md ${
+                          isActive
+                            ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
+                            : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
         )}
       </div>
