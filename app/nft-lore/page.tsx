@@ -1,7 +1,16 @@
 'use client'
 
+import { useState, useRef } from 'react'
 import { Highlights } from '@/app/components/profile/Highlights'
 import { LoreFeed } from '@/app/components/nft-lore/LoreFeed'
+import { WriteLore } from '@/app/components/nft-lore/WriteLore'
+
+interface NFT {
+  id: string
+  name: string
+  imageUrl: string
+  collection: string
+}
 
 // Sample data - Replace with actual data fetching
 const sampleNFTs = [
@@ -42,7 +51,7 @@ const sampleLoreEntries = [
     createdAt: '2024-02-19T15:45:00Z',
     author: 'MysticScribe',
     votes: 89,
-    userVote: 'up'
+    userVote: 'up' as const
   },
   {
     id: '3',
@@ -51,14 +60,38 @@ const sampleLoreEntries = [
     createdAt: '2024-02-18T09:15:00Z',
     author: 'EarthWalker',
     votes: 124,
-    userVote: 'down'
+    userVote: 'down' as const
   }
 ]
 
 export default function NFTLorePage() {
-  const handleNFTClick = (nft) => {
-    console.log('NFT clicked:', nft)
-    // Handle NFT selection, perhaps open a modal to create new lore
+  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null)
+  const [entries, setEntries] = useState(sampleLoreEntries)
+  const writeLoreRef = useRef<HTMLDivElement>(null)
+
+  const handleNFTClick = (nft: NFT) => {
+    setSelectedNFT(nft)
+    // Scroll to the WriteLore component after a short delay to ensure it's rendered
+    setTimeout(() => {
+      writeLoreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
+
+  const handleSubmitLore = async (content: string) => {
+    if (!selectedNFT) return
+
+    // In a real app, this would be an API call
+    const newEntry = {
+      id: Date.now().toString(),
+      nft: selectedNFT,
+      content,
+      createdAt: new Date().toISOString(),
+      author: 'Current User', // Replace with actual user
+      votes: 0,
+      userVote: null
+    }
+
+    setEntries(prev => [newEntry, ...prev])
   }
 
   return (
@@ -78,9 +111,19 @@ export default function NFTLorePage() {
           className="mb-8"
         />
 
+        {selectedNFT && (
+          <div ref={writeLoreRef}>
+            <WriteLore
+              nft={selectedNFT}
+              onClose={() => setSelectedNFT(null)}
+              onSubmit={handleSubmitLore}
+            />
+          </div>
+        )}
+
         <div>
           <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">LATEST LORE ENTRIES</h2>
-          <LoreFeed entries={sampleLoreEntries} />
+          <LoreFeed entries={entries} />
         </div>
       </div>
     </div>
