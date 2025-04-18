@@ -3,6 +3,8 @@
 interface PlaceholderImageProps {
   category: string
   className?: string
+  width?: number
+  height?: number
 }
 
 const categoryColors: Record<string, string> = {
@@ -11,7 +13,8 @@ const categoryColors: Record<string, string> = {
   'Cosmetics': '#FFD166',
   'Consumables': '#6A0572',
   'Membership': '#1A535C',
-  'Bundles': '#FF9F1C'
+  'Bundles': '#FF9F1C',
+  'User': '#6366F1'
 }
 
 const categoryIcons: Record<string, string> = {
@@ -20,10 +23,14 @@ const categoryIcons: Record<string, string> = {
   'Cosmetics': '💄',
   'Consumables': '⚡',
   'Membership': '👑',
-  'Bundles': '🎁'
+  'Bundles': '🎁',
+  'User': '👤'
 }
 
-export function PlaceholderImage({ category, className = '' }: PlaceholderImageProps) {
+export function PlaceholderImage({ 
+  category, 
+  className = '',
+}: PlaceholderImageProps) {
   const color = categoryColors[category] || '#6B7280'
   const icon = categoryIcons[category] || '📦'
   

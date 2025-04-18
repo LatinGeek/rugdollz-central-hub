@@ -4,6 +4,7 @@ import { StatsCard } from '../../components/admin/StatsCard'
 import { ActivityCard } from '../../components/admin/ActivityCard'
 import { UserCard } from '../../components/admin/UserCard'
 import { QuickActionButton } from '../../components/admin/QuickActionButton'
+import { useRouter } from 'next/navigation'
 
 // Sample data for demonstration
 const stats = {
@@ -49,39 +50,61 @@ const topUsers = [
 const quickActions = [
   {
     title: 'Manage Badges',
-    description: 'Create and manage user badges and achievements'
+    description: 'Create and manage user badges and achievements',
+    href: '/badge-management'
   },
   {
     title: 'NFT Moderation',
-    description: 'Review and moderate NFTs'
+    description: 'Review and moderate NFTs',
+    href: '/nft-moderation'
   },
   {
     title: 'Raffle Management',
-    description: 'Create and manage raffles'
+    description: 'Create and manage raffles',
+    href: '/raffle-management'
   },
   {
     title: 'Lore Moderation',
-    description: 'Review and moderate lore entries'
+    description: 'Review and moderate lore entries',
+    href: '/lore-moderation'
   }
 ]
 
 export default function AdminDashboard() {
+  const router = useRouter()
+
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg-dark))]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[rgb(var(--text-primary))]">Admin Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <button className="px-4 py-2 bg-[rgb(var(--bg-light))] text-[rgb(var(--text-primary))] 
-              rounded-lg hover:bg-[rgb(var(--accent))] transition-colors">
-              Refresh Data
-            </button>
-            <button className="px-4 py-2 bg-[rgb(var(--accent))] text-white rounded-lg 
-              hover:bg-[rgb(var(--accent-dark))] transition-colors">
-              Export Report
-            </button>
+    <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
+      {/* Header */}
+      <div className="bg-[rgb(var(--bg-dark))] border-b border-[rgb(var(--border-dark))]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-4">
+            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Admin Dashboard</h1>
+            <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
+              Monitor and manage your platform's activity
+            </p>
           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4 mb-8">
+          <button className="px-4 py-2 bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] rounded-lg border border-[rgb(var(--border-dark))] hover:bg-[rgb(var(--bg-darker))] transition-colors">
+            Refresh Data
+          </button>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {quickActions.map((action) => (
+            <QuickActionButton
+              key={action.title}
+              title={action.title}
+              description={action.description}
+              onClick={() => router.push(action.href)}
+            />
+          ))}
         </div>
 
         {/* Stats Grid */}
@@ -92,7 +115,8 @@ export default function AdminDashboard() {
             stats={[
               { label: 'Total Users', value: stats.users.total },
               { label: 'Active Today', value: stats.users.active },
-              { label: 'Growth', value: `+${stats.users.growth}%`, isAccent: true }
+              { label: 'New Today', value: stats.users.newToday },
+              { label: 'Growth', value: `${stats.users.growth}%` }
             ]}
           />
           <StatsCard
@@ -100,17 +124,19 @@ export default function AdminDashboard() {
             category="nft"
             stats={[
               { label: 'Total NFTs', value: stats.nfts.total },
-              { label: 'Currently Listed', value: stats.nfts.listed },
-              { label: 'Daily Volume', value: `$${stats.nfts.volume}`, isAccent: true }
+              { label: 'Listed', value: stats.nfts.listed },
+              { label: 'Sold Today', value: stats.nfts.soldToday },
+              { label: 'Volume', value: `$${stats.nfts.volume.toLocaleString()}` }
             ]}
           />
           <StatsCard
             title="Raffles"
             category="raffle"
             stats={[
-              { label: 'Active Raffles', value: stats.raffles.active },
-              { label: 'Total Participants', value: stats.raffles.participants },
-              { label: 'Revenue', value: `$${stats.raffles.revenue}`, isAccent: true }
+              { label: 'Active', value: stats.raffles.active },
+              { label: 'Completed', value: stats.raffles.completed },
+              { label: 'Participants', value: stats.raffles.participants },
+              { label: 'Revenue', value: `$${stats.raffles.revenue.toLocaleString()}` }
             ]}
           />
           <StatsCard
@@ -118,44 +144,31 @@ export default function AdminDashboard() {
             category="lore"
             stats={[
               { label: 'Total Entries', value: stats.lore.totalEntries },
-              { label: 'Active Writers', value: stats.lore.activeWriters },
-              { label: 'Total Upvotes', value: stats.lore.upvotes, isAccent: true }
+              { label: 'New Today', value: stats.lore.newToday },
+              { label: 'Upvotes', value: stats.lore.upvotes },
+              { label: 'Active Writers', value: stats.lore.activeWriters }
             ]}
           />
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Activities */}
-          <div className="lg:col-span-2 bg-[rgb(var(--bg-light))] rounded-xl p-6">
-            <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">Recent Activities</h2>
-            <div className="space-y-4">
-              {recentActivities.map(activity => (
-                <ActivityCard key={activity.id} activity={activity} />
-              ))}
-            </div>
-          </div>
-
-          {/* Top Users */}
-          <div className="bg-[rgb(var(--bg-light))] rounded-xl p-6">
-            <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">Top Users</h2>
-            <div className="space-y-4">
-              {topUsers.map(user => (
-                <UserCard key={user.id} user={user} />
-              ))}
-            </div>
+        {/* Recent Activity */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Recent Activity</h2>
+          <div className="space-y-2">
+            {recentActivities.map((activity) => (
+              <ActivityCard key={activity.id} activity={activity} />
+            ))}
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => (
-            <QuickActionButton
-              key={index}
-              title={action.title}
-              description={action.description}
-            />
-          ))}
+        {/* Top Users */}
+        <div>
+          <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Top Users</h2>
+          <div className="space-y-2">
+            {topUsers.map((user) => (
+              <UserCard key={user.id} user={user} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
