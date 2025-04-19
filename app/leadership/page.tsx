@@ -6,9 +6,9 @@ import { LeaderboardCard } from '@/app/components/leadership/LeaderboardCard'
 // Sample data for different timeframes
 const generateUserData = (timeframe: 'all' | 'month' | 'week') => {
   const basePoints = {
-    all: Array.from({ length: 30 }, () => Math.floor(Math.random() * 10000) + 1000),
-    month: Array.from({ length: 30 }, () => Math.floor(Math.random() * 5000) + 500),
-    week: Array.from({ length: 30 }, () => Math.floor(Math.random() * 2000) + 200)
+    all: Array.from({ length: 30 }, (v,k) => 1000+k),
+    month: Array.from({ length: 30 }, (v,k) => 500+k),
+    week: Array.from({ length: 30 }, (v,k) => 200+k)
   }
 
   return Array.from({ length: 30 }, (_, i) => ({
@@ -17,9 +17,9 @@ const generateUserData = (timeframe: 'all' | 'month' | 'week') => {
     name: `User${i + 1}`,
     avatar: `https://i.pravatar.cc/150?img=${i + 1}`,
     points: basePoints[timeframe][i],
-    level: Math.floor(Math.random() * 50) + 1,
-    achievements: Math.floor(Math.random() * 20) + 1,
-    streak: Math.floor(Math.random() * 30) + 1
+    level: Math.floor(i+30),
+    achievements: i + 10,
+    streak: i + 1
   })).sort((a, b) => b.points - a.points)
     .map((user, index) => ({
       ...user,
@@ -44,7 +44,7 @@ export default function LeadershipPage() {
         {/* Header with animated gradient */}
         <div className="text-center mb-16 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-[rgb(var(--accent))]/20 to-transparent blur-3xl -z-10" />
-          <h1 className="text-5xl font-bold text-[rgb(var(--text-primary))] mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))]">
+          <h1 className="text-5xl font-bold sm:font-extrabold text-[rgb(var(--primary-orange))] mb-6">
             Leaderboard
           </h1>
           <p className="text-lg text-[rgb(var(--text-secondary))] max-w-2xl mx-auto">
@@ -104,7 +104,7 @@ export default function LeadershipPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">{user.name}</h3>
                 <div className="text-[rgb(var(--accent))] font-semibold text-xl mb-6">
-                  {user.points.toLocaleString()} points
+                  {user.points.toLocaleString("en-US")} points
                 </div>
                 <div className="flex justify-center gap-6 text-sm">
                   <div className="flex flex-col items-center">
@@ -123,7 +123,7 @@ export default function LeadershipPage() {
 
         {/* Leaderboard List with enhanced spacing */}
         <div className="space-y-6 max-w-4xl mx-auto">
-          {sortedUsers.map((user) => (
+          {sortedUsers.slice(3).map((user) => (
             <LeaderboardCard
               key={user.id}
               user={user}

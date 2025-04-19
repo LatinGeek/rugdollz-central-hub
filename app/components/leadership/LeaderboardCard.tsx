@@ -24,7 +24,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
       ? 'bg-gradient-to-r from-[rgb(var(--accent-light))] to-[rgb(var(--accent-light))]/80' 
       : user.rank <= 3 
       ? 'bg-[rgb(var(--bg-light))]'
-      : 'bg-[rgb(var(--bg-dark))]'} 
+      : 'bg-[rgb(var(--bg-light))]'} 
       rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
       
       {/* Rank Badge with gradient */}
@@ -35,7 +35,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
           ? 'bg-gradient-to-br from-gray-400 to-gray-600'
           : user.rank === 3
           ? 'bg-gradient-to-br from-amber-600 to-amber-800'
-          : 'bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))]'} 
+          : 'bg-gradient-to-br from-[rgb(var(--primary-orange))] to-[rgb(var(--bg-light))]'} 
         text-white font-bold text-lg shadow-lg z-10`}>
         {user.rank}
       </div>
@@ -69,7 +69,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
         {/* User Info with improved layout */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
-            <h3 className={`font-bold text-lg truncate ${isCurrentUser 
+            <h3 className={`text-base font-bold text-lg truncate ${isCurrentUser 
               ? 'text-[rgb(var(--accent))]' 
               : 'text-[rgb(var(--text-primary))]'}`}>
               {user.name}
@@ -81,23 +81,23 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-6 mt-2">
+          <div className="flex flex-wrap items-center gap-0 sm:gap-5 mt-2">
             <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Points:</span>
-              <span className="font-semibold text-[rgb(var(--accent))] text-lg">
-                {user.points.toLocaleString()}
+              <span className="font-semibold text-[rgb(var(--accent))] text-base">
+                {user.points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Achievements:</span>
-              <span className="font-semibold text-[rgb(var(--accent))] text-lg">
+              <span className="font-semibold text-[rgb(var(--accent))] text-base">
                 {user.achievements}
               </span>
             </div>
             {user.streak > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-[rgb(var(--text-secondary))]">Streak:</span>
-                <span className="font-semibold text-[rgb(var(--accent))] text-lg">
+                <span className="font-semibold text-[rgb(var(--accent))] text-base">
                   {user.streak} days
                 </span>
               </div>
@@ -105,19 +105,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
           </div>
         </div>
 
-        {/* Progress Bar with enhanced design */}
-        <div className="w-40 hidden md:block flex-shrink-0">
-          <div className="h-2.5 bg-[rgb(var(--bg-light))] rounded-full overflow-hidden shadow-inner">
-            <div 
-              className="h-full bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
-                rounded-full transition-all duration-500"
-              style={{ width: `${(user.points / 10000) * 100}%` }}
-            />
-          </div>
-          <div className="text-xs text-[rgb(var(--text-secondary))] text-right mt-1.5">
-            {Math.round((user.points / 10000) * 100)}% to next level
-          </div>
-        </div>
+
       </div>
     </div>
   )
