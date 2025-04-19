@@ -35,14 +35,16 @@ export function PlaceholderImage({
   const icon = categoryIcons[category] || '📦'
   
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div 
+      className={`relative w-full h-full ${className}`}
+      style={{ backgroundColor: `${color}1A`}} // 1A = 10% opacity in hex
+    >
       <svg
         className="w-full h-full"
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect width="400" height="300" fill={color} fillOpacity="0.1" />
         <path
           d="M200 150C222.091 150 240 132.091 240 110C240 87.9086 222.091 70 200 70C177.909 70 160 87.9086 160 110C160 132.091 177.909 150 200 150Z"
           fill={color}
@@ -55,7 +57,7 @@ export function PlaceholderImage({
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-6xl transform transition-transform duration-300 group-hover:scale-110">
+        <div className="text-4xl md:text-6xl transform transition-transform duration-300 group-hover:scale-110">
           {icon}
         </div>
       </div>
