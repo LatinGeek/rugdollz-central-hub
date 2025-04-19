@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
 import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
@@ -22,6 +23,8 @@ interface Raffle {
     name: string
     avatar?: string
   }
+  requirements: string
+  rewards: string
 }
 
 // Sample raffles from the raffle discovery page
@@ -36,7 +39,9 @@ const sampleRaffles: Raffle[] = [
     participants: 245,
     maxParticipants: 500,
     status: 'programmed',
-    imageUrl: 'https://i.imgur.com/example1.jpg'
+    imageUrl: 'https://i.imgur.com/example1.jpg',
+    requirements: '',
+    rewards: ''
   },
   {
     id: '2',
@@ -48,7 +53,9 @@ const sampleRaffles: Raffle[] = [
     participants: 189,
     maxParticipants: 300,
     status: 'started',
-    imageUrl: 'https://i.imgur.com/example2.jpg'
+    imageUrl: 'https://i.imgur.com/example2.jpg',
+    requirements: '',
+    rewards: ''
   },
   {
     id: '3',
@@ -65,7 +72,9 @@ const sampleRaffles: Raffle[] = [
       id: 'user123',
       name: 'CryptoMaster',
       avatar: 'https://i.pravatar.cc/150?img=3'
-    }
+    },
+    requirements: '',
+    rewards: ''
   },
   {
     id: '4',
@@ -77,11 +86,14 @@ const sampleRaffles: Raffle[] = [
     participants: 320,
     maxParticipants: 500,
     status: 'programmed',
-    imageUrl: 'https://i.imgur.com/example4.jpg'
+    imageUrl: 'https://i.imgur.com/example4.jpg',
+    requirements: '',
+    rewards: ''
   }
 ]
 
 export default function RaffleManagementPage() {
+  const router = useRouter()
   const [raffles, setRaffles] = useState<Raffle[]>(sampleRaffles)
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -89,13 +101,23 @@ export default function RaffleManagementPage() {
     title: '',
     description: '',
     category: 'Bundles',
-    startDate: new Date().toISOString(),
-    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-    participants: 0,
+    imageUrl: '',
+    startDate: '',
+    endDate: '',
     maxParticipants: 100,
     status: 'programmed',
-    imageUrl: ''
+    requirements: '',
+    rewards: '',
+    participants: 0
   })
+
+  const handleTitleClick = (raffle: Raffle) => {
+    router.push(`/raffle-details/${raffle.id}`)
+  }
+
+  const handleEditClick = (raffle: Raffle) => {
+    router.push(`/raffle-details/${raffle.id}`)
+  }
 
   const handleCreateRaffle = () => {
     if (!newRaffle.title || !newRaffle.description) return
@@ -111,12 +133,14 @@ export default function RaffleManagementPage() {
       title: '',
       description: '',
       category: 'Bundles',
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      participants: 0,
+      imageUrl: '',
+      startDate: '',
+      endDate: '',
       maxParticipants: 100,
       status: 'programmed',
-      imageUrl: ''
+      requirements: '',
+      rewards: '',
+      participants: 0
     })
   }
 
@@ -243,6 +267,36 @@ export default function RaffleManagementPage() {
           }
         }
       }
+    },
+    {
+      label: 'Requirements',
+      name: 'requirements',
+      type: 'textarea' as const,
+      value: selectedRaffle?.requirements || newRaffle.requirements,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedRaffle) {
+            setSelectedRaffle({ ...selectedRaffle, requirements: value })
+          } else {
+            setNewRaffle({ ...newRaffle, requirements: value })
+          }
+        }
+      }
+    },
+    {
+      label: 'Rewards',
+      name: 'rewards',
+      type: 'textarea' as const,
+      value: selectedRaffle?.rewards || newRaffle.rewards,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedRaffle) {
+            setSelectedRaffle({ ...selectedRaffle, rewards: value })
+          } else {
+            setNewRaffle({ ...newRaffle, rewards: value })
+          }
+        }
+      }
     }
   ]
 
@@ -265,7 +319,7 @@ export default function RaffleManagementPage() {
         <div className="mb-6">
           <QuickActionButton
             title="Create New Raffle"
-            description="Set up a new raffle event"
+            description="Set up a new raffle"
             onClick={() => setIsCreating(true)}
           />
         </div>
@@ -278,16 +332,18 @@ export default function RaffleManagementPage() {
                   key={raffle.id}
                   id={raffle.id}
                   title={raffle.title}
-                  description={`${raffle.participants}/${raffle.maxParticipants} participants • ${raffle.category} • `}
+                  description={`${raffle.participants} participants • ${raffle.category} • ${raffle.requirements}`}
                   category={raffle.category}
+                  type="raffle"
+                  status={raffle.status}
+                  imageUrl={raffle.imageUrl}
                   startDate={raffle.startDate}
                   endDate={raffle.endDate}
                   participants={raffle.participants}
                   maxParticipants={raffle.maxParticipants}
-                  status={raffle.status}
-                  imageUrl={raffle.imageUrl}
-                  winner={raffle.winner}
                   onDelete={() => handleDeleteRaffle(raffle.id)}
+                  onEdit={() => handleEditClick(raffle)}
+                  onTitleClick={() => handleTitleClick(raffle)}
                 />
               ))}
             </div>
@@ -305,12 +361,14 @@ export default function RaffleManagementPage() {
               title: '',
               description: '',
               category: 'Bundles',
-              startDate: new Date().toISOString(),
-              endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-              participants: 0,
+              imageUrl: '',
+              startDate: '',
+              endDate: '',
               maxParticipants: 100,
               status: 'programmed',
-              imageUrl: ''
+              requirements: '',
+              rewards: '',
+              participants: 0
             })
           } else {
             setSelectedRaffle(null)

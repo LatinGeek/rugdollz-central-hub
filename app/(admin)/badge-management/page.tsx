@@ -4,18 +4,18 @@ import { useState } from 'react'
 import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
 import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
-import { AdminListItem } from '@/app/components/admin/AdminListItem'
+import AdminListItem from '@/app/components/admin/AdminListItem'
 
-interface Emblem {
+interface Badge {
   id: string
   name: string
+  description: string
   icon: string
   isActive: boolean
-  description?: string
 }
 
-// Sample emblems from profile page
-const sampleEmblems = [
+// Sample badges from profile page
+const sampleBadges: Badge[] = [
   {
     id: '1',
     name: 'Early Adopter',
@@ -89,47 +89,115 @@ const sampleEmblems = [
 ]
 
 export default function BadgeManagementPage() {
-  const [emblems, setEmblems] = useState<Emblem[]>(sampleEmblems)
-  const [selectedEmblem, setSelectedEmblem] = useState<Emblem | null>(null)
+  const [badges, setBadges] = useState<Badge[]>(sampleBadges)
+  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const [newEmblem, setNewEmblem] = useState<Partial<Emblem>>({
+  const [newBadge, setNewBadge] = useState<Omit<Badge, 'id'>>({
     name: '',
+    description: '',
     icon: '',
-    isActive: true,
-    description: ''
+    isActive: true
   })
 
-  const handleCreateEmblem = () => {
-    if (!newEmblem.name || !newEmblem.icon) return
+  const handleTitleClick = (badge: Badge) => {
+    setSelectedBadge(badge)
+  }
 
-    const emblem: Emblem = {
+  const handleCreateBadge = () => {
+    if (!newBadge.name || !newBadge.icon) return
+
+    const badge: Badge = {
       id: Date.now().toString(),
-      name: newEmblem.name,
-      icon: newEmblem.icon,
-      isActive: newEmblem.isActive ?? true,
-      description: newEmblem.description || ''
+      ...newBadge
     }
 
-    setEmblems([...emblems, emblem])
+    setBadges([...badges, badge])
     setIsCreating(false)
-    setNewEmblem({
+    setNewBadge({
       name: '',
+      description: '',
       icon: '',
-      isActive: true,
-      description: ''
+      isActive: true
     })
   }
 
-  const handleDeleteEmblem = (id: string) => {
-    setEmblems(emblems.filter(emblem => emblem.id !== id))
+  const handleDeleteBadge = (id: string) => {
+    setBadges(badges.filter(badge => badge.id !== id))
   }
 
-  const handleUpdateEmblem = (updatedEmblem: Emblem) => {
-    setEmblems(emblems.map(emblem => 
-      emblem.id === updatedEmblem.id ? updatedEmblem : emblem
+  const handleUpdateBadge = (updatedBadge: Badge) => {
+    setBadges(badges.map(badge => 
+      badge.id === updatedBadge.id ? updatedBadge : badge
     ))
-    setSelectedEmblem(null)
+    setSelectedBadge(null)
   }
+
+  const formFields = [
+    {
+      label: 'Name',
+      name: 'name',
+      type: 'text' as const,
+      value: selectedBadge?.name || newBadge.name,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedBadge) {
+            setSelectedBadge({ ...selectedBadge, name: value })
+          } else {
+            setNewBadge({ ...newBadge, name: value })
+          }
+        }
+      }
+    },
+    {
+      label: 'Description',
+      name: 'description',
+      type: 'textarea' as const,
+      value: selectedBadge?.description || newBadge.description,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedBadge) {
+            setSelectedBadge({ ...selectedBadge, description: value })
+          } else {
+            setNewBadge({ ...newBadge, description: value })
+          }
+        }
+      }
+    },
+    {
+      label: 'Icon',
+      name: 'icon',
+      type: 'text' as const,
+      value: selectedBadge?.icon || newBadge.icon,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedBadge) {
+            setSelectedBadge({ ...selectedBadge, icon: value })
+          } else {
+            setNewBadge({ ...newBadge, icon: value })
+          }
+        }
+      }
+    },
+    {
+      label: 'Status',
+      name: 'status',
+      type: 'select' as const,
+      value: selectedBadge?.isActive ? 'active' : 'inactive',
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedBadge) {
+            setSelectedBadge({ ...selectedBadge, isActive: value === 'active' })
+          } else {
+            setNewBadge({ ...newBadge, isActive: value === 'active' })
+          }
+        }
+      },
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' }
+      ]
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
@@ -139,7 +207,7 @@ export default function BadgeManagementPage() {
           <div className="py-4">
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Badge Management</h1>
             <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
-              Manage and create new badges for users
+              Create and manage badges for your community
             </p>
           </div>
         </div>
@@ -150,7 +218,7 @@ export default function BadgeManagementPage() {
         <div className="mb-6">
           <QuickActionButton
             title="Create New Badge"
-            description="Add a new badge to the collection"
+            description="Set up a new badge"
             onClick={() => setIsCreating(true)}
           />
         </div>
@@ -158,18 +226,19 @@ export default function BadgeManagementPage() {
         <div className="bg-[rgb(var(--bg-dark))] rounded-xl border border-[rgb(var(--border-dark))]">
           <div className="p-6">
             <div className="space-y-4">
-              {emblems.map((emblem) => (
+              {badges.map((badge) => (
                 <AdminListItem
-                  key={emblem.id}
-                  icon={emblem.icon}
-                  title={emblem.name}
-                  description={emblem.description}
-                  status={{
-                    label: emblem.isActive ? 'Active' : 'Inactive',
-                    isActive: emblem.isActive
-                  }}
-                  onEdit={() => setSelectedEmblem(emblem)}
-                  onDelete={() => handleDeleteEmblem(emblem.id)}
+                  key={badge.id}
+                  id={badge.id}
+                  title={badge.name}
+                  description={badge.description}
+                  category="Badge"
+                  type="badge"
+                  status={badge.isActive ? 'active' : 'inactive'}
+                  icon={badge.icon}
+                  onDelete={() => handleDeleteBadge(badge.id)}
+                  onEdit={() => setSelectedBadge(badge)}
+                  onTitleClick={() => handleTitleClick(badge)}
                 />
               ))}
             </div>
@@ -179,106 +248,40 @@ export default function BadgeManagementPage() {
 
       {/* Create/Edit Modal */}
       <AdminModal
-        isOpen={isCreating || !!selectedEmblem}
+        isOpen={isCreating || !!selectedBadge}
         onClose={() => {
           if (isCreating) {
             setIsCreating(false)
-            setNewEmblem({
+            setNewBadge({
               name: '',
+              description: '',
               icon: '',
-              isActive: true,
-              description: ''
+              isActive: true
             })
           } else {
-            setSelectedEmblem(null)
+            setSelectedBadge(null)
           }
         }}
         title={isCreating ? 'Create New Badge' : 'Edit Badge'}
       >
         <AdminForm
           title={isCreating ? 'Create New Badge' : 'Edit Badge'}
-          fields={[
-            {
-              label: 'Name',
-              name: 'name',
-              type: 'text',
-              value: isCreating ? newEmblem.name || '' : selectedEmblem?.name || '',
-              onChange: (value) => {
-                const name = value as string;
-                if (isCreating) {
-                  setNewEmblem({ ...newEmblem, name })
-                } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, name: value as string })
-                }
-              }
-            },
-            {
-              label: 'Description',
-              name: 'description',
-              type: 'text',
-              value: isCreating ? newEmblem.description || '' : selectedEmblem?.description || '',
-              onChange: (value) => {
-                const description = value as string;
-                if (isCreating) {
-                  setNewEmblem({ ...newEmblem, description })
-                } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, description })
-                }
-              }
-            },
-            {
-              label: 'Icon',
-              name: 'icon',
-              type: 'text', // Changed from 'file' to 'text' to match the allowed types
-              value: isCreating ? newEmblem.icon || '' : selectedEmblem?.icon || '',
-              onChange: (value) => {
-                const icon = value as string;
-                if (isCreating) {
-                  setNewEmblem({ ...newEmblem, icon })
-                } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, icon })
-                }
-              }
-            },
-            {
-              label: 'Status',
-              name: 'status',
-              type: 'select',
-              value: isCreating ? (newEmblem.isActive ? 'active' : 'inactive') : (selectedEmblem?.isActive ? 'active' : 'inactive'),
-              onChange: (value) => {
-                if (isCreating) {
-                  setNewEmblem({ ...newEmblem, isActive: value === 'active' })
-                } else if (selectedEmblem) {
-                  setSelectedEmblem({ ...selectedEmblem, isActive: value === 'active' })
-                }
-              },
-              options: [
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' }
-              ]
-            }
-          ]}
+          fields={formFields}
           onCancel={() => {
             if (isCreating) {
               setIsCreating(false)
-              setNewEmblem({
-                name: '',
-                icon: '',
-                isActive: true,
-                description: ''
-              })
             } else {
-              setSelectedEmblem(null)
+              setSelectedBadge(null)
             }
           }}
           onSubmit={() => {
             if (isCreating) {
-              handleCreateEmblem()
-            } else if (selectedEmblem) {
-              handleUpdateEmblem(selectedEmblem)
+              handleCreateBadge()
+            } else if (selectedBadge) {
+              handleUpdateBadge(selectedBadge)
             }
           }}
-          submitLabel={isCreating ? 'Create' : 'Save'}
+          submitLabel={isCreating ? 'Create Badge' : 'Update Badge'}
         />
       </AdminModal>
     </div>

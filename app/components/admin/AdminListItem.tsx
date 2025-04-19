@@ -4,26 +4,30 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
-import { ChevronDown, ChevronUp, Trash2, Ticket, Calendar, Clock, DollarSign } from 'lucide-react'
+import { ChevronDown, ChevronUp, Trash2, Edit, Award } from 'lucide-react'
 import { PlaceholderImage } from '@/app/components/PlaceholderImage'
 
 interface AdminListItemProps {
   id: string
   title: string
   description: string
-  category: 'Bundles' | 'Game Items' | 'Pets' | 'Membership'
-  startDate: string
-  endDate: string
-  participants: number
-  maxParticipants: number
-  status: 'programmed' | 'started' | 'ended'
-  imageUrl: string
+  category: string
+  type: 'raffle' | 'badge'
+  startDate?: string
+  endDate?: string
+  participants?: number
+  maxParticipants?: number
+  status?: 'programmed' | 'started' | 'ended' | 'active' | 'inactive'
+  imageUrl?: string
+  icon?: string
   winner?: {
     id: string
     name: string
     avatar?: string
   }
   onDelete: () => void
+  onEdit: () => void
+  onTitleClick?: () => void
 }
 
 export default function AdminListItem({
@@ -31,14 +35,18 @@ export default function AdminListItem({
   title,
   description,
   category,
+  type,
   startDate,
   endDate,
   participants,
   maxParticipants,
   status,
   imageUrl,
+  icon,
   winner,
   onDelete,
+  onEdit,
+  onTitleClick,
 }: AdminListItemProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [imageError, setImageError] = useState(false)
@@ -48,12 +56,37 @@ export default function AdminListItem({
     setIsExpanded(!isExpanded)
   }
 
+  const handleTitleClick = () => {
+    if (onTitleClick) {
+      onTitleClick()
+    } else {
+      router.push(`/${type}-details/${id}`)
+    }
+  }
+
   const calculateProgress = () => {
+    if (!participants || !maxParticipants) return 0
     return (participants / maxParticipants) * 100
   }
 
-  const formatDate = (date: string) => {
+  const formatDate = (date?: string) => {
+    if (!date) return 'N/A'
     return format(new Date(date), 'MMM d, yyyy h:mm a')
+  }
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'started':
+      case 'active':
+        return 'bg-green-500'
+      case 'ended':
+      case 'inactive':
+        return 'bg-red-500'
+      case 'programmed':
+        return 'bg-yellow-500'
+      default:
+        return 'bg-gray-500'
+    }
   }
 
   return (
@@ -75,17 +108,29 @@ export default function AdminListItem({
                     className="w-full h-full object-cover"
                     onError={() => setImageError(true)}
                   />
+                ) : icon ? (
+                  <div 
+                    className="w-full h-full flex items-center justify-center bg-[rgb(var(--background-tertiary))]"
+                    dangerouslySetInnerHTML={{ __html: icon }}
+                  />
                 ) : (
                   <PlaceholderImage category={category} className="w-full h-full" />
                 )}
               </div>
               <div>
-                <h3 
-                  className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
-                  onClick={() => router.push(`/raffle-details/${id}`)}
-                >
-                  {title}
-                </h3>
+                <div className="flex items-center space-x-2">
+                  <h3 
+                    className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
+                    onClick={handleTitleClick}
+                  >
+                    {title}
+                  </h3>
+                  {status && (
+                    <span className={`px-2 py-1 text-xs font-medium text-white rounded-full ${getStatusColor()}`}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">{description}</p>
               </div>
             </div>
@@ -100,6 +145,12 @@ export default function AdminListItem({
               ) : (
                 <ChevronDown className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
               )}
+            </button>
+            <button
+              onClick={onEdit}
+              className="p-2 rounded-full hover:bg-[rgb(var(--accent))]/10 transition-colors"
+            >
+              <Edit className="w-5 h-5 text-[rgb(var(--accent))]" />
             </button>
             <button
               onClick={onDelete}
@@ -119,26 +170,30 @@ export default function AdminListItem({
             className="mt-6 space-y-4"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
-                <div>
-                  <p className="text-sm text-[rgb(var(--text-secondary))]">Start Date</p>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {formatDate(startDate)}
-                  </p>
+              {startDate && (
+                <div className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
+                  <div>
+                    <p className="text-sm text-[rgb(var(--text-secondary))]">Start Date</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {formatDate(startDate)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
-                <div>
-                  <p className="text-sm text-[rgb(var(--text-secondary))]">End Date</p>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {formatDate(endDate)}
-                  </p>
+              )}
+              {endDate && (
+                <div className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
+                  <div>
+                    <p className="text-sm text-[rgb(var(--text-secondary))]">End Date</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {formatDate(endDate)}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex items-center space-x-2">
-                <DollarSign className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
+                <Award className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
                 <div>
                   <p className="text-sm text-[rgb(var(--text-secondary))]">Category</p>
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -146,32 +201,17 @@ export default function AdminListItem({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Ticket className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
-                <div>
-                  <p className="text-sm text-[rgb(var(--text-secondary))]">Participants</p>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {participants} / {maxParticipants}
-                  </p>
+              {participants !== undefined && (
+                <div className="flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-[rgb(var(--text-secondary))]" />
+                  <div>
+                    <p className="text-sm text-[rgb(var(--text-secondary))]">Participants</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {participants}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-[rgb(var(--text-secondary))]">Progress</span>
-                <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                  {calculateProgress().toFixed(1)}%
-                </span>
-              </div>
-              <div className="h-2 bg-[rgb(var(--background-tertiary))] rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${calculateProgress()}%` }}
-                  transition={{ duration: 0.5 }}
-                  className="h-full bg-[rgb(var(--accent))]"
-                />
-              </div>
+              )}
             </div>
 
             {winner && (
