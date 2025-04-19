@@ -15,7 +15,7 @@ const samplePurchases = [
     },
     buyer: 'LoreKeeper_42',
     price: 0.5,
-    status: 'pending',
+    status: 'pending' as const,
     purchaseDate: '2024-03-20T10:30:00Z'
   },
   {
@@ -28,7 +28,7 @@ const samplePurchases = [
     },
     buyer: 'MysticScribe',
     price: 0.75,
-    status: 'delivered',
+    status: 'delivered' as const,
     purchaseDate: '2024-03-19T15:45:00Z'
   },
   {
@@ -41,7 +41,7 @@ const samplePurchases = [
     },
     buyer: 'EarthWalker',
     price: 0.6,
-    status: 'cancelled',
+    status: 'cancelled' as const,
     purchaseDate: '2024-03-18T09:15:00Z'
   }
 ]
