@@ -62,7 +62,7 @@ export function Emblems({ emblems }: EmblemsProps) {
               </div>
               
               {/* Enhanced Tooltip */}
-              <div className="invisible group-hover:visible absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none">
+              <div className="hidden sm:group-hover:block absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 sm:group-hover:opacity-100 transition-all duration-200 pointer-events-none">
                 <div className="bg-[rgb(var(--bg-darker))] p-2.5 rounded-lg shadow-lg border border-[rgb(var(--border-dark))] w-[250px]">
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between gap-3">
@@ -79,6 +79,12 @@ export function Emblems({ emblems }: EmblemsProps) {
                       <p className="text-xs text-[rgb(var(--text-secondary))] break-words leading-relaxed">
                         {emblem.description}
                       </p>
+                    )}
+                    {/* Icon based on ID */}
+                    {emblem.id === '9' && (
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[rgb(var(--text-secondary))]">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                      </svg>
                     )}
                   </div>
                 </div>

@@ -113,7 +113,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
-      <ProfileHeader walletAddress={address} />
+      <ProfileHeader walletAddress={address} username="LatinGeek"/>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
