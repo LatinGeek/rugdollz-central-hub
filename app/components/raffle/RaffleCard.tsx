@@ -2,6 +2,7 @@
 
 import { useRaffleTimer } from './useRaffleTimer'
 import { PlaceholderImage } from '../PlaceholderImage'
+import { useRouter } from 'next/navigation'
 
 interface Raffle {
   id: string
@@ -26,6 +27,7 @@ interface RaffleCardProps {
 }
 
 export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
+  const router = useRouter()
   const timer = useRaffleTimer(raffle.startDate, raffle.endDate)
 
   const formatTime = (value: number) => {
@@ -93,7 +95,12 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
         <div className="flex-1 p-4">
           <div className="flex sm:flex-row justify-between items-start gap-4 sm:gap-0 mb-2">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{raffle.title}</h3>
+              <h3 
+                className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
+                onClick={() => router.push(`/raffle-details/${raffle.id}`)}
+              >
+                {raffle.title}
+              </h3>
               <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
                 {raffle.description}
               </p>

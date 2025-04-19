@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
 import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
-import { AdminListItem } from '@/app/components/admin/AdminListItem'
+import AdminListItem from '@/app/components/admin/AdminListItem'
 
 interface Raffle {
   id: string
@@ -16,6 +16,7 @@ interface Raffle {
   participants: number
   maxParticipants: number
   status: 'programmed' | 'started' | 'ended'
+  imageUrl: string
   winner?: {
     id: string
     name: string
@@ -34,7 +35,8 @@ const sampleRaffles: Raffle[] = [
     endDate: '2025-04-25T10:00:00Z',
     participants: 245,
     maxParticipants: 500,
-    status: 'programmed'
+    status: 'programmed',
+    imageUrl: 'https://i.imgur.com/example1.jpg'
   },
   {
     id: '2',
@@ -45,7 +47,8 @@ const sampleRaffles: Raffle[] = [
     endDate: '2025-04-22T00:00:00Z',
     participants: 189,
     maxParticipants: 300,
-    status: 'started'
+    status: 'started',
+    imageUrl: 'https://i.imgur.com/example2.jpg'
   },
   {
     id: '3',
@@ -57,6 +60,7 @@ const sampleRaffles: Raffle[] = [
     participants: 150,
     maxParticipants: 200,
     status: 'ended',
+    imageUrl: 'https://i.imgur.com/example3.jpg',
     winner: {
       id: 'user123',
       name: 'CryptoMaster',
@@ -72,7 +76,8 @@ const sampleRaffles: Raffle[] = [
     endDate: '2025-05-29T12:00:00Z',
     participants: 320,
     maxParticipants: 500,
-    status: 'programmed'
+    status: 'programmed',
+    imageUrl: 'https://i.imgur.com/example4.jpg'
   }
 ]
 
@@ -88,7 +93,8 @@ export default function RaffleManagementPage() {
     endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
     participants: 0,
     maxParticipants: 100,
-    status: 'programmed'
+    status: 'programmed',
+    imageUrl: ''
   })
 
   const handleCreateRaffle = () => {
@@ -109,7 +115,8 @@ export default function RaffleManagementPage() {
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       participants: 0,
       maxParticipants: 100,
-      status: 'programmed'
+      status: 'programmed',
+      imageUrl: ''
     })
   }
 
@@ -221,6 +228,21 @@ export default function RaffleManagementPage() {
           }
         }
       }
+    },
+    {
+      label: 'Image URL',
+      name: 'imageUrl',
+      type: 'text' as const,
+      value: selectedRaffle?.imageUrl || newRaffle.imageUrl,
+      onChange: (value: string | Date | null) => {
+        if (typeof value === 'string') {
+          if (selectedRaffle) {
+            setSelectedRaffle({ ...selectedRaffle, imageUrl: value })
+          } else {
+            setNewRaffle({ ...newRaffle, imageUrl: value })
+          }
+        }
+      }
     }
   ]
 
@@ -254,13 +276,17 @@ export default function RaffleManagementPage() {
               {raffles.map((raffle) => (
                 <AdminListItem
                   key={raffle.id}
+                  id={raffle.id}
                   title={raffle.title}
                   description={`${raffle.participants}/${raffle.maxParticipants} participants • ${raffle.category} • `}
-                  status={{
-                    label: `${raffle.status.charAt(0).toUpperCase() + raffle.status.slice(1)}`,
-                    isActive: raffle.status === 'started'
-                  }}
-                  onEdit={() => setSelectedRaffle(raffle)}
+                  category={raffle.category}
+                  startDate={raffle.startDate}
+                  endDate={raffle.endDate}
+                  participants={raffle.participants}
+                  maxParticipants={raffle.maxParticipants}
+                  status={raffle.status}
+                  imageUrl={raffle.imageUrl}
+                  winner={raffle.winner}
                   onDelete={() => handleDeleteRaffle(raffle.id)}
                 />
               ))}
@@ -283,7 +309,8 @@ export default function RaffleManagementPage() {
               endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
               participants: 0,
               maxParticipants: 100,
-              status: 'programmed'
+              status: 'programmed',
+              imageUrl: ''
             })
           } else {
             setSelectedRaffle(null)
