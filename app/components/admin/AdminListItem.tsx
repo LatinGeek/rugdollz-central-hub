@@ -39,7 +39,6 @@ export default function AdminListItem({
   startDate,
   endDate,
   participants,
-  maxParticipants,
   status,
   imageUrl,
   icon,
@@ -62,11 +61,6 @@ export default function AdminListItem({
     } else {
       router.push(`/${type}-details/${id}`)
     }
-  }
-
-  const calculateProgress = () => {
-    if (!participants || !maxParticipants) return 0
-    return (participants / maxParticipants) * 100
   }
 
   const formatDate = (date?: string) => {

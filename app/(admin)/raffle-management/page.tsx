@@ -95,7 +95,6 @@ const sampleRaffles: Raffle[] = [
 export default function RaffleManagementPage() {
   const router = useRouter()
   const [raffles, setRaffles] = useState<Raffle[]>(sampleRaffles)
-  const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [newRaffle, setNewRaffle] = useState<Omit<Raffle, 'id'>>({
     title: '',
@@ -148,26 +147,15 @@ export default function RaffleManagementPage() {
     setRaffles(raffles.filter(raffle => raffle.id !== id))
   }
 
-  const handleUpdateRaffle = (updatedRaffle: Raffle) => {
-    setRaffles(raffles.map(raffle => 
-      raffle.id === updatedRaffle.id ? updatedRaffle : raffle
-    ))
-    setSelectedRaffle(null)
-  }
-
   const formFields = [
     {
       label: 'Title',
       name: 'title',
       type: 'text' as const,
-      value: selectedRaffle?.title || newRaffle.title,
+      value: newRaffle.title,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, title: value })
-          } else {
-            setNewRaffle({ ...newRaffle, title: value })
-          }
+          setNewRaffle({ ...newRaffle, title: value })
         }
       }
     },
@@ -175,14 +163,10 @@ export default function RaffleManagementPage() {
       label: 'Description',
       name: 'description',
       type: 'textarea' as const,
-      value: selectedRaffle?.description || newRaffle.description,
+      value: newRaffle.description,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, description: value })
-          } else {
-            setNewRaffle({ ...newRaffle, description: value })
-          }
+          setNewRaffle({ ...newRaffle, description: value })
         }
       }
     },
@@ -190,14 +174,10 @@ export default function RaffleManagementPage() {
       label: 'Category',
       name: 'category',
       type: 'select' as const,
-      value: selectedRaffle?.category || newRaffle.category,
+      value: newRaffle.category,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, category: value as Raffle['category'] })
-          } else {
-            setNewRaffle({ ...newRaffle, category: value as Raffle['category'] })
-          }
+          setNewRaffle({ ...newRaffle, category: value as Raffle['category'] })
         }
       },
       options: [
@@ -211,14 +191,10 @@ export default function RaffleManagementPage() {
       label: 'Start Date',
       name: 'startDate',
       type: 'datetime' as const,
-      value: new Date(selectedRaffle?.startDate || newRaffle.startDate),
+      value: new Date(newRaffle.startDate),
       onChange: (value: string | Date | null) => {
         if (value instanceof Date) {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, startDate: value.toISOString() })
-          } else {
-            setNewRaffle({ ...newRaffle, startDate: value.toISOString() })
-          }
+          setNewRaffle({ ...newRaffle, startDate: value.toISOString() })
         }
       }
     },
@@ -226,14 +202,10 @@ export default function RaffleManagementPage() {
       label: 'End Date',
       name: 'endDate',
       type: 'datetime' as const,
-      value: new Date(selectedRaffle?.endDate || newRaffle.endDate),
+      value: new Date(newRaffle.endDate),
       onChange: (value: string | Date | null) => {
         if (value instanceof Date) {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, endDate: value.toISOString() })
-          } else {
-            setNewRaffle({ ...newRaffle, endDate: value.toISOString() })
-          }
+          setNewRaffle({ ...newRaffle, endDate: value.toISOString() })
         }
       }
     },
@@ -241,15 +213,11 @@ export default function RaffleManagementPage() {
       label: 'Max Participants',
       name: 'maxParticipants',
       type: 'text' as const,
-      value: String(selectedRaffle?.maxParticipants || newRaffle.maxParticipants),
+      value: String(newRaffle.maxParticipants),
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
           const numValue = parseInt(value) || 0
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, maxParticipants: numValue })
-          } else {
-            setNewRaffle({ ...newRaffle, maxParticipants: numValue })
-          }
+          setNewRaffle({ ...newRaffle, maxParticipants: numValue })
         }
       }
     },
@@ -257,14 +225,10 @@ export default function RaffleManagementPage() {
       label: 'Image URL',
       name: 'imageUrl',
       type: 'text' as const,
-      value: selectedRaffle?.imageUrl || newRaffle.imageUrl,
+      value: newRaffle.imageUrl,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, imageUrl: value })
-          } else {
-            setNewRaffle({ ...newRaffle, imageUrl: value })
-          }
+          setNewRaffle({ ...newRaffle, imageUrl: value })
         }
       }
     },
@@ -272,14 +236,10 @@ export default function RaffleManagementPage() {
       label: 'Requirements',
       name: 'requirements',
       type: 'textarea' as const,
-      value: selectedRaffle?.requirements || newRaffle.requirements,
+      value: newRaffle.requirements,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, requirements: value })
-          } else {
-            setNewRaffle({ ...newRaffle, requirements: value })
-          }
+          setNewRaffle({ ...newRaffle, requirements: value })
         }
       }
     },
@@ -287,14 +247,10 @@ export default function RaffleManagementPage() {
       label: 'Rewards',
       name: 'rewards',
       type: 'textarea' as const,
-      value: selectedRaffle?.rewards || newRaffle.rewards,
+      value: newRaffle.rewards,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          if (selectedRaffle) {
-            setSelectedRaffle({ ...selectedRaffle, rewards: value })
-          } else {
-            setNewRaffle({ ...newRaffle, rewards: value })
-          }
+          setNewRaffle({ ...newRaffle, rewards: value })
         }
       }
     }
@@ -351,49 +307,33 @@ export default function RaffleManagementPage() {
         </div>
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Create Modal */}
       <AdminModal
-        isOpen={isCreating || !!selectedRaffle}
+        isOpen={isCreating}
         onClose={() => {
-          if (isCreating) {
-            setIsCreating(false)
-            setNewRaffle({
-              title: '',
-              description: '',
-              category: 'Bundles',
-              imageUrl: '',
-              startDate: '',
-              endDate: '',
-              maxParticipants: 100,
-              status: 'programmed',
-              requirements: '',
-              rewards: '',
-              participants: 0
-            })
-          } else {
-            setSelectedRaffle(null)
-          }
+          setIsCreating(false)
+          setNewRaffle({
+            title: '',
+            description: '',
+            category: 'Bundles',
+            imageUrl: '',
+            startDate: '',
+            endDate: '',
+            maxParticipants: 100,
+            status: 'programmed',
+            requirements: '',
+            rewards: '',
+            participants: 0
+          })
         }}
-        title={isCreating ? 'Create New Raffle' : 'Edit Raffle'}
+        title="Create New Raffle"
       >
         <AdminForm
-          title={isCreating ? 'Create New Raffle' : 'Edit Raffle'}
+          title="Create New Raffle"
           fields={formFields}
-          onCancel={() => {
-            if (isCreating) {
-              setIsCreating(false)
-            } else {
-              setSelectedRaffle(null)
-            }
-          }}
-          onSubmit={() => {
-            if (isCreating) {
-              handleCreateRaffle()
-            } else if (selectedRaffle) {
-              handleUpdateRaffle(selectedRaffle)
-            }
-          }}
-          submitLabel={isCreating ? 'Create Raffle' : 'Update Raffle'}
+          onCancel={() => setIsCreating(false)}
+          onSubmit={handleCreateRaffle}
+          submitLabel="Create Raffle"
         />
       </AdminModal>
     </div>
