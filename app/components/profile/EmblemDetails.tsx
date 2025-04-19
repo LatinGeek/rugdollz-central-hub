@@ -168,7 +168,9 @@ export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: Em
         </div>
 
         {/* Main content */}
-        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto" onClick={() => {
+                onClose()
+            }}>
           <div className="max-w-2xl mx-auto">
             {/* Selected emblem header */}
             <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-8">
