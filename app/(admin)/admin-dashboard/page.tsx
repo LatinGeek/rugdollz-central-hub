@@ -108,7 +108,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatsCard
             title="Users"
             category="user"
@@ -116,7 +116,6 @@ export default function AdminDashboard() {
               { label: 'Total Users', value: stats.users.total },
               { label: 'Active Today', value: stats.users.active },
               { label: 'New Today', value: stats.users.newToday },
-              { label: 'Growth', value: `${stats.users.growth}%` }
             ]}
           />
           <StatsCard
@@ -126,7 +125,6 @@ export default function AdminDashboard() {
               { label: 'Total NFTs', value: stats.nfts.total },
               { label: 'Listed', value: stats.nfts.listed },
               { label: 'Sold Today', value: stats.nfts.soldToday },
-              { label: 'Volume', value: `$${stats.nfts.volume.toLocaleString()}` }
             ]}
           />
           <StatsCard
@@ -136,7 +134,6 @@ export default function AdminDashboard() {
               { label: 'Active', value: stats.raffles.active },
               { label: 'Completed', value: stats.raffles.completed },
               { label: 'Participants', value: stats.raffles.participants },
-              { label: 'Revenue', value: `$${stats.raffles.revenue.toLocaleString()}` }
             ]}
           />
           <StatsCard
@@ -146,7 +143,6 @@ export default function AdminDashboard() {
               { label: 'Total Entries', value: stats.lore.totalEntries },
               { label: 'New Today', value: stats.lore.newToday },
               { label: 'Upvotes', value: stats.lore.upvotes },
-              { label: 'Active Writers', value: stats.lore.activeWriters }
             ]}
           />
         </div>
