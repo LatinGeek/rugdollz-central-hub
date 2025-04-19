@@ -55,9 +55,9 @@ const quickActions = [
     href: '/badge-management'
   },
   {
-    title: 'NFT Moderation',
-    description: 'Review and moderate NFTs',
-    href: '/nft-moderation'
+    title: 'Purchase Management',
+    description: 'Review purchases',
+    href: '/purchase-management'
   },
   {
     title: 'Raffle Management',
