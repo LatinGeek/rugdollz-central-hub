@@ -112,7 +112,10 @@ export default function NFTLorePage() {
         />
 
         {selectedNFT && (
-          <div ref={writeLoreRef}>
+          <div 
+            ref={writeLoreRef}
+            className="scroll-mt-16 w-full mx-auto   py-8"
+          >
             <WriteLore
               nft={selectedNFT}
               onClose={() => setSelectedNFT(null)}
