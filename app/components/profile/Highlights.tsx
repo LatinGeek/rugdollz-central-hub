@@ -33,13 +33,13 @@ export function Highlights({
             <img
               src={nft.imageUrl}
               alt={nft.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-500 sm:group-hover:scale-110 scale-110 sm:scale-100"
             />
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/0 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300" />
             
             {/* Content */}
-            <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute inset-x-0 bottom-0 p-4 translate-y-0 sm:translate-y-full sm:group-hover:translate-y-0 transition-transform duration-300">
               <div className="text-white">
                 <p className="text-sm font-medium truncate">{nft.name}</p>
                 <p className="text-xs text-white/70">{nft.collection}</p>
