@@ -84,9 +84,9 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
     <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-4 sm:p-4 space-y-4">
       {/* Author and timestamp */}
       <div className="flex items-center justify-between text-sm">
-        <span className="text-[rgb(var(--text-primary))]">{entry.author}</span>
+        <span className="text-sm text-[rgb(var(--text-primary))]">{entry.author}</span>
         <span 
-          className="text-[0.8em] sm:text-sm text-[rgb(var(--text-secondary))]" 
+          className="text-xs sm:text-sm text-[rgb(var(--text-secondary))]" 
           title={new Date(entry.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: '2-digit',
@@ -111,21 +111,21 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
           />
         </div>
         <div className="flex-1">
-          <h3 className="text-base sm:text-lg font-medium text-[rgb(var(--text-primary))]">
+          <h3 className="text-sm sm:text-base font-medium text-[rgb(var(--text-primary))]">
             {entry.nft.name}
           </h3>
-          <p className="text-sm text-[rgb(var(--text-secondary))] mb-2">
+          <p className="text-xs sm:text-sm text-[rgb(var(--text-secondary))] mb-2">
             {entry.nft.collection}
           </p>
           <div className="relative">
             <div className={`relative ${
               isExpanded 
-                ? 'transition-[max-height] duration-300 ease-in-out max-h-[1000px]' 
-                : 'transition-[max-height] duration-100 ease-in max-h-[4.5em] overflow-hidden'
+                ? 'max-h-[1000px]' 
+                : 'max-h-[4.5em] overflow-hidden'
             }`}>
               <p 
                 ref={contentRef}
-                className="text-xs sm:text-sm text-[rgb(var(--text-primary))] leading-[1.5]"
+                className="text-xs sm:text-base text-[rgb(var(--text-primary))] leading-[1.5]"
               >
                 {entry.content}
               </p>
@@ -136,7 +136,7 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
             {needsTruncation && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-sm text-[rgb(var(--text-secondary))] sm:hover:text-[rgb(var(--text-primary))] mt-1 transition-colors duration-200"
+                className="text-xs sm:text-sm text-[rgb(var(--text-secondary))] sm:hover:text-[rgb(var(--text-primary))] mt-1 transition-colors duration-200"
               >
                 {isExpanded ? 'Show less' : 'Read more'}
               </button>

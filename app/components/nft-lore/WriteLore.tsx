@@ -59,7 +59,7 @@ export function WriteLore({ nft, onClose, onSubmit }: WriteLoreProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Share the story behind this NFT..."
-            className="w-full h-32 p-3 rounded-lg bg-[rgb(var(--bg-secondary))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]"
+            className="w-full h-32 p-3 rounded-lg bg-[rgb(var(--bg-secondary))] text-xs sm:text-base text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]"
             required
           />
         </div>
