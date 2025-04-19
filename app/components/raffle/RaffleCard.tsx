@@ -84,14 +84,14 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
   }
 
   return (
-    <div className="bg-[rgb(var(--bg-primary))] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-[rgb(var(--bg-dark))] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row">
         <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
           <PlaceholderImage category={raffle.category} className="w-full h-full object-cover" />
         </div>
 
         <div className="flex-1 p-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0 mb-2">
+          <div className="flex sm:flex-row justify-between items-start gap-4 sm:gap-0 mb-2">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{raffle.title}</h3>
               <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
@@ -112,7 +112,7 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
               disabled={isJoined || timer.isEnded}
               className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                 isJoined
-                  ? 'bg-gray-500 text-white cursor-not-allowed'
+                  ? 'bg-[rgb(var(--primary-orange))] text-white cursor-not-allowed'
                   : timer.isEnded
                   ? 'bg-gray-500 text-white cursor-not-allowed'
                   : 'bg-[rgb(var(--accent))] text-white hover:bg-[rgb(var(--accent-dark))]'
