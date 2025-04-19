@@ -17,7 +17,7 @@ interface UserCardProps {
 export function UserCard({ user }: UserCardProps) {
   return (
     <div className="flex items-center gap-3 py-1.5 px-3 bg-[rgb(var(--bg-dark))] rounded-lg">
-      <div className="w-10 h-10">
+      <div className="w-20 h-20">
         <PlaceholderImage 
           category="User" 
         />

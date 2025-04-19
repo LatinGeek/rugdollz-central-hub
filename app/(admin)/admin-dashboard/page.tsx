@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { StatsCard } from '../../components/admin/StatsCard'
 import { ActivityCard } from '../../components/admin/ActivityCard'
 import { UserCard } from '../../components/admin/UserCard'
@@ -70,6 +71,66 @@ const quickActions = [
   }
 ]
 
+interface CollapsibleSectionProps {
+  title: string
+  children: React.ReactNode
+  defaultExpanded?: boolean
+  defaultExpandedDesktop?: boolean
+}
+
+function useResponsiveDefault(defaultMobile: boolean, defaultDesktop: boolean) {
+  const [isExpanded, setIsExpanded] = useState(defaultMobile)
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setIsExpanded(defaultDesktop)
+      } else {
+        setIsExpanded(defaultMobile)
+      }
+    }
+
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [defaultMobile, defaultDesktop])
+
+  return isExpanded
+}
+
+function CollapsibleSection({ 
+  title, 
+  children, 
+  defaultExpanded = false,
+  defaultExpandedDesktop = false 
+}: CollapsibleSectionProps) {
+  const isExpanded = useResponsiveDefault(defaultExpanded, defaultExpandedDesktop)
+  const [localExpanded, setLocalExpanded] = useState(isExpanded)
+
+  useEffect(() => {
+    setLocalExpanded(isExpanded)
+  }, [isExpanded])
+
+  return (
+    <div>
+      <button
+        onClick={() => setLocalExpanded(!localExpanded)}
+        className="flex items-center gap-2 text-xl font-semibold text-[rgb(var(--text-primary))] mb-4 hover:text-[rgb(var(--text-secondary))] transition-colors"
+      >
+        {title}
+        <svg 
+          viewBox="0 0 24 24" 
+          className={`w-5 h-5 transition-transform duration-200 ${localExpanded ? 'rotate-180' : ''}`}
+          fill="currentColor"
+        >
+          <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+        </svg>
+      </button>
+      {localExpanded && children}
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
 
@@ -108,64 +169,68 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatsCard
-            title="Users"
-            category="user"
-            stats={[
-              { label: 'Total Users', value: stats.users.total },
-              { label: 'Active Today', value: stats.users.active },
-              { label: 'New Today', value: stats.users.newToday },
-            ]}
-          />
-          <StatsCard
-            title="NFTs"
-            category="nft"
-            stats={[
-              { label: 'Total NFTs', value: stats.nfts.total },
-              { label: 'Listed', value: stats.nfts.listed },
-              { label: 'Sold Today', value: stats.nfts.soldToday },
-            ]}
-          />
-          <StatsCard
-            title="Raffles"
-            category="raffle"
-            stats={[
-              { label: 'Active', value: stats.raffles.active },
-              { label: 'Completed', value: stats.raffles.completed },
-              { label: 'Participants', value: stats.raffles.participants },
-            ]}
-          />
-          <StatsCard
-            title="Lore"
-            category="lore"
-            stats={[
-              { label: 'Total Entries', value: stats.lore.totalEntries },
-              { label: 'New Today', value: stats.lore.newToday },
-              { label: 'Upvotes', value: stats.lore.upvotes },
-            ]}
-          />
-        </div>
+        <CollapsibleSection 
+          title="Hub Stats" 
+          defaultExpanded={false}
+          defaultExpandedDesktop={true}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatsCard
+              title="Users"
+              category="user"
+              stats={[
+                { label: 'Total Users', value: stats.users.total },
+                { label: 'Active Today', value: stats.users.active },
+                { label: 'New Today', value: stats.users.newToday },
+              ]}
+            />
+            <StatsCard
+              title="NFTs"
+              category="nft"
+              stats={[
+                { label: 'Total NFTs', value: stats.nfts.total },
+                { label: 'Listed', value: stats.nfts.listed },
+                { label: 'Sold Today', value: stats.nfts.soldToday },
+              ]}
+            />
+            <StatsCard
+              title="Raffles"
+              category="raffle"
+              stats={[
+                { label: 'Active', value: stats.raffles.active },
+                { label: 'Completed', value: stats.raffles.completed },
+                { label: 'Participants', value: stats.raffles.participants },
+              ]}
+            />
+            <StatsCard
+              title="Lore"
+              category="lore"
+              stats={[
+                { label: 'Total Entries', value: stats.lore.totalEntries },
+                { label: 'New Today', value: stats.lore.newToday },
+                { label: 'Upvotes', value: stats.lore.upvotes },
+              ]}
+            />
+          </div>
+        </CollapsibleSection>
 
         {/* Recent Activity */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Recent Activity</h2>
-          <div className="space-y-2">
+        <CollapsibleSection title="Recent Activity">
+          <div className="space-y-2 mb-8">
             {recentActivities.map((activity) => (
               <ActivityCard key={activity.id} activity={activity} />
             ))}
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Top Users */}
-        <div>
-          <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-4">Top Users</h2>
+        <CollapsibleSection title="Top Users">
           <div className="space-y-2">
             {topUsers.map((user) => (
               <UserCard key={user.id} user={user} />
             ))}
           </div>
-        </div>
+        </CollapsibleSection>
       </div>
     </div>
   )

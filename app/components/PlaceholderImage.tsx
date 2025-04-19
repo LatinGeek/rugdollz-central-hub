@@ -14,7 +14,7 @@ const categoryColors: Record<string, string> = {
   'Consumables': '#6A0572',
   'Membership': '#1A535C',
   'Bundles': '#FF9F1C',
-  'User': '#6366F1'
+  'User': 'rgb(var(--text-secondary))'
 }
 
 const categoryIcons: Record<string, string> = {
@@ -24,15 +24,15 @@ const categoryIcons: Record<string, string> = {
   'Consumables': '⚡',
   'Membership': '👑',
   'Bundles': '🎁',
-  'User': '👤'
+  'User': ''
 }
 
 export function PlaceholderImage({ 
   category, 
   className = '',
 }: PlaceholderImageProps) {
-  const color = categoryColors[category] || '#6B7280'
-  const icon = categoryIcons[category] || '📦'
+  const color = categoryColors[category] || 'rgb(var(--text-secondary))'
+  const icon = categoryIcons[category] == '' ? '' :categoryIcons[category] || '📦'
   
   return (
     <div 
