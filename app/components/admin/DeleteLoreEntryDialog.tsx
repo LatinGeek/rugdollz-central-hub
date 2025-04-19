@@ -23,7 +23,7 @@ export function DeleteLoreEntryDialog({
     >
       <div className="space-y-4">
         <p>
-          Are you sure you want to delete the lore entry for "{entryTitle}"?
+          Are you sure you want to delete the lore entry for &quot;{entryTitle}&quot;?
           This action cannot be undone.
         </p>
 
