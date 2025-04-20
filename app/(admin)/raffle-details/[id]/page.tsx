@@ -41,10 +41,10 @@ const sampleRaffle = {
   ]
 }
 
-export default function RaffleDetailsPage() {
+export default function RaffleDetailsPage({ params }: { params: { id: string } }) {
   const [raffle, setRaffle] = useState(sampleRaffle)
   const [newNote, setNewNote] = useState('')
-
+  console.log(params)
   const handleStatusChange = (newStatus: 'pending' | 'delivered' | 'cancelled') => {
     setRaffle(current => ({ ...current, status: newStatus }))
   }

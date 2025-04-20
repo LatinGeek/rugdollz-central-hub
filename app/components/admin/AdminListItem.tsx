@@ -90,11 +90,11 @@ export default function AdminListItem({
       exit={{ opacity: 0, y: -20 }}
       className="bg-[rgb(var(--background-secondary))] rounded-lg shadow-lg overflow-hidden"
     >
-      <div className="p-6">
+      <div className="p-2 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden flex-shrink-0">
                 {imageUrl && !imageError ? (
                   <img
                     src={imageUrl}
@@ -111,28 +111,29 @@ export default function AdminListItem({
                   <PlaceholderImage category={category} className="w-full h-full" />
                 )}
               </div>
-              <div>
+              <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <h3 
-                    className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
+                    className="text-sm sm:text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
                     onClick={handleTitleClick}
                   >
                     {title}
                   </h3>
+                  <div className="grow md:hidden" />
                   {status && (
-                    <span className={`px-2 py-1 text-xs font-medium text-white rounded-full ${getStatusColor()}`}>
+                    <span className={`text-[0.6em] sm:text-xs px-2 py-1 text-white rounded-full ${getStatusColor()}`}>
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">{description}</p>
+                <p className="text-xs sm:text-sm text-[rgb(var(--text-secondary))] mt-1">{description}</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className=" flex flex-col-reverse sm:flex-row-reverse items-center pl-3">
             <button
               onClick={toggleExpand}
-              className="p-2 rounded-full hover:bg-[rgb(var(--background-tertiary))] transition-colors"
+              className="p-2 sm:p-4 rounded-full hover:bg-[rgb(var(--background-tertiary))] transition-colors"
             >
               {isExpanded ? (
                 <ChevronUp className="w-5 h-5 text-[rgb(var(--text-secondary))]" />

@@ -224,7 +224,7 @@ export default function BadgeManagementPage() {
         </div>
 
         <div className="bg-[rgb(var(--bg-dark))] rounded-xl border border-[rgb(var(--border-dark))]">
-          <div className="p-6">
+          <div className="p-2">
             <div className="space-y-4">
               {badges.map((badge) => (
                 <AdminListItem
