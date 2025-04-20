@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { SendHorizonal } from 'lucide-react'
 
 interface NFT {
   id: string
@@ -52,18 +53,7 @@ export function RaffleDetails({
   onNoteChange,
   onAddNote
 }: RaffleDetailsProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-500/20 text-yellow-500'
-      case 'delivered':
-        return 'bg-green-500/20 text-green-500'
-      case 'cancelled':
-        return 'bg-red-500/20 text-red-500'
-      default:
-        return 'bg-gray-500/20 text-gray-500'
-    }
-  }
+
 
   return (
     <div className="space-y-8">
@@ -91,9 +81,6 @@ export function RaffleDetails({
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(raffle.status)}`}>
-                {raffle.status.charAt(0).toUpperCase() + raffle.status.slice(1)}
-              </div>
               <select
                 value={raffle.status}
                 onChange={(e) => onStatusChange(e.target.value as 'pending' | 'delivered' | 'cancelled')}
@@ -139,13 +126,13 @@ export function RaffleDetails({
             value={newNote}
             onChange={(e) => onNoteChange(e.target.value)}
             placeholder="Add a note..."
-            className="flex-1 bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-3 py-2"
+            className="w-full sm:w-1/2 flex-1 sm:flex-none text-sm bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-3 py-2"
           />
           <button
             onClick={onAddNote}
-            className="px-4 py-2 bg-[rgb(var(--accent))] text-white rounded-lg hover:bg-[rgb(var(--accent-dark))]"
+            className="px-0 py-2 text-4xl bg-[rgb(var(--accent))] text-white rounded-lg hover:bg-[rgb(var(--accent-dark))]"
           >
-            Add Note
+            <SendHorizonal></SendHorizonal>
           </button>
         </div>
 
