@@ -29,7 +29,17 @@ const sampleCategories: Array<{
         id: 'bg3',
         name: 'City',
         imageUrl: '/images/sample-nft-layers/xmas_overlay_1.png'
-      }
+      },
+      {
+        id: 'bg4',
+        name: 'Valentine',
+        imageUrl: '/images/sample-nft-layers/Valentines_Overlay_sample.png'
+      },
+      {
+        id: 'bg5',
+        name: 'Halloween',
+        imageUrl: '/images/sample-nft-layers/Halloween_Overlay_sample_1.png'
+      },
     ]
   },
   {
@@ -94,24 +104,47 @@ const sampleCategories: Array<{
         imageUrl: '/images/nft/layers/accessories/necklace.png'
       }
     ]
+  },
+  {
+    id: 'other',
+    name: 'Other',
+    options: [
+      {
+        id: 'acc1',
+        name: 'Pipe',
+        imageUrl: '/images/nft/layers/accessories/glasses.png'
+      },
+      {
+        id: 'acc2',
+        name: 'Cigar',
+        imageUrl: '/images/nft/layers/accessories/hat.png'
+      },
+      {
+        id: 'acc3',
+        name: 'Necklace',
+        imageUrl: '/images/nft/layers/accessories/necklace.png'
+      }
+    ]
   }
 ]
 
 export default function NFTCustomizationPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-0 py-8">
       <div className="max-w-4xl mx-auto">
+        <div className="px-4">
         <h1 className="text-3xl font-bold text-[rgb(var(--text-primary))] mb-2">
           NFT Customization
         </h1>
         <p className="text-[rgb(var(--text-secondary))] mb-8">
           Create your unique NFT by selecting different layers and customizing its appearance.
         </p>
-
+        </div>
         <NFTCustomizer
           baseImage="/images/sample-base-nfts/NFT_sample_1.png"
           categories={sampleCategories}
         />
+       
       </div>
     </div>
   )
