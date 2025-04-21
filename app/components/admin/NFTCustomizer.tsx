@@ -133,10 +133,17 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
       <div className="px-4 relative w-full sm:w-1/2 m-auto aspect-square bg-[rgb(var(--bg-dark))] rounded-lg overflow-hidden">
         <canvas
           ref={canvasRef}
-          className="p-4 absolute inset-0 w-full h-full "
+          className="p-4 absolute inset-0 w-full h-full"
           width={1000}
           height={1000}
         />
+        {/* Download Button */}
+        <button
+          onClick={handleDownload}
+          className="absolute bottom-5 right-5 flex items-center space-x-2 px-2 py-2 sm:px-4 sm:py-4 bg-[rgba(var(--bg-dark))]/60 text-white rounded-lg hover:bg-[rgba(var(--primary-orange))]/60 transition-colors shadow-lg font-bold "
+        >
+          <Download className="w-6 h-6" />
+        </button>
       </div>
 
       {/* Category Selector */}
@@ -238,17 +245,6 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
             })}
           <div className='snap-start w-4 min-w-4 flex-shrink-0'></div>
         </div>
-      </div>
-
-      {/* Download Button */}
-      <div className="flex justify-center px-4">
-        <button
-          onClick={handleDownload}
-          className="flex items-center space-x-2 px-6 py-3 bg-[rgb(var(--accent))] text-white rounded-lg hover:bg-[rgb(var(--accent))]/90 transition-colors"
-        >
-          <Download className="w-5 h-5" />
-          <span>Download NFT</span>
-        </button>
       </div>
     </div>
   )
