@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { PlaceholderImage } from '@/app/components/PlaceholderImage'
 
 export default function AboutPage() {

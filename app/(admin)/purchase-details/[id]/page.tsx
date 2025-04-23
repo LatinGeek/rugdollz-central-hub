@@ -38,15 +38,15 @@ const samplePurchase = {
 }
 
 interface PurchaseDetailsPageProps {
-  params: {
-    id: string
-  }
+  params: Promise<{
+    address: string
+  }>
 }
 
 export default function PurchaseDetailsPage({ params }: PurchaseDetailsPageProps) {
   // In a real application, you would fetch the purchase data using the ID
   // const purchase = await fetchPurchase(params.id)
-  console.log(params.id)
+  console.log(params)
   // For now, we'll use the sample data
   const purchase = samplePurchase
 
