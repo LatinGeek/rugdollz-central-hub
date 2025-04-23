@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { StoreItem } from '../components/StoreItem'
+import { PurchaseConfirmDialog } from '../components/ui/PurchaseConfirmDialog'
 
 // Sample store items data
 const storeItems = [
@@ -55,6 +57,19 @@ const storeItems = [
 ]
 
 export default function StorePage() {
+  const [selectedItem, setSelectedItem] = useState<typeof storeItems[0] | null>(null)
+  const [currentBalance] = useState(5000) // This would come from your wallet/backend
+
+  const handlePurchase = (item: typeof storeItems[0]) => {
+    setSelectedItem(item)
+  }
+
+  const handleConfirmPurchase = () => {
+    // Here you would handle the actual purchase logic
+    console.log('Purchasing item:', selectedItem)
+    setSelectedItem(null)
+  }
+
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-darker))] py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,10 +82,25 @@ export default function StorePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {storeItems.map((item) => (
-            <StoreItem key={item.id} {...item} />
+            <StoreItem 
+              key={item.id} 
+              {...item} 
+              onPurchase={() => handlePurchase(item)}
+            />
           ))}
         </div>
       </div>
+
+      {selectedItem && (
+        <PurchaseConfirmDialog
+          isOpen={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onConfirm={handleConfirmPurchase}
+          itemName={selectedItem.name}
+          itemPrice={selectedItem.price}
+          currentBalance={currentBalance}
+        />
+      )}
     </div>
   )
 } 

@@ -10,9 +10,10 @@ interface StoreItemProps {
   price: number
   imageUrl: string
   category: string
+  onPurchase: () => void
 }
 
-export function StoreItem({ name, description, price, imageUrl, category }: StoreItemProps) {
+export function StoreItem({ id, name, description, price, imageUrl, category, onPurchase }: StoreItemProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [hasImageError, setHasImageError] = useState(false)
   const [isImageLoaded, setIsImageLoaded] = useState(false)
@@ -80,9 +81,9 @@ export function StoreItem({ name, description, price, imageUrl, category }: Stor
           </div>
           <button
             className="px-4 py-2 text-xs md:text-sm bg-[rgb(var(--bg-dark))] text-white rounded-lg hover:bg-[rgb(var(--primary-orange))] transition-all duration-300 transform hover:scale-105 active:scale-95 font-medium shadow-lg hover:shadow-[rgb(var(--accent))]/20"
-            onClick={() => {/* TODO: Implement purchase logic */}}
+            onClick={onPurchase}
           >
-            Buy Now
+            Purchase
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { RaffleFeed } from '@/app/components/raffle/RaffleFeed'
+import { PurchaseConfirmDialog } from '@/app/components/ui/PurchaseConfirmDialog'
 
 // Sample data - Replace with actual data fetching
 const sampleRaffles = [
@@ -14,7 +15,8 @@ const sampleRaffles = [
     endDate: '2025-04-25T10:00:00Z',
     participants: 245,
     maxParticipants: 500,
-    status: 'programmed' as const
+    status: 'programmed' as const,
+    ticketPrice: 100
   },
   {
     id: '2',
@@ -25,7 +27,8 @@ const sampleRaffles = [
     endDate: '2025-04-22T00:00:00Z',
     participants: 189,
     maxParticipants: 300,
-    status: 'started' as const
+    status: 'started' as const,
+    ticketPrice: 50
   },
   {
     id: '3',
@@ -37,6 +40,7 @@ const sampleRaffles = [
     participants: 150,
     maxParticipants: 200,
     status: 'ended' as const,
+    ticketPrice: 75,
     winner: {
       id: 'user123',
       name: 'CryptoMaster',
@@ -52,16 +56,30 @@ const sampleRaffles = [
     endDate: '2025-05-29T12:00:00Z',
     participants: 320,
     maxParticipants: 500,
-    status: 'programmed' as const
+    status: 'programmed' as const,
+    ticketPrice: 200
   }
 ]
 
 export default function RaffleDiscoveryPage() {
   const [joinedRaffles, setJoinedRaffles] = useState<string[]>([])
+  const [selectedRaffle, setSelectedRaffle] = useState<typeof sampleRaffles[0] | null>(null)
+  const [currentBalance] = useState(5000) // This would come from your wallet/backend
 
   const handleJoinRaffle = (raffleId: string) => {
-    // In a real app, this would be an API call
-    setJoinedRaffles(prev => [...prev, raffleId])
+    const raffle = sampleRaffles.find(r => r.id === raffleId)
+    if (raffle) {
+      setSelectedRaffle(raffle)
+    }
+  }
+
+  const handleConfirmPurchase = () => {
+    if (selectedRaffle) {
+      // Here you would handle the actual purchase logic
+      console.log('Purchasing ticket for raffle:', selectedRaffle)
+      setJoinedRaffles(prev => [...prev, selectedRaffle.id])
+      setSelectedRaffle(null)
+    }
   }
 
   return (
@@ -80,6 +98,17 @@ export default function RaffleDiscoveryPage() {
           onJoin={handleJoinRaffle}
         />
       </div>
+
+      {selectedRaffle && (
+        <PurchaseConfirmDialog
+          isOpen={!!selectedRaffle}
+          onClose={() => setSelectedRaffle(null)}
+          onConfirm={handleConfirmPurchase}
+          itemName={`Raffle Ticket: ${selectedRaffle.title}`}
+          itemPrice={selectedRaffle.ticketPrice}
+          currentBalance={currentBalance}
+        />
+      )}
     </div>
   )
 } 

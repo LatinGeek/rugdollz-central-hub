@@ -40,7 +40,7 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
         <div className="text-red-500 text-right">
           <div className="text-sm font-medium">Ended</div>
           {raffle.winner ? (
-            <div className="text-xs flex items-center justify-end gap-2 mt-1">
+            <div className="text-white text-xs flex items-center justify-end gap-2 mt-1">
               <span>Winner:</span>
               {raffle.winner.avatar ? (
                 <img 
@@ -56,7 +56,7 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
               <span className="font-medium">{raffle.winner.name}</span>
             </div>
           ) : (
-            <div className="text-xs">Final results coming soon</div>
+            <div className="text-white text-xs">Final results coming soon</div>
           )}
         </div>
       )
@@ -119,10 +119,10 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
               disabled={isJoined || timer.isEnded}
               className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                 isJoined
-                  ? 'bg-[rgb(var(--primary-orange))] text-white cursor-not-allowed'
+                  ? 'bg-[rgba(var(--primary-orange))]/70 text-white cursor-not-allowed'
                   : timer.isEnded
                   ? 'bg-gray-500 text-white cursor-not-allowed'
-                  : 'bg-[rgb(var(--accent))] text-white hover:bg-[rgb(var(--accent-dark))]'
+                  : 'bg-[rgba(var(--primary-orange))] text-white hover:bg-[rgba(var(--primary-orange))]/40'
               }`}
             >
               {isJoined ? 'Joined' : timer.isEnded ? 'Ended' : 'Join Raffle'}
