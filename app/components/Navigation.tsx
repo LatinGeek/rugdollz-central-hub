@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { ExternalLink, ChevronDown, Sword, ShoppingBasket, Rabbit } from 'lucide-react'
+import { ExternalLink, ChevronDown, Sword, Rabbit } from 'lucide-react'
 
 const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
 
@@ -22,16 +22,20 @@ const navigation = [
 ]
 
 const externalLinks = [
-  { name: 'Stake', href: 'https://stake.rugdollz.com', icon: ExternalLink },
-  { name: 'Merch', href: 'https://merch.rugdollz.com', icon: ExternalLink },
+  { name: 'Merch', href: 'https://ruglabsnft.myshopify.com/', icon: ExternalLink },
+]
+
+const stakeLinks = [
+  { name: '$RUGZ', href: 'https://stake.ruglabzproject.com/', icon: ExternalLink },
+  { name: '$RBLZ', href: 'https://stakerlbz.stakeaway.io/', icon: ExternalLink },
 ]
 
 const buyLinks = [
-  { name: 'RugDollz OG', href: 'https://opensea.io/collection/officialrugdollz', icon: ExternalLink },
-  { name: 'RugDollz 3D', href: 'https://opensea.io/collection/rugdollz-3d', icon: ExternalLink },
-  { name: 'RugDollz Social', href: 'https://opensea.io/collection/rugdollz-social', icon: ExternalLink },
+  { name: 'RugDollz OG', href: 'https://magiceden.io/collections/ethereum/0x291ac379af66e25bd8488b3154f076b27b9f9e36', icon: ExternalLink },
+  { name: 'RugDollz 3D', href: 'https://magiceden.io/collections/ethereum/0xf4960b243bfef0cb2c1278d61ec6abca47e4c9fb', icon: ExternalLink },
+  { name: 'RugDollz Social', href: 'https://magiceden.io/collections/ethereum/0x2da9c39419d2213bd986dfbf64e80b2667a0b300', icon: ExternalLink },
   { name: 'RugDollz Exclusive', href: 'https://opensea.io/collection/rugdollz-exclusive', icon: ExternalLink },
-  { name: 'Doruzu', href: 'https://magiceden.io/collections/apechain/0x125e213B5CfC84dBaD82BEDeF7B2e28697f62b3C', icon: ExternalLink },
+  { name: 'Doruzu', href: 'https://magiceden.io/collections/apechain/0x125e213b5cfc84dbad82bedef7b2e28697f62b3c', icon: ExternalLink },
 ]
 
 const socialLinks = [
@@ -64,9 +68,12 @@ const socialLinks = [
     ),
   },
   {
-    name: 'Store',
-    href: 'https://ruglabsnft.myshopify.com/',
-    icon: ShoppingBasket
+    name: 'Youtube Channel',
+    href: 'https://www.youtube.com/@TheRugDollzGame',
+    icon: (props: React.SVGProps<SVGSVGElement>) => (
+        <svg className="h-5 w-5" height="64px" width="64px" version="1.1" id="Layer_1"  viewBox="0 0 461.001 461.001" {...props} fill="currentColor" stroke="#ffffff"><g id="SVGRepo_bgCarrier" ></g><g id="SVGRepo_tracerCarrier"  ></g><g id="SVGRepo_iconCarrier"> <g> <path  d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123c-3.359,1.602-7.239-0.847-7.239-4.568V168.607 c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881C304.363,229.873,304.298,235.248,300.506,237.056z"></path> </g> </g></svg>
+      ),
+    
   },
 ]
 
@@ -83,6 +90,7 @@ export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const [isBuyMenuOpen, setIsBuyMenuOpen] = useState(false)
+  const [isStakeMenuOpen, setIsStakeMenuOpen] = useState(false)
 
   const isAdminPath = pathname.startsWith('/admin') || 
                      pathname.startsWith('/badge-management') || 
@@ -166,6 +174,33 @@ export function Navigation() {
                 <h3 className="px-2 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
                   External
                 </h3>
+                {/* Stake Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsStakeMenuOpen(!isStakeMenuOpen)}
+                    className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                  >
+                    <span>Stake</span>
+                    <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isStakeMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isStakeMenuOpen && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {stakeLinks.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                        >
+                          <span>{item.name}</span>
+                          <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))] group-hover:text-[rgb(var(--text-primary))]" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {/* Buy Dropdown */}
                 <div className="relative">
                   <button
@@ -342,6 +377,33 @@ export function Navigation() {
               <h3 className="px-3 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
                 External
               </h3>
+              {/* Mobile Stake Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsStakeMenuOpen(!isStakeMenuOpen)}
+                  className="w-full flex items-center px-3 py-2 text-base font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                >
+                  <span>Stake</span>
+                  <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isStakeMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isStakeMenuOpen && (
+                  <div className="ml-4 mt-1 space-y-1">
+                    {stakeLinks.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center px-3 py-2 text-base font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                      >
+                        <span>{item.name}</span>
+                        <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))]" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Mobile Buy Dropdown */}
               <div className="relative">
                 <button
