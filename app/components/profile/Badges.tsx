@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { EmblemDetails } from './EmblemDetails'
+import { BadgeDetails } from './BadgeDetails'
 
-interface Emblem {
+interface Badge {
   id: string
   name: string
   icon: string
@@ -11,15 +11,15 @@ interface Emblem {
   description?: string
 }
 
-interface EmblemsProps {
-  emblems: Emblem[]
+interface BadgesProps {
+  badges: Badge[]
 }
 
-export function Emblems({ emblems }: EmblemsProps) {
-  const [selectedEmblem, setSelectedEmblem] = useState<Emblem | null>(null)
+export function Badges({ badges }: BadgesProps) {
+  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
 
-  // Sort emblems: active first, then inactive
-  const sortedEmblems = [...emblems].sort((a, b) => {
+  // Sort badges: active first, then inactive
+  const sortedBadges = [...badges].sort((a, b) => {
     if (a.isActive === b.isActive) return 0
     return a.isActive ? -1 : 1
   })
@@ -27,34 +27,34 @@ export function Emblems({ emblems }: EmblemsProps) {
   return (
     <>
       <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-6">
-        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">EMBLEMS</h2>
+        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">BADGES</h2>
         <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-4">
-          {sortedEmblems.map((emblem) => (
+          {sortedBadges.map((badge) => (
             <div
-              key={emblem.id}
+              key={badge.id}
               className="relative group aspect-square rounded-lg overflow-visible transition-all duration-300 cursor-pointer"
-              onClick={() => setSelectedEmblem(emblem)}
+              onClick={() => setSelectedBadge(badge)}
             >
               <div
                 className={`w-full h-full flex items-center justify-center rounded-lg transition-all duration-300 ${
-                  emblem.isActive
+                  badge.isActive
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20 hover:bg-opacity-30'
                     : 'bg-[rgb(var(--bg-darker))] grayscale hover:grayscale-0'
                 }`}
               >
                 <div
                   className={`w-full h-full flex items-center justify-center transition-all duration-300 ${
-                    emblem.isActive 
+                    badge.isActive 
                       ? 'opacity-100' 
                       : 'opacity-30 group-hover:opacity-50'
                   }`}
-                  dangerouslySetInnerHTML={{ __html: emblem.icon }}
+                  dangerouslySetInnerHTML={{ __html: badge.icon }}
                 />
                 
                 {/* Status indicator */}
                 <div 
                   className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${
-                    emblem.isActive 
+                    badge.isActive 
                       ? 'bg-[rgb(var(--accent))]' 
                       : 'bg-[rgb(var(--text-secondary))] opacity-50'
                   }`}
@@ -67,21 +67,21 @@ export function Emblems({ emblems }: EmblemsProps) {
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-sm font-medium text-[rgb(var(--text-primary))] truncate flex-1">
-                        {emblem.name}
+                        {badge.name}
                       </div>
-                      {!emblem.isActive && (
+                      {!badge.isActive && (
                         <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--bg-light))] text-[rgb(var(--text-secondary))] whitespace-nowrap">
                           Locked
                         </span>
                       )}
                     </div>
-                    {emblem.description && (
+                    {badge.description && (
                       <p className="text-xs text-[rgb(var(--text-secondary))] break-words leading-relaxed">
-                        {emblem.description}
+                        {badge.description}
                       </p>
                     )}
                     {/* Icon based on ID */}
-                    {emblem.id === '9' && (
+                    {badge.id === '9' && (
                       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[rgb(var(--text-secondary))]">
                         <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                       </svg>
@@ -101,13 +101,13 @@ export function Emblems({ emblems }: EmblemsProps) {
         </div>
       </div>
 
-      {/* Emblem Details Modal */}
-      {selectedEmblem && (
-        <EmblemDetails
-          emblems={emblems}
-          selectedEmblem={selectedEmblem}
-          onClose={() => setSelectedEmblem(null)}
-          onSelect={setSelectedEmblem}
+      {/* Badge Details Modal */}
+      {selectedBadge && (
+        <BadgeDetails
+          badges={badges}
+          selectedBadge={selectedBadge}
+          onClose={() => setSelectedBadge(null)}
+          onSelect={setSelectedBadge}
         />
       )}
     </>

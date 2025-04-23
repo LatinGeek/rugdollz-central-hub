@@ -2,11 +2,11 @@
 
 import { use } from 'react'
 import { ProfileHeader } from '@/app/components/profile/ProfileHeader'
-import { Emblems } from '@/app/components/profile/Emblems'
+import { Badges } from '@/app/components/profile/Badges'
 import { Highlights } from '@/app/components/profile/Highlights'
 
 // Sample data - Replace with actual data fetching
-const sampleEmblems = [
+const sampleBadges = [
   {
     id: '1',
     name: 'Early Adopter',
@@ -117,7 +117,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Emblems emblems={sampleEmblems} />
+          <Badges badges={sampleBadges} />
         </div>
         <div>
           <Highlights nfts={sampleNFTs} />

@@ -8,7 +8,7 @@ interface Requirement {
   isCompleted: boolean
 }
 
-interface Emblem {
+interface Badge {
   id: string
   name: string
   icon: string
@@ -16,15 +16,15 @@ interface Emblem {
   description?: string
 }
 
-interface EmblemDetailsProps {
-  emblems: Emblem[]
-  selectedEmblem: Emblem | null
+interface BadgeDetailsProps {
+  badges: Badge[]
+  selectedBadge: Badge | null
   onClose: () => void
-  onSelect: (emblem: Emblem) => void
+  onSelect: (badge: Badge) => void
 }
 
 // Helper function to get requirements based on emblem ID
-function getEmblemRequirements(emblemId: string): Requirement[] {
+function getBadgeRequirements(badgeId: string): Requirement[] {
   const requirementsMap: { [key: string]: Requirement[] } = {
     '1': [{ // Early Adopter
       title: 'Join within first month of launch',
@@ -98,10 +98,10 @@ function getEmblemRequirements(emblemId: string): Requirement[] {
     }]
   }
 
-  return requirementsMap[emblemId] || []
+  return requirementsMap[badgeId] || []
 }
 
-export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: EmblemDetailsProps) {
+export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: BadgeDetailsProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -114,9 +114,9 @@ export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: Em
     return () => window.removeEventListener('keydown', handleEscape)
   }, [onClose])
 
-  if (!selectedEmblem) return null
+  if (!selectedBadge) return null
 
-  const requirements = getEmblemRequirements(selectedEmblem.id)
+  const requirements = getBadgeRequirements(selectedBadge.id)
 
   return (
     <div 
@@ -137,7 +137,7 @@ export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: Em
       >
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between p-4 bg-[rgb(var(--bg-darker))]">
-          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">EMBLEMS</h3>
+          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">BADGES</h3>
           <button 
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-secondary))]"
@@ -150,18 +150,18 @@ export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: Em
 
         {/* Left sidebar with all emblems */}
         <div className="w-full md:w-72 bg-[rgb(var(--bg-darker))] p-4 md:p-6 overflow-x-auto md:overflow-y-auto">
-          <div className="hidden md:block text-sm font-medium text-[rgb(var(--text-secondary))] mb-4">EMBLEMS</div>
+          <div className="hidden md:block text-sm font-medium text-[rgb(var(--text-secondary))] mb-4">BADGES</div>
           <div className="grid grid-cols-6 md:grid-cols-4 gap-2 min-w-fit md:min-w-0">
-            {emblems.map((emblem) => (
+            {badges.map((badge: Badge) => (
               <div
-                key={emblem.id}
+                key={badge.id}
                 className={`aspect-square w-12 md:w-auto rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                  emblem.id === selectedEmblem.id
+                  badge.id === selectedBadge.id
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-dark))] hover:bg-opacity-80'
-                } ${!emblem.isActive && 'grayscale opacity-50'}`}
-                onClick={() => onSelect(emblem)}
-                dangerouslySetInnerHTML={{ __html: emblem.icon }}
+                } ${!badge.isActive && 'grayscale opacity-50'}`}
+                onClick={() => onSelect(badge)}
+                dangerouslySetInnerHTML={{ __html: badge.icon }}
               />
             ))}
           </div>
@@ -176,19 +176,19 @@ export function EmblemDetails({ emblems, selectedEmblem, onClose, onSelect }: Em
             <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-8">
               <div 
                 className={`w-16 h-16 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${
-                  selectedEmblem.isActive
+                  selectedBadge.isActive
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-darker))] grayscale'
                 }`}
-                dangerouslySetInnerHTML={{ __html: selectedEmblem.icon }}
+                dangerouslySetInnerHTML={{ __html: selectedBadge.icon }}
               />
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-[rgb(var(--text-primary))]">
-                  {selectedEmblem.name}
+                  {selectedBadge.name}
                 </h2>
-                {selectedEmblem.description && (
+                {selectedBadge.description && (
                   <p className="text-sm md:text-base text-[rgb(var(--text-secondary))] mt-1">
-                    {selectedEmblem.description}
+                    {selectedBadge.description}
                   </p>
                 )}
               </div>
