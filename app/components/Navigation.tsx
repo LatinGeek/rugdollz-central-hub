@@ -39,7 +39,7 @@ export function Navigation() {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 bg-[rgb(var(--bg-darker))] border-r border-[rgb(var(--border-dark))]">
+        <div className="flex-1 flex flex-col min-h-0 bg-[rgb(var(--bg-darker))] border-[rgb(var(--border-dark))]">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
               <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">RugDollz Hub</h1>
