@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { ExternalLink } from 'lucide-react'
 
 const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
 
@@ -16,6 +17,11 @@ const navigation = [
   { name: 'Lore Discovery', href: '/lore-discovery' },
   { name: 'Raffle Discovery', href: '/raffle-discovery' },
   { name: 'Leadership', href: '/leadership' },
+]
+
+const externalLinks = [
+  { name: 'Stake', href: 'https://stake.rugdollz.com', icon: ExternalLink },
+  { name: 'Merch', href: 'https://merch.rugdollz.com', icon: ExternalLink },
 ]
 
 const adminNavigation = [
@@ -39,7 +45,7 @@ export function Navigation() {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 bg-[rgb(var(--bg-darker))] border-[rgb(var(--border-dark))]">
+        <div className="flex-1 flex flex-col min-h-0 bg-[rgb(var(--bg-darker))] border-r border-[rgb(var(--border-dark))]">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
               <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">RugDollz Hub</h1>
@@ -62,8 +68,8 @@ export function Navigation() {
                 )
               })}
 
-              {/* Admin Menu */}
-              <div className="mt-4">
+                            {/* Admin Menu */}
+                            <div className="mt-4">
                 <button
                   onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
                   className={`w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${
@@ -108,6 +114,24 @@ export function Navigation() {
                   </div>
                 )}
               </div>
+              
+              {/* External Links */}
+              <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+                {externalLinks.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                  >
+                    <span>{item.name}</span>
+                    <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))] group-hover:text-[rgb(var(--text-primary))]" />
+                  </a>
+                ))}
+              </div>
+
+
             </nav>
           </div>
         </div>
@@ -168,6 +192,22 @@ export function Navigation() {
                 </Link>
               )
             })}
+
+            {/* Mobile External Links */}
+            <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+              {externalLinks.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center px-3 py-2 text-base font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                >
+                  <span>{item.name}</span>
+                  <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))]" />
+                </a>
+              ))}
+            </div>
 
             {/* Mobile Admin Menu */}
             <div className="mt-4">
