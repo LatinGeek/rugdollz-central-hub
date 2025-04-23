@@ -13,7 +13,7 @@ interface StoreItemProps {
   onPurchase: () => void
 }
 
-export function StoreItem({ id, name, description, price, imageUrl, category, onPurchase }: StoreItemProps) {
+export function StoreItem({ name, description, price, imageUrl, category, onPurchase }: StoreItemProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [hasImageError, setHasImageError] = useState(false)
   const [isImageLoaded, setIsImageLoaded] = useState(false)
