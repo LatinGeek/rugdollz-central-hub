@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, ChevronDown } from 'lucide-react'
 
 const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
 
@@ -24,6 +24,14 @@ const externalLinks = [
   { name: 'Merch', href: 'https://merch.rugdollz.com', icon: ExternalLink },
 ]
 
+const buyLinks = [
+  { name: 'RugDollz OG', href: 'https://opensea.io/collection/officialrugdollz', icon: ExternalLink },
+  { name: 'RugDollz 3D', href: 'https://opensea.io/collection/rugdollz-3d', icon: ExternalLink },
+  { name: 'RugDollz Social', href: 'https://opensea.io/collection/rugdollz-social', icon: ExternalLink },
+  { name: 'RugDollz Exclusive', href: 'https://opensea.io/collection/rugdollz-exclusive', icon: ExternalLink },
+  { name: 'Doruzu', href: 'https://magiceden.io/collections/apechain/0x125e213B5CfC84dBaD82BEDeF7B2e28697f62b3C', icon: ExternalLink },
+]
+
 const adminNavigation = [
   { name: 'Admin Dashboard', href: '/admin-dashboard' },
   { name: 'Badge Management', href: '/badge-management' },
@@ -36,6 +44,7 @@ export function Navigation() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
+  const [isBuyMenuOpen, setIsBuyMenuOpen] = useState(false)
 
   const isAdminPath = pathname.startsWith('/admin') || 
                      pathname.startsWith('/badge-management') || 
@@ -68,8 +77,8 @@ export function Navigation() {
                 )
               })}
 
-                            {/* Admin Menu */}
-                            <div className="mt-4">
+                 {/* Admin Menu */}
+                 <div className="mt-4">
                 <button
                   onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
                   className={`w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${
@@ -114,9 +123,36 @@ export function Navigation() {
                   </div>
                 )}
               </div>
-              
               {/* External Links */}
               <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+                {/* Buy Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsBuyMenuOpen(!isBuyMenuOpen)}
+                    className="w-full group flex items-center px-2 py-2 text-sm font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                  >
+                    <span>Buy</span>
+                    <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isBuyMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isBuyMenuOpen && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {buyLinks.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                        >
+                          <span>{item.name}</span>
+                          <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))] group-hover:text-[rgb(var(--text-primary))]" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Other External Links */}
                 {externalLinks.map((item) => (
                   <a
                     key={item.name}
@@ -131,7 +167,7 @@ export function Navigation() {
                 ))}
               </div>
 
-
+           
             </nav>
           </div>
         </div>
@@ -195,6 +231,34 @@ export function Navigation() {
 
             {/* Mobile External Links */}
             <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+              {/* Mobile Buy Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsBuyMenuOpen(!isBuyMenuOpen)}
+                  className="w-full flex items-center px-3 py-2 text-base font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                >
+                  <span>Buy</span>
+                  <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isBuyMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isBuyMenuOpen && (
+                  <div className="ml-4 mt-1 space-y-1">
+                    {buyLinks.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center px-3 py-2 text-base font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-light))] hover:text-[rgb(var(--text-primary))]"
+                      >
+                        <span>{item.name}</span>
+                        <item.icon className="ml-2 h-4 w-4 text-[rgb(var(--text-secondary))]" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Other Mobile External Links */}
               {externalLinks.map((item) => (
                 <a
                   key={item.name}
