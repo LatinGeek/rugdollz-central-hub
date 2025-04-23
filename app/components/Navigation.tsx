@@ -21,6 +21,8 @@ const adminNavigation = [
   { name: 'Admin Dashboard', href: '/admin-dashboard' },
   { name: 'Badge Management', href: '/badge-management' },
   { name: 'Raffle Management', href: '/raffle-management' },
+  { name: 'Purchase Management', href: '/purchase-management' },
+  { name: 'Lore Moderation', href: '/lore-moderation' },
 ]
 
 export function Navigation() {
