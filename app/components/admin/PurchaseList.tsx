@@ -10,21 +10,35 @@ interface NFT {
   collection: string
 }
 
+interface Note {
+  id: string
+  content: string
+  author: string
+  createdAt: string
+}
+
 interface Purchase {
   id: string
+  title: string
+  description: string
   nft: NFT
   buyer: string
-  price: number
+  seller: string
   status: 'pending' | 'delivered' | 'cancelled'
   purchaseDate: string
+  price: number
+  paymentMethod: string
+  transactionHash: string
+  notes: Note[]
 }
 
 interface PurchaseListProps {
   purchases: Purchase[]
   onStatusChange: (purchaseId: string, newStatus: 'pending' | 'delivered' | 'cancelled') => void
+  onTitleClick: (purchaseId: string) => void
 }
 
-export function PurchaseList({ purchases, onStatusChange }: PurchaseListProps) {
+export function PurchaseList({ purchases, onStatusChange, onTitleClick }: PurchaseListProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredPurchases = purchases.filter(purchase =>
@@ -78,14 +92,17 @@ export function PurchaseList({ purchases, onStatusChange }: PurchaseListProps) {
 
             {/* Purchase Details */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] truncate">
-                {purchase.nft.name}
+              <h3 
+                className="text-lg font-medium text-[rgb(var(--text-primary))] truncate cursor-pointer hover:text-[rgb(var(--primary-orange))] transition-colors"
+                onClick={() => onTitleClick(purchase.id)}
+              >
+                {purchase.title}
               </h3>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
                 Buyer: {purchase.buyer}
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Price: {purchase.price} ETH
+                Price: {purchase.price} {purchase.paymentMethod}
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
                 Date: {new Date(purchase.purchaseDate).toLocaleDateString()}
