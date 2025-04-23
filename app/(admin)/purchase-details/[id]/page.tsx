@@ -16,7 +16,7 @@ const samplePurchase = {
     username: 'NFTCollector_42',
     walletAddress: '0x123...456'
   },
-  status: 'completed' as const,
+  status: 'delivered' as const,
   purchaseDate: '2024-03-15T00:00:00Z',
   price: 1.5,
   paymentMethod: 'ETH',

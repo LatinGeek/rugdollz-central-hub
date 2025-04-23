@@ -1,6 +1,7 @@
 'use client'
 
-import { PurchaseDetailsInteractive } from './PurchaseDetailsInteractive'
+import { Notes } from './Notes'
+import { TransactionInfo } from './TransactionInfo'
 
 interface NFT {
   id: string
@@ -28,8 +29,7 @@ interface Purchase {
   description: string
   nft: NFT
   buyer: User
-  seller: User
-  status: 'pending' | 'completed' | 'cancelled'
+  status: 'pending' | 'delivered' | 'cancelled'
   purchaseDate: string
   price: number
   paymentMethod: string
@@ -39,7 +39,7 @@ interface Purchase {
 
 interface PurchaseDetailsProps {
   purchase: Purchase
-  onStatusChange: (status: 'pending' | 'completed' | 'cancelled') => void
+  onStatusChange: (status: 'pending' | 'delivered' | 'cancelled') => void
   newNote: string
   onNoteChange: (note: string) => void
   onAddNote: () => void
@@ -53,8 +53,39 @@ export function PurchaseDetails({
   onAddNote
 }: PurchaseDetailsProps) {
   return (
-    <PurchaseDetailsInteractive 
-      initialPurchase={purchase}
-    />
+    <div className="space-y-8">
+      <TransactionInfo
+        title={purchase.title}
+        description={purchase.description}
+        nft={purchase.nft}
+        status={purchase.status}
+        onStatusChange={onStatusChange}
+        details={[
+          {
+            label: 'Purchase Details',
+            details: [
+              { label: 'Purchase Date', value: purchase.purchaseDate, format: 'date' },
+              { label: 'Price', value: purchase.price, format: 'currency', currency: purchase.paymentMethod },
+              { label: 'Transaction Hash', value: purchase.transactionHash, format: 'text' }
+            ]
+          },
+          {
+            label: 'Buyer Details',
+            details: [
+              { label: 'Username', value: purchase.buyer.username },
+              { label: 'Wallet', value: purchase.buyer.walletAddress }
+            ]
+          },
+        ]}
+      />
+
+      {/* Notes Section */}
+      <Notes
+        notes={purchase.notes}
+        newNote={newNote}
+        onNoteChange={onNoteChange}
+        onAddNote={onAddNote}
+      />
+    </div>
   )
 } 
