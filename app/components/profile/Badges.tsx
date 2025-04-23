@@ -30,7 +30,7 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
     <>
       <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-6">
         <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">{title}</h2>
-        <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-4">
+        <div className="grid grid-cols-4 sm:grid-cols-8 md:grid-cols-12 gap-4">
           {sortedBadges.map((badge) => (
             <div
               key={badge.id}

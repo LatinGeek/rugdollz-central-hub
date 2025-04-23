@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Badges } from '@/app/components/profile/Badges'
 import { BadgeDetails } from '@/app/components/profile/BadgeDetails'
 
@@ -143,6 +143,9 @@ const lastEarnedBadges: Badge[] = [
 export default function BadgePage() {
   const [activeTab, setActiveTab] = useState<CollectionName>('RugDollz OG')
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
+  const tabsRef = useRef<HTMLDivElement>(null)
 
   const tabs: CollectionName[] = [
     'RugDollz OG',
@@ -152,6 +155,23 @@ export default function BadgePage() {
     'Game NFTs'
   ]
 
+  const handleScroll = () => {
+    if (!tabsRef.current) return
+
+    const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current
+    setShowLeftGradient(scrollLeft > 0)
+    setShowRightGradient(scrollLeft < scrollWidth - clientWidth)
+  }
+
+  useEffect(() => {
+    const container = tabsRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      handleScroll() // Initial check
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <div className="container mx-auto bg-[rgb(var(--bg-darker))] px-8 py-8">
       <h1 className="text-3xl font-bold text-[rgb(var(--text-primary))] mb-8">
@@ -159,18 +179,33 @@ export default function BadgePage() {
       </h1>
 
       {/* Last 10 Earned Badges */}
-      <div className="rounded-lg max-w-7xl mx-auto ">
+      <div className="rounded-lg max-w-7xl mx-auto">
         <Badges badges={lastEarnedBadges} title="RECENTLY EARNED" />
       </div>
 
       {/* Collection Tabs */}
-      <div className="mb-8 mt-8">
-        <div className="flex w-full space-x-4 border-b border-[rgb(var(--border-dark))]">
+      <div className="mb-8 mt-8 relative">
+        {/* Gradient Indicators */}
+        <div 
+          className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[rgb(var(--bg-darker))] to-transparent z-10 pointer-events-none transition-opacity duration-300 ${
+            showLeftGradient ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <div 
+          className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[rgb(var(--bg-darker))] to-transparent z-10 pointer-events-none transition-opacity duration-300 ${
+            showRightGradient ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        <div 
+          ref={tabsRef}
+          style={{scrollbarWidth: 'none'}} 
+          className="flex min-w-full w-0 space-x-4 border-b border-[rgb(var(--border-dark))] overflow-x-scroll"
+        >
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`w-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors duration-200 ${
                 activeTab === tab
                   ? 'text-[rgb(var(--primary-orange))] border-b-2 border-[rgb(var(--primary-orange))]'
                   : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
@@ -183,7 +218,7 @@ export default function BadgePage() {
       </div>
 
       {/* Active Collection Badges */}
-      <div className="bg-[rgb(var(--bg-dark))] rounded-lg rounded-lg max-w-7xl mx-auto ">
+      <div className="bg-[rgb(var(--bg-dark))] rounded-lg rounded-lg max-w-7xl mx-auto">
         <Badges badges={sampleBadges.filter((badge) => badge.collection === activeTab)} title={activeTab.toUpperCase()} />
       </div>
 
