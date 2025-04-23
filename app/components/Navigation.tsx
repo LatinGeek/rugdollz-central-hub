@@ -95,7 +95,7 @@ export function Navigation() {
             <div className="flex items-center flex-shrink-0 px-4">
               <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">RugDollz Hub</h1>
             </div>
-            <nav className="mt-5 flex-1 px-2 space-y-1">
+            <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
@@ -203,11 +203,12 @@ export function Navigation() {
                 ))}
               </div>
 
-              
-
               {/* Social Links */}
               <div className="mt-auto pt-4 border-t border-[rgb(var(--border-dark))]">
-                <div className="flex flex-wrap gap-2 px-2">
+                <h3 className="px-2 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
+                  Socials
+                </h3>
+                <div className="flex flex-wrap gap-4 px-2">
                   {socialLinks.map((item) => (
                     <a
                       key={item.name}
@@ -264,7 +265,7 @@ export function Navigation() {
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <nav className="px-2 pt-2 pb-3 space-y-1 bg-[rgb(var(--bg-darker))]">
+          <nav className="px-2 pt-2 pb-3 space-y-1 bg-[rgb(var(--bg-darker))] max-h-[calc(100vh-4rem)] overflow-y-auto z-1000">
             {navigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -375,11 +376,12 @@ export function Navigation() {
               ))}
             </div>
 
-           
-
             {/* Mobile Social Links */}
             <div className="mt-4 pt-4 border-t border-[rgb(var(--border-dark))]">
-              <div className="flex flex-wrap gap-4 px-3">
+              <h3 className="px-3 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
+                Socials
+              </h3>
+              <div className="flex flex-wrap gap-6 px-3 py-4 mb-6">
                 {socialLinks.map((item) => (
                   <a
                     key={item.name}
