@@ -3,19 +3,21 @@
 import { useState } from 'react'
 import { BadgeDetails } from './BadgeDetails'
 
-interface Badge {
+export interface Badge {
   id: string
   name: string
   icon: string
   isActive: boolean
-  description?: string
+  description: string
+  collection: string
 }
 
 interface BadgesProps {
   badges: Badge[]
+  title?: string
 }
 
-export function Badges({ badges }: BadgesProps) {
+export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
 
   // Sort badges: active first, then inactive
@@ -27,7 +29,7 @@ export function Badges({ badges }: BadgesProps) {
   return (
     <>
       <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-6">
-        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">BADGES</h2>
+        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">{title}</h2>
         <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-4">
           {sortedBadges.map((badge) => (
             <div

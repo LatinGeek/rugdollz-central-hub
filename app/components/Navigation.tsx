@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Home', href: '/home' },
   { name: 'About', href: '/about' },
   { name: 'Store', href: '/store' },
+  { name: 'Badges', href: '/badges' },
   { name: 'Gaming', href: '/gaming' },
   { name: 'User Profile', href: `/profile/${HARDCODED_ADDRESS}` },
   { name: 'NFT Customization', href: '/nft-customization' },

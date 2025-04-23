@@ -13,12 +13,14 @@ interface Badge {
   name: string
   icon: string
   isActive: boolean
-  description?: string
+  description: string
+  collection: string
+  earnedAt?: string
 }
 
 interface BadgeDetailsProps {
   badges: Badge[]
-  selectedBadge: Badge | null
+  selectedBadge: Badge
   onClose: () => void
   onSelect: (badge: Badge) => void
 }
