@@ -161,6 +161,9 @@ export function Navigation() {
               </div>
               {/* External Links */}
               <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+                <h3 className="px-2 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
+                  External
+                </h3>
                 {/* Buy Dropdown */}
                 <div className="relative">
                   <button
@@ -205,7 +208,7 @@ export function Navigation() {
 
               {/* Social Links */}
               <div className="mt-auto pt-4 border-t border-[rgb(var(--border-dark))]">
-                <h3 className="px-2 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
+                <h3 className="px-2 pb-2 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
                   Socials
                 </h3>
                 <div className="flex flex-wrap gap-4 px-2">
@@ -334,6 +337,9 @@ export function Navigation() {
 
             {/* Mobile External Links */}
             <div className="pt-4 border-t border-[rgb(var(--border-dark))]">
+              <h3 className="px-3 text-sm font-semibold text-[rgb(var(--text-primary))] tracking-wider uppercase mb-2">
+                External
+              </h3>
               {/* Mobile Buy Dropdown */}
               <div className="relative">
                 <button
