@@ -9,13 +9,6 @@ export default function AboutPage() {
       {/* Hero Section */}
       <div className="relative h-[400px] bg-[rgb(var(--bg-dark))]">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgb(var(--bg-darker))] z-10" />
-        <Image
-          src="/images/about-hero.jpg"
-          alt="RugDollz Universe"
-          fill
-          className="object-cover"
-          priority
-        />
         <div className="relative z-20 h-full flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
