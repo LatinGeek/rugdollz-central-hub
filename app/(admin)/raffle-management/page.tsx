@@ -6,6 +6,7 @@ import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
 import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
 import AdminListItem from '@/app/components/admin/AdminListItem'
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog'
 
 interface Raffle {
   id: string
@@ -96,6 +97,7 @@ export default function RaffleManagementPage() {
   const router = useRouter()
   const [raffles, setRaffles] = useState<Raffle[]>(sampleRaffles)
   const [isCreating, setIsCreating] = useState(false)
+  const [raffleToDelete, setRaffleToDelete] = useState<Raffle | null>(null)
   const [newRaffle, setNewRaffle] = useState<Omit<Raffle, 'id'>>({
     title: '',
     description: '',
@@ -143,8 +145,19 @@ export default function RaffleManagementPage() {
     })
   }
 
-  const handleDeleteRaffle = (id: string) => {
-    setRaffles(raffles.filter(raffle => raffle.id !== id))
+  const handleDeleteClick = (raffle: Raffle) => {
+    setRaffleToDelete(raffle)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (raffleToDelete) {
+      setRaffles(raffles.filter(raffle => raffle.id !== raffleToDelete.id))
+      setRaffleToDelete(null)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setRaffleToDelete(null)
   }
 
   const formFields = [
@@ -297,7 +310,7 @@ export default function RaffleManagementPage() {
                   endDate={raffle.endDate}
                   participants={raffle.participants}
                   maxParticipants={raffle.maxParticipants}
-                  onDelete={() => handleDeleteRaffle(raffle.id)}
+                  onDelete={() => handleDeleteClick(raffle)}
                   onEdit={() => handleEditClick(raffle)}
                   onTitleClick={() => handleTitleClick(raffle)}
                 />
@@ -336,6 +349,18 @@ export default function RaffleManagementPage() {
           submitLabel="Create Raffle"
         />
       </AdminModal>
+
+      {/* Delete Confirmation Dialog */}
+      {raffleToDelete && (
+        <ConfirmDialog
+          isOpen={!!raffleToDelete}
+          onClose={handleDeleteCancel}
+          title="Delete Raffle"
+          description={`Are you sure you want to delete the raffle "${raffleToDelete.title}"? This action cannot be undone.`}
+          onConfirm={handleDeleteConfirm}
+          action="Delete Raffle"
+        />
+      )}
     </div>
   )
 } 

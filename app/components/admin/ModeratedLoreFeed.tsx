@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { ModeratedLoreEntry } from './ModeratedLoreEntry'
-import { DeleteLoreEntryDialog } from './DeleteLoreEntryDialog'
+import { ConfirmDialog } from '../ui/ConfirmDialog'
 
 interface NFT {
   id: string
@@ -118,11 +118,13 @@ export function ModeratedLoreFeed({ entries: initialEntries }: ModeratedLoreFeed
 
       {/* Delete Confirmation Dialog */}
       {entryToDelete && (
-        <DeleteLoreEntryDialog
+        <ConfirmDialog
           isOpen={!!entryToDelete}
           onClose={handleDeleteCancel}
+          title="Delete Lore Entry"
+          description={`Are you sure you want to delete the lore entry for "${entryToDelete.nft.name}"? This action cannot be undone.`}
           onConfirm={handleDeleteConfirm}
-          entryTitle={entryToDelete.nft.name}
+          action="Delete Lore Entry"
         />
       )}
     </div>

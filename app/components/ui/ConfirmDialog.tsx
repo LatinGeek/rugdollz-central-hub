@@ -2,29 +2,32 @@
 
 import { Modal } from '@/app/components/ui/Modal'
 
-interface DeleteLoreEntryDialogProps {
+interface ConfirmDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
-  entryTitle: string
+  description: string,
+  title: string,
+  action: string
 }
 
-export function DeleteLoreEntryDialog({
+export function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
-  entryTitle
-}: DeleteLoreEntryDialogProps) {
+  description,
+  title,
+  action,
+}: ConfirmDialogProps) {
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Delete Lore Entry"
+      title={title}
     >
       <div className="space-y-4">
         <p>
-          Are you sure you want to delete the lore entry for &quot;{entryTitle}&quot;?
-          This action cannot be undone.
+          {description}
         </p>
 
         <div className="flex justify-end gap-4">
@@ -38,7 +41,7 @@ export function DeleteLoreEntryDialog({
             onClick={onConfirm}
             className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
           >
-            Delete
+            {action}
           </button>
         </div>
       </div>

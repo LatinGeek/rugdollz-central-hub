@@ -5,6 +5,7 @@ import { QuickActionButton } from '@/app/components/admin/QuickActionButton'
 import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
 import AdminListItem from '@/app/components/admin/AdminListItem'
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog'
 
 interface Badge {
   id: string
@@ -92,6 +93,7 @@ export default function BadgeManagementPage() {
   const [badges, setBadges] = useState<Badge[]>(sampleBadges)
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [badgeToDelete, setBadgeToDelete] = useState<Badge | null>(null)
   const [newBadge, setNewBadge] = useState<Omit<Badge, 'id'>>({
     name: '',
     description: '',
@@ -121,8 +123,19 @@ export default function BadgeManagementPage() {
     })
   }
 
-  const handleDeleteBadge = (id: string) => {
-    setBadges(badges.filter(badge => badge.id !== id))
+  const handleDeleteClick = (badge: Badge) => {
+    setBadgeToDelete(badge)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (badgeToDelete) {
+      setBadges(badges.filter(badge => badge.id !== badgeToDelete.id))
+      setBadgeToDelete(null)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setBadgeToDelete(null)
   }
 
   const handleUpdateBadge = (updatedBadge: Badge) => {
@@ -236,7 +249,7 @@ export default function BadgeManagementPage() {
                   type="badge"
                   status={badge.isActive ? 'active' : 'inactive'}
                   icon={badge.icon}
-                  onDelete={() => handleDeleteBadge(badge.id)}
+                  onDelete={() => handleDeleteClick(badge)}
                   onEdit={() => setSelectedBadge(badge)}
                   onTitleClick={() => handleTitleClick(badge)}
                 />
@@ -284,6 +297,18 @@ export default function BadgeManagementPage() {
           submitLabel={isCreating ? 'Create Badge' : 'Update Badge'}
         />
       </AdminModal>
+
+      {/* Delete Confirmation Dialog */}
+      {badgeToDelete && (
+        <ConfirmDialog
+          isOpen={!!badgeToDelete}
+          onClose={handleDeleteCancel}
+          title="Delete Badge"
+          description={`Are you sure you want to delete the badge "${badgeToDelete.name}"? This action cannot be undone.`}
+          onConfirm={handleDeleteConfirm}
+          action="Delete Badge"
+        />
+      )}
     </div>
   )
 } 
