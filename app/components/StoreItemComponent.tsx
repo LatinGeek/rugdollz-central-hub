@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { PlaceholderImage } from './PlaceholderImage'
 
-interface StoreItemProps {
+interface StoreItemComponentProps {
   id: string
   name: string
   description: string
@@ -13,7 +13,7 @@ interface StoreItemProps {
   onPurchase: () => void
 }
 
-export function StoreItem({ name, description, price, imageUrl, category, onPurchase }: StoreItemProps) {
+export function StoreItemComponent({ name, description, price, imageUrl, category, onPurchase }: StoreItemComponentProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [hasImageError, setHasImageError] = useState(false)
   const [isImageLoaded, setIsImageLoaded] = useState(false)

@@ -1,11 +1,8 @@
 'use client'
 
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
+import { NFT } from "@/types/nft"
+
+
 
 interface HighlightsProps {
   title?: string

@@ -2,39 +2,12 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
-
-interface Note {
-  id: string
-  content: string
-  author: string
-  createdAt: string
-}
-
-interface Purchase {
-  id: string
-  title: string
-  description: string
-  nft: NFT
-  buyer: string
-  seller: string
-  status: 'pending' | 'delivered' | 'cancelled'
-  purchaseDate: string
-  price: number
-  paymentMethod: string
-  transactionHash: string
-  notes: Note[]
-}
+import { PurchaseDetails } from '@/types/FormattedData/purchase-details'
+import { OrderStatusType } from '@/types/enums/order-status'
 
 interface PurchaseListProps {
-  purchases: Purchase[]
-  onStatusChange: (purchaseId: string, newStatus: 'pending' | 'delivered' | 'cancelled') => void
+  purchases: PurchaseDetails[]
+  onStatusChange: (purchaseId: string, newStatus: OrderStatusType) => void
   onTitleClick: (purchaseId: string) => void
 }
 
@@ -42,8 +15,8 @@ export function PurchaseList({ purchases, onStatusChange, onTitleClick }: Purcha
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredPurchases = purchases.filter(purchase =>
-    purchase.buyer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    purchase.nft.name.toLowerCase().includes(searchQuery.toLowerCase())
+    purchase.buyer.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    purchase.item.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const getStatusColor = (status: string) => {
@@ -77,14 +50,14 @@ export function PurchaseList({ purchases, onStatusChange, onTitleClick }: Purcha
       <div className="space-y-4">
         {filteredPurchases.map(purchase => (
           <div
-            key={purchase.id}
+            key={purchase.purchase.id}
             className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-[rgb(var(--bg-darker))] rounded-lg"
           >
             {/* NFT Image */}
             <div className="relative w-16 h-16 flex-shrink-0">
               <Image
-                src={purchase.nft.imageUrl}
-                alt={purchase.nft.name}
+                src={purchase.item.imageUrl}
+                alt={purchase.item.name}
                 fill
                 className="object-cover rounded-lg"
               />
@@ -94,30 +67,30 @@ export function PurchaseList({ purchases, onStatusChange, onTitleClick }: Purcha
             <div className="flex-1 min-w-0">
               <h3 
                 className="text-lg font-medium text-[rgb(var(--text-primary))] truncate cursor-pointer hover:text-[rgb(var(--primary-orange))] transition-colors"
-                onClick={() => onTitleClick(purchase.id)}
+                onClick={() => onTitleClick(purchase.purchase.id)}
               >
-                {purchase.title}
+                {purchase.item.name}
               </h3>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Buyer: {purchase.buyer}
+                Buyer: {purchase.buyer.username ?? 'N/A'}
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Price: {purchase.price} {purchase.paymentMethod}
+                Price: {purchase.purchase.price} {purchase.purchase.paymentMethod}
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Date: {new Date(purchase.purchaseDate).toLocaleDateString()}
+                Date: {new Date(purchase.purchase.purchaseDate).toLocaleDateString()}
               </p>
             </div>
 
             {/* Status Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(purchase.status)}`}>
-                {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(purchase.purchase.status)}`}>
+                {purchase.purchase.status.charAt(0).toUpperCase() + purchase.purchase.status.slice(1)}
               </div>
               
               <select
-                value={purchase.status}
-                onChange={(e) => onStatusChange(purchase.id, e.target.value as 'pending' | 'delivered' | 'cancelled')}
+                value={purchase.purchase.status}
+                onChange={(e) => onStatusChange(purchase.purchase.id, e.target.value as 'pending' | 'delivered' | 'cancelled')}
                 className="bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-3 py-1 text-sm"
               >
                 <option value="pending">Pending</option>

@@ -2,27 +2,14 @@
 
 import { useState, useMemo } from 'react'
 import { LeaderboardCard } from '@/app/components/leadership/LeaderboardCard'
+import { getSampleUserDetailsLeaderboard } from '@/types/FormattedData/user-details'
 
 // Sample data for different timeframes
-const generateUserData = (timeframe: 'all' | 'month' | 'week') => {
-  const basePoints = {
-    all: Array.from({ length: 30 }, (v,k) => 1000+k),
-    month: Array.from({ length: 30 }, (v,k) => 500+k),
-    week: Array.from({ length: 30 }, (v,k) => 200+k)
-  }
+const generateUserData = (timeframe: 'All' | 'Month' | 'Week') => {
 
-  return Array.from({ length: 30 }, (_, i) => ({
-    id: `user${i + 1}`,
-    rank: i + 1,
-    name: `User${i + 1}`,
-    avatar: `https://i.pravatar.cc/150?img=${i + 1}`,
-    points: basePoints[timeframe][i],
-    level: Math.floor(i+30),
-    achievements: i + 10,
-    streak: i + 1
-  })).sort((a, b) => b.points - a.points)
+  return getSampleUserDetailsLeaderboard(timeframe).sort((a, b) => b.points - a.points)
     .map((user, index) => ({
-      ...user,
+      userDetails: user,
       rank: index + 1
     }))
 }
@@ -31,7 +18,7 @@ const generateUserData = (timeframe: 'all' | 'month' | 'week') => {
 const currentUserId = 'user15'
 
 export default function LeadershipPage() {
-  const [timeframe, setTimeframe] = useState<'all' | 'month' | 'week'>('all')
+  const [timeframe, setTimeframe] = useState<'All' | 'Month' | 'Week'>('All')
 
   // Memoize the sorted users based on timeframe
   const sortedUsers = useMemo(() => {
@@ -55,7 +42,7 @@ export default function LeadershipPage() {
         {/* Timeframe Selector with modern design */}
         <div className="flex justify-center mb-12">
           <div className="inline-flex rounded-xl bg-[rgb(var(--bg-primary))] p-1 shadow-lg">
-            {(['all', 'month', 'week'] as const).map((time) => (
+            {(['All', 'Month', 'Week'] as const).map((time) => (
               <button
                 key={time}
                 onClick={() => setTimeframe(time)}
@@ -75,7 +62,7 @@ export default function LeadershipPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {sortedUsers.slice(0, 3).map((user) => (
             <div 
-              key={user.id} 
+              key={user.userDetails.id} 
               className="relative transform transition-all duration-500 hover:scale-105 hover:z-10"
             >
               {/* Rank Badge with gradient */}
@@ -96,24 +83,24 @@ export default function LeadershipPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
                     rounded-full blur-xl opacity-30" />
                   <img 
-                    src={user.avatar} 
-                    alt={user.name}
+                    src={user.userDetails.avatar} 
+                    alt={user.userDetails.username || 'User Avatar'}
                     className="w-full h-full rounded-full object-cover border-4 border-[rgb(var(--accent))] 
                       shadow-lg relative z-10"
                   />
                 </div>
-                <h3 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">{user.name}</h3>
+                <h3 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">{user.userDetails.username}</h3>
                 <div className="text-[rgb(var(--accent))] font-semibold text-xl mb-6">
-                  {user.points.toLocaleString("en-US")} points
+                  {user.userDetails.points.toLocaleString("en-US")} points
                 </div>
                 <div className="flex justify-center gap-6 text-sm">
                   <div className="flex flex-col items-center">
                     <span className="text-[rgb(var(--text-secondary))]">Level</span>
-                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{user.level}</span>
+                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{Math.floor(user.userDetails.points/100)}</span>
                   </div>
                   <div className="flex flex-col items-center">
                     <span className="text-[rgb(var(--text-secondary))]">Achievements</span>
-                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{user.achievements}</span>
+                    <span className="text-[rgb(var(--accent))] font-bold text-lg">{user.userDetails.achievements.length}</span>
                   </div>
                 </div>
               </div>
@@ -125,9 +112,9 @@ export default function LeadershipPage() {
         <div className="space-y-6 max-w-4xl mx-auto">
           {sortedUsers.slice(3).map((user) => (
             <LeaderboardCard
-              key={user.id}
-              user={user}
-              isCurrentUser={user.id === currentUserId}
+              key={user.userDetails.id}
+              userData={{userDetails: user.userDetails, rank: user.rank}}
+              isCurrentUser={user.userDetails.id === currentUserId}
             />
           ))}
         </div>

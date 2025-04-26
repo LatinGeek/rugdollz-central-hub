@@ -6,6 +6,8 @@ import { ActivityCard } from '../../components/admin/ActivityCard'
 import { UserCard } from '../../components/admin/UserCard'
 import { QuickActionButton } from '../../components/admin/QuickActionButton'
 import { useRouter } from 'next/navigation'
+import { sampleActivityDetails } from '@/types/FormattedData/activity-details'
+import { sampleUserDetails } from '@/types/FormattedData/user-details'
 
 // Sample data for demonstration
 const stats = {
@@ -35,18 +37,9 @@ const stats = {
   }
 }
 
-const recentActivities = [
-  { id: 1, type: 'nft', action: 'New NFT listed', user: 'User123', time: '5 min ago' },
-  { id: 2, type: 'raffle', action: 'Raffle created', user: 'Admin', time: '15 min ago' },
-  { id: 3, type: 'lore', action: 'New lore entry', user: 'Writer456', time: '30 min ago' },
-  { id: 4, type: 'user', action: 'New user registered', user: 'NewUser789', time: '1 hour ago' }
-]
+const recentActivities = sampleActivityDetails
 
-const topUsers = [
-  { id: 1, name: 'User123', points: 12500, nfts: 45, achievements: 12 },
-  { id: 2, name: 'Writer456', points: 9800, nfts: 32, achievements: 10 },
-  { id: 3, name: 'Collector789', points: 8500, nfts: 56, achievements: 8 }
-]
+const topUsers = sampleUserDetails;
 
 const quickActions = [
   {
@@ -217,8 +210,8 @@ export default function AdminDashboard() {
         {/* Recent Activity */}
         <CollapsibleSection title="Recent Activity">
           <div className="space-y-2 mb-8">
-            {recentActivities.map((activity) => (
-              <ActivityCard key={activity.id} activity={activity} />
+            {recentActivities.map((activityDetails) => (
+              <ActivityCard key={activityDetails.activity.id} activityDetails={activityDetails} />
             ))}
           </div>
         </CollapsibleSection>
@@ -226,8 +219,8 @@ export default function AdminDashboard() {
         {/* Top Users */}
         <CollapsibleSection title="Top Users">
           <div className="space-y-2">
-            {topUsers.map((user) => (
-              <UserCard key={user.id} user={user} />
+            {topUsers.map((userDetails) => (
+              <UserCard key={userDetails.id} userDetails={userDetails} />
             ))}
           </div>
         </CollapsibleSection>

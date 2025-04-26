@@ -3,32 +3,17 @@
 import { useState, useMemo } from 'react'
 import { ModeratedLoreEntry } from './ModeratedLoreEntry'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
-
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
-
-interface LoreEntry {
-  id: string
-  nft: NFT
-  content: string
-  createdAt: string
-  author: string
-  votes: number
-}
+import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
 
 interface ModeratedLoreFeedProps {
-  entries: LoreEntry[]
+  loreEntryDetails: LoreEntryDetails[]
 }
 
-export function ModeratedLoreFeed({ entries: initialEntries }: ModeratedLoreFeedProps) {
-  const [entries, setEntries] = useState(initialEntries)
+export function ModeratedLoreFeed({ loreEntryDetails }: ModeratedLoreFeedProps) {
+  const [entries, setEntries] = useState(loreEntryDetails)
   const [searchQuery, setSearchQuery] = useState('')
   const [showWorstRated, setShowWorstRated] = useState(false)
-  const [entryToDelete, setEntryToDelete] = useState<LoreEntry | null>(null)
+  const [entryToDelete, setEntryToDelete] = useState<LoreEntryDetails | null>(null)
 
   // Filter entries by search query and worst rating
   const filteredEntries = useMemo(() => {
@@ -38,32 +23,32 @@ export function ModeratedLoreFeed({ entries: initialEntries }: ModeratedLoreFeed
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(entry => 
-        entry.author.toLowerCase().includes(query)
+        entry.userDetails.username?.toLowerCase().includes(query)
       )
     }
 
     // Apply worst rating filter
     if (showWorstRated) {
       // Sort by votes ascending and take the bottom 25%
-      const sortedByVotes = [...filtered].sort((a, b) => a.votes - b.votes)
+      const sortedByVotes = [...filtered].sort((a, b) => a.loreEntry.votes - b.loreEntry.votes)
       const worstCount = Math.max(1, Math.floor(sortedByVotes.length * 0.25))
       const worstEntries = sortedByVotes.slice(0, worstCount)
       filtered = filtered.filter(entry => 
-        worstEntries.some(worst => worst.id === entry.id)
+        worstEntries.some(worst => worst.loreEntry.id === entry.loreEntry.id)
       )
     }
 
     return filtered
   }, [entries, searchQuery, showWorstRated])
 
-  const handleDeleteClick = (entry: LoreEntry) => {
+  const handleDeleteClick = (entry: LoreEntryDetails) => {
     setEntryToDelete(entry)
   }
 
   const handleDeleteConfirm = () => {
     if (entryToDelete) {
       setEntries(currentEntries => 
-        currentEntries.filter(entry => entry.id !== entryToDelete.id)
+        currentEntries.filter(entry => entry.loreEntry.id !== entryToDelete.loreEntry.id)
       )
       setEntryToDelete(null)
     }
@@ -109,8 +94,8 @@ export function ModeratedLoreFeed({ entries: initialEntries }: ModeratedLoreFeed
       <div className="space-y-4">
         {filteredEntries.map(entry => (
           <ModeratedLoreEntry
-            key={entry.id}
-            entry={entry}
+            key={entry.loreEntry.id}
+            entryDetails={entry}
             onDelete={() => handleDeleteClick(entry)}
           />
         ))}

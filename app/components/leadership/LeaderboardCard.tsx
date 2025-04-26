@@ -1,43 +1,37 @@
 'use client'
 
+import { UserDetails } from '@/types/FormattedData/user-details'
 import { PlaceholderImage } from '../PlaceholderImage'
 
-interface User {
-  id: string
-  rank: number
-  name: string
-  avatar?: string
-  points: number
-  level: number
-  achievements: number
-  streak: number
-}
 
 interface LeaderboardCardProps {
-  user: User
+  userData: {
+    userDetails: UserDetails,
+    rank: number
+  }
   isCurrentUser?: boolean
 }
 
-export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
+export function LeaderboardCard({ userData, isCurrentUser }: LeaderboardCardProps) {
   return (
     <div className={`relative group ${isCurrentUser 
       ? 'bg-gradient-to-r from-[rgb(var(--accent-light))] to-[rgb(var(--accent-light))]/80' 
-      : user.rank <= 3 
+      : userData.rank <= 3 
       ? 'bg-[rgb(var(--bg-light))]'
       : 'bg-[rgb(var(--bg-light))]'} 
       rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
       
       {/* Rank Badge with gradient */}
       <div className={`absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center
-        ${user.rank === 1 
+        ${userData.rank === 1 
           ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' 
-          : user.rank === 2 
+          : userData.rank === 2 
           ? 'bg-gradient-to-br from-gray-400 to-gray-600'
-          : user.rank === 3
+          : userData.rank === 3
           ? 'bg-gradient-to-br from-amber-600 to-amber-800'
           : 'bg-gradient-to-br from-[rgb(var(--primary-orange))] to-[rgb(var(--bg-light))]'} 
         text-white font-bold text-lg shadow-lg z-10`}>
-        {user.rank}
+        {userData.rank}
       </div>
 
       <div className="flex items-center gap-6 ml-8">
@@ -45,10 +39,10 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
         <div className="relative flex-shrink-0">
           <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[rgb(var(--accent))] 
             shadow-lg group-hover:shadow-xl transition-all duration-300">
-            {user.avatar ? (
+            {userData.userDetails.avatar ? (
               <img 
-                src={user.avatar} 
-                alt={user.name}
+                src={userData.userDetails.avatar} 
+                alt={userData.userDetails.username || 'User Avatar'}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -62,7 +56,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
           <div className="absolute -bottom-1 -right-1 bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
             text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center 
             border-2 border-white shadow-md">
-            {user.level}
+            {Math.floor(userData.userDetails.points/100)}
           </div>
         </div>
 
@@ -72,7 +66,7 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
             <h3 className={`text-base font-bold text-lg truncate ${isCurrentUser 
               ? 'text-[rgb(var(--accent))]' 
               : 'text-[rgb(var(--text-primary))]'}`}>
-              {user.name}
+              {userData.userDetails.username}
             </h3>
             {isCurrentUser && (
               <span className="text-xs bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
@@ -85,23 +79,15 @@ export function LeaderboardCard({ user, isCurrentUser }: LeaderboardCardProps) {
             <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Points:</span>
               <span className="font-semibold text-[rgb(var(--accent))] text-base">
-                {user.points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                {userData.userDetails.points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-[rgb(var(--text-secondary))]">Achievements:</span>
               <span className="font-semibold text-[rgb(var(--accent))] text-base">
-                {user.achievements}
+                {userData.userDetails.achievements.length}
               </span>
             </div>
-            {user.streak > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[rgb(var(--text-secondary))]">Streak:</span>
-                <span className="font-semibold text-[rgb(var(--accent))] text-base">
-                  {user.streak} days
-                </span>
-              </div>
-            )}
           </div>
         </div>
 

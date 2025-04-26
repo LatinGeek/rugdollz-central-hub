@@ -1,13 +1,9 @@
 'use client'
 
+import { StoreItem } from '@/types/Entities/store-item'
+import { OrderStatusType } from '@/types/enums/order-status'
 import Image from 'next/image'
 
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
 
 interface Detail {
   label: string
@@ -24,16 +20,18 @@ interface DetailSection {
 interface TransactionInfoProps {
   title: string
   description: string
-  nft: NFT
-  status: 'pending' | 'delivered' | 'cancelled'
-  onStatusChange: (status: 'pending' | 'delivered' | 'cancelled') => void
+  item?: StoreItem
+  imageUrl?: string
+  status: OrderStatusType
+  onStatusChange: (status: OrderStatusType) => void
   details: DetailSection[]
 }
 
 export function TransactionInfo({ 
   title, 
   description, 
-  nft, 
+  item, 
+  imageUrl,
   status, 
   onStatusChange, 
   details 
@@ -56,8 +54,8 @@ export function TransactionInfo({
       {/* NFT Image */}
       <div className="relative w-full md:w-64 h-64 flex-shrink-0">
         <Image
-          src={nft.imageUrl}
-          alt={nft.name}
+          src={item?.imageUrl ?? imageUrl ?? "" }
+          alt={item?.name ?? imageUrl ?? ""}
           fill
           className="object-cover rounded-lg"
         />

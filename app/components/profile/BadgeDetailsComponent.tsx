@@ -1,109 +1,19 @@
 'use client'
 
+import { BadgeDetails } from '@/types/FormattedData/badge-details'
+import { UserBadgeRequirement } from '@/types/FormattedData/user-badge-requirement'
 import { useEffect, useState } from 'react'
 
-interface Requirement {
-  title: string
-  points: number
-  isCompleted: boolean
-}
 
-interface Badge {
-  id: string
-  name: string
-  icon: string
-  isActive: boolean
-  description: string
-  collection: string
-  earnedAt?: string
-}
-
-interface BadgeDetailsProps {
-  badges: Badge[]
-  selectedBadge: Badge
+interface BadgeDetailsComponentProps {
+  badges: BadgeDetails[]
+  selectedBadge: BadgeDetails
   onClose: () => void
-  onSelect: (badge: Badge) => void
+  onSelect: (badge: BadgeDetails) => void
 }
 
-// Helper function to get requirements based on emblem ID
-function getBadgeRequirements(badgeId: string): Requirement[] {
-  const requirementsMap: { [key: string]: Requirement[] } = {
-    '1': [{ // Early Adopter
-      title: 'Join within first month of launch',
-      points: 12000,
-      isCompleted: true
-    }],
-    '2': [{ // Race Champion
-      title: 'Win a racing tournament',
-      points: 15000,
-      isCompleted: true
-    }, {
-      title: 'Complete 50 races',
-      points: 5000,
-      isCompleted: true
-    }],
-    '3': [{ // Collector
-      title: 'Own 10 unique RugDollz NFTs',
-      points: 20000,
-      isCompleted: true
-    }],
-    '4': [{ // Rugling Master
-      title: 'Train a Rugling to Level 100',
-      points: 25000,
-      isCompleted: true
-    }, {
-      title: 'Complete all training missions',
-      points: 10000,
-      isCompleted: true
-    }],
-    '5': [{ // Top Staker
-      title: 'Stake 100,000 $RUGZ',
-      points: 30000,
-      isCompleted: false
-    }],
-    '6': [{ // Beta Tester
-      title: 'Participate in beta testing',
-      points: 8000,
-      isCompleted: true
-    }, {
-      title: 'Report 5 bugs',
-      points: 2000,
-      isCompleted: true
-    }],
-    '7': [{ // Tournament Winner
-      title: 'Win a major tournament',
-      points: 50000,
-      isCompleted: false
-    }],
-    '8': [{ // RUGZ Whale
-      title: 'Hold 1,000,000 $RUGZ',
-      points: 100000,
-      isCompleted: false
-    }],
-    '9': [{ // Community Leader
-      title: 'Create 10 community guides',
-      points: 15000,
-      isCompleted: true
-    }, {
-      title: 'Help 100 community members',
-      points: 10000,
-      isCompleted: true
-    }],
-    '10': [{ // Legendary Trader
-      title: 'Complete 100 NFT trades',
-      points: 20000,
-      isCompleted: false
-    }, {
-      title: 'Trade volume over 1M $RUGZ',
-      points: 30000,
-      isCompleted: false
-    }]
-  }
 
-  return requirementsMap[badgeId] || []
-}
-
-export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: BadgeDetailsProps) {
+export function BadgeDetailsComponent({ badges, selectedBadge, onClose, onSelect }: BadgeDetailsComponentProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -118,7 +28,7 @@ export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: Badge
 
   if (!selectedBadge) return null
 
-  const requirements = getBadgeRequirements(selectedBadge.id)
+  const requirements: UserBadgeRequirement[] = selectedBadge.userBadgeRequirements;
 
   return (
     <div 
@@ -154,16 +64,16 @@ export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: Badge
         <div className="w-full md:w-72 bg-[rgb(var(--bg-darker))] p-4 md:p-6 overflow-x-auto md:overflow-y-auto">
           <div className="hidden md:block text-sm font-medium text-[rgb(var(--text-secondary))] mb-4">BADGES</div>
           <div className="grid grid-cols-6 md:grid-cols-4 gap-2 min-w-fit md:min-w-0">
-            {badges.map((badge: Badge) => (
+            {badges.map((badge: BadgeDetails) => (
               <div
-                key={badge.id}
+                key={badge.badge.id}
                 className={`aspect-square w-12 md:w-auto rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                  badge.id === selectedBadge.id
+                  badge.badge.id === selectedBadge.badge.id
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-dark))] hover:bg-opacity-80'
-                } ${!badge.isActive && 'grayscale opacity-50'}`}
+                } ${!badge.badge.isActive && 'grayscale opacity-50'}`}
                 onClick={() => onSelect(badge)}
-                dangerouslySetInnerHTML={{ __html: badge.icon }}
+                dangerouslySetInnerHTML={{ __html: badge.badge.icon }}
               />
             ))}
           </div>
@@ -178,19 +88,19 @@ export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: Badge
             <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-8">
               <div 
                 className={`w-16 h-16 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${
-                  selectedBadge.isActive
+                  selectedBadge.badge.isActive
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-darker))] grayscale'
                 }`}
-                dangerouslySetInnerHTML={{ __html: selectedBadge.icon }}
+                dangerouslySetInnerHTML={{ __html: selectedBadge.badge.icon }}
               />
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-[rgb(var(--text-primary))]">
-                  {selectedBadge.name}
+                  {selectedBadge.badge.name}
                 </h2>
-                {selectedBadge.description && (
+                {selectedBadge.badge.description && (
                   <p className="text-sm md:text-base text-[rgb(var(--text-secondary))] mt-1">
-                    {selectedBadge.description}
+                    {selectedBadge.badge.description}
                   </p>
                 )}
               </div>
@@ -226,10 +136,10 @@ export function BadgeDetails({ badges, selectedBadge, onClose, onSelect }: Badge
                     </div>
                     <div className="flex-1">
                       <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                        {req.title}
+                        {req.requirement.title}
                       </div>
                       <div className="text-xs text-[rgb(var(--text-secondary))]">
-                        +{req.points.toLocaleString()}
+                        +{req.requirement.points.toLocaleString()}
                       </div>
                     </div>
                   </div>

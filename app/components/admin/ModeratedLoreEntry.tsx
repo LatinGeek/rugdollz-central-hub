@@ -1,5 +1,6 @@
 'use client'
 
+import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
 import { useState, useRef, useEffect } from 'react'
 
 function formatDate(dateString: string): string {
@@ -27,28 +28,14 @@ function formatDate(dateString: string): string {
   }
 }
 
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
 
-interface LoreEntry {
-  id: string
-  nft: NFT
-  content: string
-  createdAt: string
-  author: string
-  votes: number
-}
 
 interface ModeratedLoreEntryProps {
-  entry: LoreEntry
+  entryDetails: LoreEntryDetails
   onDelete: (entryId: string) => void
 }
 
-export function ModeratedLoreEntry({ entry, onDelete }: ModeratedLoreEntryProps) {
+export function ModeratedLoreEntry({ entryDetails, onDelete }: ModeratedLoreEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [needsTruncation, setNeedsTruncation] = useState(false)
   const contentRef = useRef<HTMLParagraphElement>(null)
@@ -66,20 +53,20 @@ export function ModeratedLoreEntry({ entry, onDelete }: ModeratedLoreEntryProps)
     checkOverflow()
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)
-  }, [entry.content])
+  }, [entryDetails.content])
 
   return (
     <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-4 sm:p-4 space-y-4">
       {/* Author and timestamp with delete button */}
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[rgb(var(--text-primary))]">{entry.author}</span>
-          <span className="text-xs text-[rgb(var(--text-secondary))]">({entry.votes} votes)</span>
+          <span className="text-sm text-[rgb(var(--text-primary))]">{entryDetails.author.username}</span>
+          <span className="text-xs text-[rgb(var(--text-secondary))]">({entryDetails.votes} votes)</span>
         </div>
         <div className="flex items-center gap-4">
           <span 
             className="text-xs sm:text-sm text-[rgb(var(--text-secondary))]" 
-            title={new Date(entry.createdAt).toLocaleDateString('en-US', {
+            title={new Date(entryDetails.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
@@ -89,10 +76,10 @@ export function ModeratedLoreEntry({ entry, onDelete }: ModeratedLoreEntryProps)
               hour12: false
             })}
           >
-            {formatDate(entry.createdAt)}
+            {formatDate(entryDetails.createdAt.toISOString())}
           </span>
           <button
-            onClick={() => onDelete(entry.id)}
+            onClick={() => onDelete(entryDetails.id)}
             className="text-red-500 hover:text-red-400 transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -106,17 +93,17 @@ export function ModeratedLoreEntry({ entry, onDelete }: ModeratedLoreEntryProps)
       <div className="flex gap-2 sm:gap-4">
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden flex-shrink-0">
           <img
-            src={entry.nft.imageUrl}
-            alt={entry.nft.name}
+            src={entryDetails.nft.imageUrl}
+            alt={entryDetails.nft.name}
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1">
           <h3 className="text-sm sm:text-base font-medium text-[rgb(var(--text-primary))]">
-            {entry.nft.name}
+            {entryDetails.nft.name}
           </h3>
           <p className="text-xs sm:text-sm text-[rgb(var(--text-secondary))] mb-2">
-            {entry.nft.collection}
+            {entryDetails.nft.collection}
           </p>
           <div className="relative">
             <div className={`relative ${
@@ -128,7 +115,7 @@ export function ModeratedLoreEntry({ entry, onDelete }: ModeratedLoreEntryProps)
                 ref={contentRef}
                 className="text-xs sm:text-base text-[rgb(var(--text-primary))] leading-[1.5]"
               >
-                {entry.content}
+                {entryDetails.content}
               </p>
               {!isExpanded && needsTruncation && (
                 <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[rgb(var(--bg-dark))] to-transparent pointer-events-none" />

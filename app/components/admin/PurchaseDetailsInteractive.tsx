@@ -1,54 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { PurchaseDetails } from './PurchaseDetails'
+import { PurchaseDetails } from '@/types/FormattedData/purchase-details'
+import { OrderStatusType } from '@/types/enums/order-status';
+import { Note } from '@/types/Entities/note';
+import { PurchaseDetailsComponent } from './PurchaseDetailsComponent';
 
 interface PurchaseDetailsInteractiveProps {
-  initialPurchase: {
-    id: string
-    title: string
-    description: string
-    nft: {
-      id: string
-      name: string
-      imageUrl: string
-      collection: string
-    }
-    buyer: {
-      id: string
-      username: string
-      walletAddress: string
-    }
-    status: 'pending' | 'delivered' | 'cancelled'
-    purchaseDate: string
-    price: number
-    paymentMethod: string
-    transactionHash: string
-    notes: {
-      id: string
-      content: string
-      author: string
-      createdAt: string
-    }[]
-  }
+  purchaseDetails: PurchaseDetails;
 }
 
-export function PurchaseDetailsInteractive({ initialPurchase }: PurchaseDetailsInteractiveProps) {
-  const [purchase, setPurchase] = useState(initialPurchase)
+export function PurchaseDetailsInteractive({ purchaseDetails }: PurchaseDetailsInteractiveProps) {
+  const [purchase, setPurchase] = useState(purchaseDetails)
   const [newNote, setNewNote] = useState('')
 
-  const handleStatusChange = (status: 'pending' | 'delivered' | 'cancelled') => {
+  const handleStatusChange = (status: OrderStatusType) => {
     setPurchase(current => ({ ...current, status }))
   }
 
   const handleAddNote = () => {
     if (!newNote.trim()) return
 
-    const note = {
+    const note: Note = {
       id: Date.now().toString(),
       content: newNote,
-      author: 'Admin',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      userId: purchase.buyer.id
     }
 
     setPurchase(current => ({
@@ -59,7 +36,7 @@ export function PurchaseDetailsInteractive({ initialPurchase }: PurchaseDetailsI
   }
 
   return (
-    <PurchaseDetails 
+    <PurchaseDetailsComponent 
       purchase={purchase}
       onStatusChange={handleStatusChange}
       newNote={newNote}

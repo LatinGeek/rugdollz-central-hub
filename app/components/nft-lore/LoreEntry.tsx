@@ -1,5 +1,6 @@
 'use client'
 
+import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
 import { useState, useRef, useEffect } from 'react'
 
 function formatDate(dateString: string): string {
@@ -27,29 +28,13 @@ function formatDate(dateString: string): string {
   }
 }
 
-interface NFT {
-  id: string
-  name: string
-  imageUrl: string
-  collection: string
-}
-
-interface LoreEntry {
-  id: string
-  nft: NFT
-  content: string
-  createdAt: string
-  author: string
-  votes: number
-  userVote?: 'up' | 'down' | null
-}
 
 interface LoreEntryProps {
-  entry: LoreEntry
-  onVote: (entryId: string, vote: 'up' | 'down' | null) => void
+  loreEntryDetails: LoreEntryDetails
+  onVote: (entryId: string, vote: 1 | -1 | null) => void
 }
 
-export function LoreEntry({ entry, onVote }: LoreEntryProps) {
+export function LoreEntry({ loreEntryDetails, onVote }: LoreEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [needsTruncation, setNeedsTruncation] = useState(false)
   const contentRef = useRef<HTMLParagraphElement>(null)
@@ -69,14 +54,14 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
     // Recheck on window resize
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)
-  }, [entry.content])
+  }, [loreEntryDetails.loreEntry.content])
 
-  const handleVote = (vote: 'up' | 'down') => {
+  const handleVote = (vote: 1 | -1 | null) => {
     // If user clicks the same vote again, remove their vote
-    if (entry.userVote === vote) {
-      onVote(entry.id, null)
+    if (loreEntryDetails.userVote === vote) {
+      onVote(loreEntryDetails.loreEntry.id, null)
     } else {
-      onVote(entry.id, vote)
+      onVote(loreEntryDetails.loreEntry.id, vote)
     }
   }
 
@@ -84,10 +69,10 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
     <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-4 sm:p-4 space-y-4">
       {/* Author and timestamp */}
       <div className="flex items-center justify-between text-sm">
-        <span className="text-sm text-[rgb(var(--text-primary))]">{entry.author}</span>
+        <span className="text-sm text-[rgb(var(--text-primary))]">{loreEntryDetails.userDetails.username}</span>
         <span 
           className="text-xs sm:text-sm text-[rgb(var(--text-secondary))]" 
-          title={new Date(entry.createdAt).toLocaleDateString('en-US', {
+          title={new Date(loreEntryDetails.loreEntry.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -97,7 +82,7 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
             hour12: false
           })}
         >
-          {formatDate(entry.createdAt)}
+          {formatDate(loreEntryDetails.loreEntry.createdAt.toISOString())}
         </span>
       </div>
 
@@ -105,17 +90,17 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
       <div className="flex gap-2 sm:gap-4">
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden flex-shrink-0">
           <img
-            src={entry.nft.imageUrl}
-            alt={entry.nft.name}
+            src={loreEntryDetails.nft.imageUrl}
+            alt={loreEntryDetails.nft.name}
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1">
           <h3 className="text-sm sm:text-base font-medium text-[rgb(var(--text-primary))]">
-            {entry.nft.name}
+            {loreEntryDetails.nft.name}
           </h3>
           <p className="text-xs sm:text-sm text-[rgb(var(--text-secondary))] mb-2">
-            {entry.nft.collection}
+            {loreEntryDetails.nft.collection}
           </p>
           <div className="relative">
             <div className={`relative ${
@@ -127,7 +112,7 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
                 ref={contentRef}
                 className="text-xs sm:text-base text-[rgb(var(--text-primary))] leading-[1.5]"
               >
-                {entry.content}
+                {loreEntryDetails.loreEntry.content}
               </p>
               {!isExpanded && needsTruncation && (
                 <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[rgb(var(--bg-dark))] to-transparent pointer-events-none" />
@@ -148,9 +133,9 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
       {/* Voting */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => handleVote('up')}
+          onClick={() => handleVote(1)}
           className={`flex items-center gap-1 transition-colors ${
-            entry.userVote === 'up'
+            loreEntryDetails.userVote === 1
               ? 'text-[rgb(var(--primary-orange))]'
               : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
           }`}
@@ -159,11 +144,11 @@ export function LoreEntry({ entry, onVote }: LoreEntryProps) {
             <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
           </svg>
         </button>
-        <span className="text-[rgb(var(--text-primary))]">{entry.votes}</span>
+        <span className="text-[rgb(var(--text-primary))]">{loreEntryDetails.loreEntry.votes}</span>
         <button
-          onClick={() => handleVote('down')}
+          onClick={() => handleVote(-1)}
           className={`flex items-center gap-1 transition-colors ${
-            entry.userVote === 'down'
+            loreEntryDetails.userVote === -1
               ? 'text-[rgb(var(--primary-orange))]'
               : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
           }`}

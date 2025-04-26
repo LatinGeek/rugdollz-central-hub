@@ -3,26 +3,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Download } from 'lucide-react'
 import { PlaceholderImage } from '@/app/components/PlaceholderImage'
-
-interface LayerOption {
-  id: string
-  name: string
-  imageUrl: string
-}
-
-interface LayerCategory {
-  id: string
-  name: string
-  options: LayerOption[]
-}
-
+import { NFTLayerCategoryDetails } from '@/types/FormattedData/nft-layer-category-details'
 interface NFTCustomizerProps {
-  baseImage: string
-  categories: LayerCategory[]
-}
+    baseImage: string
+    categoryDetails: NFTLayerCategoryDetails[]
+  }
 
-export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0].id)
+export function NFTCustomizer({ baseImage, categoryDetails   }: NFTCustomizerProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryDetails[0].nftLayerCategory.id)
   const [selectedLayers, setSelectedLayers] = useState<Record<string, string>>({})
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
   const [showLeftGradient, setShowLeftGradient] = useState(false)
@@ -110,8 +98,8 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
 
       // Draw selected layers
       Object.entries(selectedLayers).forEach(([categoryId, optionId]) => {
-        const category = categories.find(cat => cat.id === categoryId)
-        const option = category?.options.find(opt => opt.id === optionId)
+        const category = categoryDetails.find(cat => cat.nftLayerCategory.id === categoryId)
+        const option = category?.nftLayerOptions.find(opt => opt.id === optionId)
         
         if (option) {
           const layerImg = new Image()
@@ -125,7 +113,7 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
         }
       })
     }
-  }, [baseImage, selectedLayers, categories])
+  }, [baseImage, selectedLayers, categoryDetails])
 
   return (
     <div className="w-full max-w-full space-y-0">
@@ -169,17 +157,17 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
           }}
         >
           <div className='snap-start w-4 min-w-4 flex-shrink-0'></div>
-          {categories.map(category => (
+          {categoryDetails.map(category => (
             <button
-              key={category.id}
-              onClick={() => handleCategorySelect(category.id)}
+              key={category.nftLayerCategory.id}
+              onClick={() => handleCategorySelect(category.nftLayerCategory.id)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors snap-start ${
-                selectedCategory === category.id
+                selectedCategory === category.nftLayerCategory.id
                   ? 'bg-[rgb(var(--primary-orange))] text-white'
                   : 'bg-[rgb(var(--bg-light))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-tertiary))]'
               }`}
             >
-              {category.name}
+              {category.nftLayerCategory.name}
             </button>
           ))}
           <div className='snap-start w-4 min-w-4 flex-shrink-0'></div>
@@ -209,9 +197,9 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
           }}
         >
           <div className='snap-start w-4 min-w-4 flex-shrink-0'></div>
-          {categories
-            .find(cat => cat.id === selectedCategory)
-            ?.options.map(option => {
+          {categoryDetails
+            .find(cat => cat.nftLayerCategory.id === selectedCategory)
+            ?.nftLayerOptions.map(option => {
               const hasError = imageErrors.has(option.imageUrl)
               
               return (
@@ -226,7 +214,7 @@ export function NFTCustomizer({ baseImage, categories }: NFTCustomizerProps) {
                 >
                   {hasError ? (
                     <PlaceholderImage 
-                      category={categories.find(cat => cat.id === selectedCategory)?.name || 'User'} 
+                      category={categoryDetails.find(cat => cat.nftLayerCategory.id === selectedCategory)?.nftLayerCategory.name || 'User'} 
                       className="w-full h-full"
                     />
                   ) : (

@@ -1,21 +1,11 @@
 'use client'
 
 import { RaffleCard } from './RaffleCard'
+import { RaffleDetails } from '@/types/FormattedData/raffle-details'
 
-interface Raffle {
-  id: string
-  title: string
-  description: string
-  category: string
-  startDate: string
-  endDate: string
-  participants: number
-  maxParticipants: number
-  status: 'programmed' | 'started' | 'ended'
-}
 
 interface RaffleFeedProps {
-  raffles: Raffle[]
+  raffles: RaffleDetails[]
   joinedRaffles: string[]
   onJoin: (raffleId: string) => void
 }
@@ -25,10 +15,10 @@ export function RaffleFeed({ raffles, joinedRaffles, onJoin }: RaffleFeedProps) 
     <div className="space-y-4">
       {raffles.map(raffle => (
         <RaffleCard
-          key={raffle.id}
-          raffle={raffle}
+          key={raffle.raffle.id}
+          raffleDetails={raffle}
           onJoin={onJoin}
-          isJoined={joinedRaffles.includes(raffle.id)}
+          isJoined={joinedRaffles.includes(raffle.raffle.id)}
         />
       ))}
     </div>

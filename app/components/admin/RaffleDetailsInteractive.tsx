@@ -1,66 +1,49 @@
 'use client'
 
 import { useState } from 'react'
-import { RaffleDetails } from './RaffleDetails'
+import { RaffleDetailsComponent } from './RaffleDetailsComponent'
+import { OrderStatusType } from '@/types/enums/order-status'
+import { RaffleDetails } from '@/types/FormattedData/raffle-details'
+import { Note } from '@/types/Entities/note'
+import { NoteDetails } from '@/types/FormattedData/note-details'
+import { sampleUserDetails } from '@/types/FormattedData/user-details'
 
 interface RaffleDetailsInteractiveProps {
-  initialRaffle: {
-    id: string
-    title: string
-    description: string
-    nft: {
-      id: string
-      name: string
-      imageUrl: string
-      collection: string
-    }
-    winner: {
-      id: string
-      username: string
-      walletAddress: string
-    }
-    status: 'pending' | 'delivered' | 'cancelled'
-    startDate: string
-    endDate: string
-    ticketPrice: number
-    totalTickets: number
-    soldTickets: number
-    notes: {
-      id: string
-      content: string
-      author: string
-      createdAt: string
-    }[]
-  }
+  initialRaffle: RaffleDetails
 }
 
 export function RaffleDetailsInteractive({ initialRaffle }: RaffleDetailsInteractiveProps) {
-  const [raffle, setRaffle] = useState(initialRaffle)
+  const [raffle, setRaffle] = useState<RaffleDetails>(initialRaffle)
   const [newNote, setNewNote] = useState('')
 
-  const handleStatusChange = (status: 'pending' | 'delivered' | 'cancelled') => {
-    setRaffle(current => ({ ...current, status }))
+  const handleStatusChange = (status: OrderStatusType) => {
+    raffle.raffle.raffleStatus = status;
   }
 
   const handleAddNote = () => {
     if (!newNote.trim()) return
 
-    const note = {
-      id: Date.now().toString(),
+    const note: Note= {
+      id: "1",
       content: newNote,
-      author: 'Admin',
+      userId: '12312312',
       createdAt: new Date().toISOString()
+    }
+
+    const noteDetails: NoteDetails = {
+      note: note,
+      user: sampleUserDetails[0]
     }
 
     setRaffle(current => ({
       ...current,
-      notes: [note, ...current.notes]
+      notes: [noteDetails, ...current.notes]
     }))
     setNewNote('')
   }
 
   return (
-    <RaffleDetails 
+    <RaffleDetailsComponent 
       raffle={raffle}
       onStatusChange={handleStatusChange}
       newNote={newNote}

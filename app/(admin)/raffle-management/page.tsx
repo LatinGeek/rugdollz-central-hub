@@ -7,151 +7,47 @@ import { AdminModal } from '@/app/components/admin/AdminModal'
 import { AdminForm } from '@/app/components/admin/AdminForm'
 import AdminListItem from '@/app/components/admin/AdminListItem'
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog'
+import { RaffleDetails, sampleRaffleDetails } from '@/types/FormattedData/raffle-details'
+import { generateDefaultRaffle, Raffle } from '@/types/Entities/raffle'
+import { RaffleStatusType } from '@/types/enums/raffle-status'
 
-interface Raffle {
-  id: string
-  title: string
-  description: string
-  category: 'Bundles' | 'Game Items' | 'Pets' | 'Membership'
-  startDate: string
-  endDate: string
-  participants: number
-  maxParticipants: number
-  status: 'programmed' | 'started' | 'ended'
-  imageUrl: string
-  winner?: {
-    id: string
-    name: string
-    avatar?: string
-  }
-  requirements: string
-  rewards: string
-}
 
-// Sample raffles from the raffle discovery page
-const sampleRaffles: Raffle[] = [
-  {
-    id: '1',
-    title: 'Legendary NFT Bundle',
-    description: 'Win a collection of rare NFTs including a one-of-a-kind RugDollz and exclusive game items.',
-    category: 'Bundles' as const,
-    startDate: '2024-04-20T10:00:00Z',
-    endDate: '2025-04-25T10:00:00Z',
-    participants: 245,
-    maxParticipants: 500,
-    status: 'programmed',
-    imageUrl: 'https://i.imgur.com/example1.jpg',
-    requirements: '',
-    rewards: ''
-  },
-  {
-    id: '2',
-    title: 'Racing Kart Upgrade',
-    description: 'Get a chance to win a premium racing kart upgrade for your NFT collection.',
-    category: 'Game Items' as const,
-    startDate: '2024-04-18T00:00:00Z',
-    endDate: '2025-04-22T00:00:00Z',
-    participants: 189,
-    maxParticipants: 300,
-    status: 'started',
-    imageUrl: 'https://i.imgur.com/example2.jpg',
-    requirements: '',
-    rewards: ''
-  },
-  {
-    id: '3',
-    title: 'Exclusive Pet Companion',
-    description: 'Rare pet companion that gives special abilities in the RugDollz universe.',
-    category: 'Pets' as const,
-    startDate: '2024-04-15T00:00:00Z',
-    endDate: '2025-04-17T00:00:00Z',
-    participants: 150,
-    maxParticipants: 200,
-    status: 'ended',
-    imageUrl: 'https://i.imgur.com/example3.jpg',
-    winner: {
-      id: 'user123',
-      name: 'CryptoMaster',
-      avatar: 'https://i.pravatar.cc/150?img=3'
-    },
-    requirements: '',
-    rewards: ''
-  },
-  {
-    id: '4',
-    title: 'Premium Membership',
-    description: 'Win a 3-month premium membership with exclusive benefits and early access to new features.',
-    category: 'Membership' as const,
-    startDate: '2025-05-22T12:00:00Z',
-    endDate: '2025-05-29T12:00:00Z',
-    participants: 320,
-    maxParticipants: 500,
-    status: 'programmed',
-    imageUrl: 'https://i.imgur.com/example4.jpg',
-    requirements: '',
-    rewards: ''
-  }
-]
 
 export default function RaffleManagementPage() {
   const router = useRouter()
-  const [raffles, setRaffles] = useState<Raffle[]>(sampleRaffles)
+  const [raffles, setRaffles] = useState<RaffleDetails[]>(sampleRaffleDetails)
   const [isCreating, setIsCreating] = useState(false)
-  const [raffleToDelete, setRaffleToDelete] = useState<Raffle | null>(null)
-  const [newRaffle, setNewRaffle] = useState<Omit<Raffle, 'id'>>({
-    title: '',
-    description: '',
-    category: 'Bundles',
-    imageUrl: '',
-    startDate: '',
-    endDate: '',
-    maxParticipants: 100,
-    status: 'programmed',
-    requirements: '',
-    rewards: '',
-    participants: 0
-  })
+  const [raffleToDelete, setRaffleToDelete] = useState<RaffleDetails | null>(null)
+  const [newRaffle, setNewRaffle] = useState<Omit<Raffle, 'id'>>(generateDefaultRaffle())
 
-  const handleTitleClick = (raffle: Raffle) => {
-    router.push(`/raffle-details/${raffle.id}`)
+  const handleTitleClick = (raffleDetails: RaffleDetails) => {
+    router.push(`/raffle-details/${raffleDetails.raffle.id}`)
   }
 
-  const handleEditClick = (raffle: Raffle) => {
-    router.push(`/raffle-details/${raffle.id}`)
+  const handleEditClick = (raffleDetails: RaffleDetails) => {
+      router.push(`/raffle-details/${raffleDetails.raffle.id}`)
   }
 
   const handleCreateRaffle = () => {
-    if (!newRaffle.title || !newRaffle.description) return
+    if (!newRaffle.name || !newRaffle.description) return
 
     const raffle: Raffle = {
       id: Date.now().toString(),
       ...newRaffle
     }
 
-    setRaffles([...raffles, raffle])
+    setRaffles([...raffles, {raffle: raffle, winner: undefined, notes: []}])
     setIsCreating(false)
-    setNewRaffle({
-      title: '',
-      description: '',
-      category: 'Bundles',
-      imageUrl: '',
-      startDate: '',
-      endDate: '',
-      maxParticipants: 100,
-      status: 'programmed',
-      requirements: '',
-      rewards: '',
-      participants: 0
-    })
+    setNewRaffle(generateDefaultRaffle())
   }
 
-  const handleDeleteClick = (raffle: Raffle) => {
-    setRaffleToDelete(raffle)
+  const handleDeleteClick = (raffleDetails: RaffleDetails) => {
+    setRaffleToDelete(raffleDetails)
   }
 
   const handleDeleteConfirm = () => {
     if (raffleToDelete) {
-      setRaffles(raffles.filter(raffle => raffle.id !== raffleToDelete.id))
+      setRaffles(raffles.filter(raffleDetails => raffleDetails.raffle.id !== raffleToDelete.raffle.id))
       setRaffleToDelete(null)
     }
   }
@@ -165,10 +61,10 @@ export default function RaffleManagementPage() {
       label: 'Title',
       name: 'title',
       type: 'text' as const,
-      value: newRaffle.title,
+      value: newRaffle.name,
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
-          setNewRaffle({ ...newRaffle, title: value })
+          setNewRaffle({ ...newRaffle, name: value })
         }
       }
     },
@@ -207,7 +103,7 @@ export default function RaffleManagementPage() {
       value: new Date(newRaffle.startDate),
       onChange: (value: string | Date | null) => {
         if (value instanceof Date) {
-          setNewRaffle({ ...newRaffle, startDate: value.toISOString() })
+          setNewRaffle({ ...newRaffle, startDate: value })
         }
       }
     },
@@ -218,7 +114,7 @@ export default function RaffleManagementPage() {
       value: new Date(newRaffle.endDate),
       onChange: (value: string | Date | null) => {
         if (value instanceof Date) {
-          setNewRaffle({ ...newRaffle, endDate: value.toISOString() })
+          setNewRaffle({ ...newRaffle, endDate: value })
         }
       }
     },
@@ -226,11 +122,11 @@ export default function RaffleManagementPage() {
       label: 'Max Participants',
       name: 'maxParticipants',
       type: 'text' as const,
-      value: String(newRaffle.maxParticipants),
+      value: String(newRaffle.totalTickets),
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
           const numValue = parseInt(value) || 0
-          setNewRaffle({ ...newRaffle, maxParticipants: numValue })
+          setNewRaffle({ ...newRaffle, totalTickets: numValue })
         }
       }
     },
@@ -242,28 +138,6 @@ export default function RaffleManagementPage() {
       onChange: (value: string | Date | null) => {
         if (typeof value === 'string') {
           setNewRaffle({ ...newRaffle, imageUrl: value })
-        }
-      }
-    },
-    {
-      label: 'Requirements',
-      name: 'requirements',
-      type: 'textarea' as const,
-      value: newRaffle.requirements,
-      onChange: (value: string | Date | null) => {
-        if (typeof value === 'string') {
-          setNewRaffle({ ...newRaffle, requirements: value })
-        }
-      }
-    },
-    {
-      label: 'Rewards',
-      name: 'rewards',
-      type: 'textarea' as const,
-      value: newRaffle.rewards,
-      onChange: (value: string | Date | null) => {
-        if (typeof value === 'string') {
-          setNewRaffle({ ...newRaffle, rewards: value })
         }
       }
     }
@@ -296,23 +170,23 @@ export default function RaffleManagementPage() {
         <div className="bg-[rgb(var(--bg-dark))] rounded-xl border border-[rgb(var(--border-dark))]">
           <div className="p-2">
             <div className="space-y-4">
-              {raffles.map((raffle) => (
+              {raffles.map((raffleDetails) => (
                 <AdminListItem
-                  key={raffle.id}
-                  id={raffle.id}
-                  title={raffle.title}
-                  description={`${raffle.participants} participants • ${raffle.category} • ${raffle.requirements}`}
-                  category={raffle.category}
+                  key={raffleDetails.raffle.id}
+                  id={raffleDetails.raffle.id}
+                  title={raffleDetails.raffle.name}
+                  description={`${raffleDetails.raffle.totalTickets} participants • ${raffleDetails.raffle.category}`}
+                  category={raffleDetails.raffle.category}
                   type="raffle"
-                  status={raffle.status}
-                  imageUrl={raffle.imageUrl}
-                  startDate={raffle.startDate}
-                  endDate={raffle.endDate}
-                  participants={raffle.participants}
-                  maxParticipants={raffle.maxParticipants}
-                  onDelete={() => handleDeleteClick(raffle)}
-                  onEdit={() => handleEditClick(raffle)}
-                  onTitleClick={() => handleTitleClick(raffle)}
+                  status={raffleDetails.raffle.raffleStatus as RaffleStatusType}
+                  imageUrl={raffleDetails.raffle.imageUrl}
+                  startDate={raffleDetails.raffle.startDate.toISOString()}
+                  endDate={raffleDetails.raffle.endDate.toISOString()}
+                  participants={raffleDetails.raffle.soldTickets}
+                  maxParticipants={raffleDetails.raffle.totalTickets}
+                  onDelete={() => handleDeleteClick(raffleDetails)}
+                  onEdit={() => handleEditClick(raffleDetails)}
+                  onTitleClick={() => handleTitleClick(raffleDetails)}
                 />
               ))}
             </div>
@@ -325,19 +199,7 @@ export default function RaffleManagementPage() {
         isOpen={isCreating}
         onClose={() => {
           setIsCreating(false)
-          setNewRaffle({
-            title: '',
-            description: '',
-            category: 'Bundles',
-            imageUrl: '',
-            startDate: '',
-            endDate: '',
-            maxParticipants: 100,
-            status: 'programmed',
-            requirements: '',
-            rewards: '',
-            participants: 0
-          })
+          setNewRaffle(generateDefaultRaffle())
         }}
         title="Create New Raffle"
       >
@@ -356,7 +218,7 @@ export default function RaffleManagementPage() {
           isOpen={!!raffleToDelete}
           onClose={handleDeleteCancel}
           title="Delete Raffle"
-          description={`Are you sure you want to delete the raffle "${raffleToDelete.title}"? This action cannot be undone.`}
+          description={`Are you sure you want to delete the raffle "${raffleToDelete.raffle.name}"? This action cannot be undone.`}
           onConfirm={handleDeleteConfirm}
           action="Delete Raffle"
         />

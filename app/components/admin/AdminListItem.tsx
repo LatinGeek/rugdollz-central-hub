@@ -17,7 +17,7 @@ interface AdminListItemProps {
   endDate?: string
   participants?: number
   maxParticipants?: number
-  status?: 'programmed' | 'started' | 'ended' | 'active' | 'inactive'
+  status?: string,
   imageUrl?: string
   icon?: string
   winner?: {

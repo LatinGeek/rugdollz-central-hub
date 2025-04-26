@@ -3,32 +3,18 @@
 import { useRaffleTimer } from './useRaffleTimer'
 import { PlaceholderImage } from '../PlaceholderImage'
 import { useRouter } from 'next/navigation'
+import { RaffleDetails } from '@/types/FormattedData/raffle-details'
 
-interface Raffle {
-  id: string
-  title: string
-  description: string
-  category: string
-  startDate: string
-  endDate: string
-  participants: number
-  maxParticipants: number
-  winner?: {
-    id: string
-    name: string
-    avatar?: string
-  }
-}
 
 interface RaffleCardProps {
-  raffle: Raffle
+  raffleDetails: RaffleDetails
   onJoin: (raffleId: string) => void
   isJoined: boolean
 }
 
-export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
+export function RaffleCard({ raffleDetails, onJoin, isJoined }: RaffleCardProps) {
   const router = useRouter()
-  const timer = useRaffleTimer(raffle.startDate, raffle.endDate)
+  const timer = useRaffleTimer(raffleDetails.raffle.startDate.toISOString(), raffleDetails.raffle.endDate.toISOString())
 
   const formatTime = (value: number) => {
     return value.toString().padStart(2, '0')
@@ -39,21 +25,21 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
       return (
         <div className="text-red-500 text-right">
           <div className="text-sm font-medium">Ended</div>
-          {raffle.winner ? (
+          {raffleDetails.winner ? (
             <div className="text-white text-xs flex items-center justify-end gap-2 mt-1">
               <span>Winner:</span>
-              {raffle.winner.avatar ? (
+              {raffleDetails.winner.avatar ? (
                 <img 
-                  src={raffle.winner.avatar} 
-                  alt={raffle.winner.name}
+                  src={raffleDetails.winner.avatar} 
+                  alt={raffleDetails.winner.username}
                   className="w-4 h-4 rounded-full"
                 />
               ) : (
                 <div className="w-4 h-4 rounded-full bg-[rgb(var(--accent))] flex items-center justify-center text-[8px] text-white">
-                  {raffle.winner.name.charAt(0).toUpperCase()}
+                  {raffleDetails.winner.username?.charAt(0).toUpperCase()}
                 </div>
               )}
-              <span className="font-medium">{raffle.winner.name}</span>
+              <span className="font-medium">{raffleDetails.winner.username}</span>
             </div>
           ) : (
             <div className="text-white text-xs">Final results coming soon</div>
@@ -89,7 +75,7 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
     <div className="bg-[rgb(var(--bg-dark))] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row">
         <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-          <PlaceholderImage category={raffle.category} className="w-full h-full object-cover" />
+          <PlaceholderImage category={raffleDetails.raffle.category} className="w-full h-full object-cover" />
         </div>
 
         <div className="flex-1 p-4">
@@ -97,25 +83,25 @@ export function RaffleCard({ raffle, onJoin, isJoined }: RaffleCardProps) {
             <div className="flex-1">
               <h3 
                 className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
-                onClick={() => router.push(`/raffle-details/${raffle.id}`)}
+                onClick={() => router.push(`/raffle-details/${raffleDetails.raffle.id}`)}
               >
-                {raffle.title}
+                {raffleDetails.raffle.name}
               </h3>
               <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-                {raffle.description}
+                {raffleDetails.raffle.description}
               </p>
             </div>
             <div className="flex flex-col items-end">
               {renderTimer()}
               <span className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-                {raffle.participants}/{raffle.maxParticipants} joined
+                {raffleDetails.raffle.soldTickets}/{raffleDetails.raffle.totalTickets} joined
               </span>
             </div>
           </div>
 
           <div className="flex justify-end mt-4 sm:mt-0">
             <button
-              onClick={() => onJoin(raffle.id)}
+              onClick={() => onJoin(raffleDetails.raffle.id)}
               disabled={isJoined || timer.isEnded}
               className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                 isJoined

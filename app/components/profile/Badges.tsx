@@ -1,29 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { BadgeDetails } from './BadgeDetails'
-
-export interface Badge {
-  id: string
-  name: string
-  icon: string
-  isActive: boolean
-  description: string
-  collection: string
-}
+import { BadgeDetailsComponent } from './BadgeDetailsComponent'
+import { BadgeDetails } from '@/types/FormattedData/badge-details'
 
 interface BadgesProps {
-  badges: Badge[]
+  badges: BadgeDetails[]
   title?: string
 }
 
 export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
-  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null)
+  const [selectedBadge, setSelectedBadge] = useState<BadgeDetails | null>(null)
 
   // Sort badges: active first, then inactive
   const sortedBadges = [...badges].sort((a, b) => {
-    if (a.isActive === b.isActive) return 0
-    return a.isActive ? -1 : 1
+    if (a.badge.isActive === b.badge.isActive) return 0
+    return a.badge.isActive ? -1 : 1
   })
 
   return (
@@ -33,30 +25,30 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
         <div className="grid grid-cols-4 sm:grid-cols-8 md:grid-cols-12 gap-4">
           {sortedBadges.map((badge) => (
             <div
-              key={badge.id}
+              key={badge.badge.id}
               className="relative group aspect-square rounded-lg overflow-visible transition-all duration-300 cursor-pointer"
               onClick={() => setSelectedBadge(badge)}
             >
               <div
                 className={`w-full h-full flex items-center justify-center rounded-lg transition-all duration-300 ${
-                  badge.isActive
+                  badge.badge.isActive
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20 hover:bg-opacity-30'
                     : 'bg-[rgb(var(--bg-darker))] grayscale hover:grayscale-0'
                 }`}
               >
                 <div
                   className={`w-full h-full flex items-center justify-center transition-all duration-300 ${
-                    badge.isActive 
+                    badge.badge.isActive 
                       ? 'opacity-100' 
                       : 'opacity-30 group-hover:opacity-50'
                   }`}
-                  dangerouslySetInnerHTML={{ __html: badge.icon }}
+                  dangerouslySetInnerHTML={{ __html: badge.badge.icon }}
                 />
                 
                 {/* Status indicator */}
                 <div 
                   className={`absolute top-1 right-1 w-2 h-2 rounded-full transition-all duration-300 ${
-                    badge.isActive 
+                    badge.badge.isActive 
                       ? 'bg-[rgb(var(--accent))]' 
                       : 'bg-[rgb(var(--text-secondary))] opacity-50'
                   }`}
@@ -69,21 +61,21 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-sm font-medium text-[rgb(var(--text-primary))] truncate flex-1">
-                        {badge.name}
+                        {badge.badge.name}
                       </div>
-                      {!badge.isActive && (
+                      {!badge.badge.isActive && (
                         <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--bg-light))] text-[rgb(var(--text-secondary))] whitespace-nowrap">
                           Locked
                         </span>
                       )}
                     </div>
-                    {badge.description && (
+                    {badge.badge.description && (
                       <p className="text-xs text-[rgb(var(--text-secondary))] break-words leading-relaxed">
-                        {badge.description}
+                        {badge.badge.description}
                       </p>
                     )}
                     {/* Icon based on ID */}
-                    {badge.id === '9' && (
+                    {badge.badge.id === '9' && (
                       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-[rgb(var(--text-secondary))]">
                         <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                       </svg>
@@ -105,11 +97,11 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
 
       {/* Badge Details Modal */}
       {selectedBadge && (
-        <BadgeDetails
+        <BadgeDetailsComponent
           badges={badges}
           selectedBadge={selectedBadge}
           onClose={() => setSelectedBadge(null)}
-          onSelect={setSelectedBadge}
+          onSelect={(badge) => setSelectedBadge(badge)}
         />
       )}
     </>

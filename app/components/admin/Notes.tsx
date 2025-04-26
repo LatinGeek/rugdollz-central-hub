@@ -1,16 +1,12 @@
 'use client'
 
+import { NoteDetails } from '@/types/FormattedData/note-details'
 import { SendHorizonal } from 'lucide-react'
 
-interface Note {
-  id: string
-  content: string
-  author: string
-  createdAt: string
-}
+
 
 interface NotesProps {
-  notes: Note[]
+  notes: NoteDetails[]
   newNote: string
   onNoteChange: (note: string) => void
   onAddNote: () => void
@@ -42,19 +38,19 @@ export function Notes({ notes, newNote, onNoteChange, onAddNote }: NotesProps) {
       <div className="space-y-4">
         {notes.map(note => (
           <div
-            key={note.id}
+            key={note.note.id}
             className="p-4 bg-[rgb(var(--bg-darker))] rounded-lg"
           >
             <div className="flex justify-between items-start mb-2">
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                {note.author}
+                {note.user.username}
               </span>
               <span className="text-xs text-[rgb(var(--text-secondary))]">
-                {new Date(note.createdAt).toLocaleString()}
+                {new Date(note.note.createdAt).toLocaleString()}
               </span>
             </div>
             <p className="text-sm text-[rgb(var(--text-secondary))]">
-              {note.content}
+              {note.note.content}
             </p>
           </div>
         ))}
