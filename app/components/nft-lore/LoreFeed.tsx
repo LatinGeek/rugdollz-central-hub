@@ -9,29 +9,35 @@ interface LoreFeedProps {
 
 export function LoreFeed({ loreEntryDetails }: LoreFeedProps) {
   const [entries, setEntries] = useState<LoreEntryDetails[]>(loreEntryDetails)
+
   const handleVote = (entryId: string, vote: 1 | -1 | null) => {
-    setEntries(currentEntries =>
-      currentEntries.map((entry: LoreEntryDetails) => {
-        if (entry.loreEntry.id !== entryId) return entry
-        const oldVote = entry.userVote
-        let voteChange = 0
+    setEntries(currentEntries => {
+      const entry = currentEntries.find(e => e.loreEntry.id === entryId)
+      if (!entry) return currentEntries
 
-        // Calculate vote change
-        if (vote === null && oldVote === 1) voteChange = -1
-        if (vote === null && oldVote === -1) voteChange = 1
-        if (vote === 1 && oldVote === null) voteChange = 1
-        if (vote === 1 && oldVote === -1) voteChange = 2
-        if (vote === -1 && oldVote === null) voteChange = -1
-        if (vote === -1 && oldVote === 1) voteChange = -2
+      const oldVote = entry.userVote
+      let voteChange = 0
 
+      // Calculate vote change
+      if (vote === null && oldVote === 1) voteChange = -1
+      if (vote === null && oldVote === -1) voteChange = 1
+      if (vote === 1 && oldVote === null) voteChange = 1
+      if (vote === 1 && oldVote === -1) voteChange = 2
+      if (vote === -1 && oldVote === null) voteChange = -1
+      if (vote === -1 && oldVote === 1) voteChange = -2
 
-        entry.loreEntry.votes = entry.loreEntry.votes + voteChange
+      return currentEntries.map(e => {
+        if (e.loreEntry.id !== entryId) return e
         return {
-          ...entry,
+          ...e,
+          loreEntry: {
+            ...e.loreEntry,
+            votes: e.loreEntry.votes + voteChange
+          },
           userVote: vote
         }
       })
-    )
+    })
   }
 
   return (
