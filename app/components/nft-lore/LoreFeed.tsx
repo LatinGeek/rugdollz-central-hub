@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LoreEntry } from './LoreEntry'
 import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
 interface LoreFeedProps {
@@ -9,6 +9,10 @@ interface LoreFeedProps {
 
 export function LoreFeed({ loreEntryDetails }: LoreFeedProps) {
   const [entries, setEntries] = useState<LoreEntryDetails[]>(loreEntryDetails)
+  
+  useEffect(() => {
+    setEntries(loreEntryDetails)
+  }, [loreEntryDetails])
 
   const handleVote = (entryId: string, vote: 1 | -1 | null) => {
     setEntries(currentEntries => {
