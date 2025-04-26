@@ -20,6 +20,10 @@ export function RaffleCard({ raffleDetails, onJoin, isJoined }: RaffleCardProps)
     return value.toString().padStart(2, '0')
   }
 
+  const navigateToRaffleDetails = () => {
+    router.push(`/raffle-details/${raffleDetails.raffle.id}`)
+  }
+
   const renderTimer = () => {
     if (timer.isEnded) {
       return (
@@ -75,7 +79,17 @@ export function RaffleCard({ raffleDetails, onJoin, isJoined }: RaffleCardProps)
     <div className="bg-[rgb(var(--bg-dark))] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row">
         <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-          <PlaceholderImage category={raffleDetails.raffle.category} className="w-full h-full object-cover" />
+          <div className="w-full h-48 rounded-t-lg overflow-hidden cursor-pointer" onClick={navigateToRaffleDetails}>
+            {raffleDetails.raffle.imageUrl ? (
+              <img
+                src={raffleDetails.raffle.imageUrl}
+                alt={raffleDetails.raffle.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <PlaceholderImage category={raffleDetails.raffle.category} className="w-full h-full object-cover" />
+            )}
+          </div>
         </div>
 
         <div className="flex-1 p-4">
@@ -83,7 +97,7 @@ export function RaffleCard({ raffleDetails, onJoin, isJoined }: RaffleCardProps)
             <div className="flex-1">
               <h3 
                 className="text-lg font-semibold text-[rgb(var(--text-primary))] cursor-pointer hover:text-[rgb(var(--accent))]"
-                onClick={() => router.push(`/raffle-details/${raffleDetails.raffle.id}`)}
+                onClick={navigateToRaffleDetails}
               >
                 {raffleDetails.raffle.name}
               </h3>
