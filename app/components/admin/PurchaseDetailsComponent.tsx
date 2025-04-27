@@ -24,18 +24,19 @@ export function PurchaseDetailsComponent({
   return (
     <div className="space-y-8">
       <TransactionInfo
+        showStatusChange={true}
         title={purchase.item.name}
         description={purchase.item.description}
         item={purchase.item}
-        status={purchase.status}
+        status={purchase.purchase.status}
         onStatusChange={onStatusChange}
         details={[
           {
             label: 'Purchase Details',
             details: [
-              { label: 'Purchase Date', value: purchase.purchaseDate.toLocaleString(), format: 'date' },
-              { label: 'Price', value: purchase.price, format: 'currency', currency: purchase.paymentMethod },
-              { label: 'Transaction Hash', value: purchase.transactionHash, format: 'text' }
+              { label: 'Purchase Date', value: purchase.purchase.purchaseDate.toLocaleString(), format: 'date' },
+              { label: 'Price', value: purchase.purchase.price, format: 'currency', currency: purchase.purchase.paymentMethod },
+              { label: 'Transaction Hash', value: purchase.purchase.transactionHash, format: 'text' }
             ]
           },
           {
@@ -54,6 +55,7 @@ export function PurchaseDetailsComponent({
         newNote={newNote}
         onNoteChange={onNoteChange}
         onAddNote={onAddNote}
+        showNoteAddition={true}
       />
     </div>
   )

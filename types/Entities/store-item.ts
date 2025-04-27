@@ -15,7 +15,7 @@ export const sampleStoreItems: StoreItem[] = [  {
   name: 'RugDollz Racing Kart',
   description: 'High-performance racing kart for the NFT Race game',
   price: 1000,
-  imageUrl: '/images/kart1.png',
+  imageUrl: '/images/sample-nfts/nft-1.png',
   category: 'Game Items',
   createdAt: new Date(),
   updatedAt: new Date()
@@ -25,7 +25,7 @@ export const sampleStoreItems: StoreItem[] = [  {
   name: 'Rugling Pet',
   description: 'Cute companion pet with special abilities',
   price: 500,
-  imageUrl: '/images/rugling1.png',
+  imageUrl: '/images/sample-nfts/nft-2.png',
   category: 'Pets',
   createdAt: new Date(),
   updatedAt: new Date()

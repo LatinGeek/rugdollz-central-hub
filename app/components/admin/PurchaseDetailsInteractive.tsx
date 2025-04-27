@@ -5,17 +5,20 @@ import { PurchaseDetails } from '@/types/FormattedData/purchase-details'
 import { OrderStatusType } from '@/types/enums/order-status';
 import { Note } from '@/types/Entities/note';
 import { PurchaseDetailsComponent } from './PurchaseDetailsComponent';
+import { NoteDetails } from '@/types/FormattedData/note-details';
 
 interface PurchaseDetailsInteractiveProps {
   purchaseDetails: PurchaseDetails;
 }
 
 export function PurchaseDetailsInteractive({ purchaseDetails }: PurchaseDetailsInteractiveProps) {
-  const [purchase, setPurchase] = useState(purchaseDetails)
+  const [purchase, setPurchase] = useState<PurchaseDetails>(purchaseDetails)
   const [newNote, setNewNote] = useState('')
 
   const handleStatusChange = (status: OrderStatusType) => {
-    setPurchase(current => ({ ...current, status }))
+    console.log(purchase);
+    purchase.purchase.status = status;
+    setPurchase({...purchase});
   }
 
   const handleAddNote = () => {
@@ -28,9 +31,14 @@ export function PurchaseDetailsInteractive({ purchaseDetails }: PurchaseDetailsI
       userId: purchase.buyer.id
     }
 
+    const noteDetails: NoteDetails = {
+      note: note,
+      user: purchase.buyer
+    }
+
     setPurchase(current => ({
       ...current,
-      notes: [note, ...current.notes]
+      notes: [noteDetails, ...current.notes]
     }))
     setNewNote('')
   }

@@ -39,7 +39,6 @@ export function ModeratedLoreEntry({ entryDetails, onDelete }: ModeratedLoreEntr
   const [isExpanded, setIsExpanded] = useState(false)
   const [needsTruncation, setNeedsTruncation] = useState(false)
   const contentRef = useRef<HTMLParagraphElement>(null)
-
   useEffect(() => {
     const checkOverflow = () => {
       const element = contentRef.current
@@ -53,20 +52,20 @@ export function ModeratedLoreEntry({ entryDetails, onDelete }: ModeratedLoreEntr
     checkOverflow()
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)
-  }, [entryDetails.content])
+  }, [entryDetails.loreEntry.content])
 
   return (
     <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-4 sm:p-4 space-y-4">
       {/* Author and timestamp with delete button */}
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[rgb(var(--text-primary))]">{entryDetails.author.username}</span>
-          <span className="text-xs text-[rgb(var(--text-secondary))]">({entryDetails.votes} votes)</span>
+          <span className="text-sm text-[rgb(var(--text-primary))]">{entryDetails.userDetails.username}</span>
+          <span className="text-xs text-[rgb(var(--text-secondary))]">({entryDetails.loreEntry.votes} votes)</span>
         </div>
         <div className="flex items-center gap-4">
           <span 
             className="text-xs sm:text-sm text-[rgb(var(--text-secondary))]" 
-            title={new Date(entryDetails.createdAt).toLocaleDateString('en-US', {
+            title={new Date(entryDetails.loreEntry.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
@@ -76,10 +75,10 @@ export function ModeratedLoreEntry({ entryDetails, onDelete }: ModeratedLoreEntr
               hour12: false
             })}
           >
-            {formatDate(entryDetails.createdAt.toISOString())}
+            {formatDate(entryDetails.loreEntry.createdAt.toISOString())}
           </span>
           <button
-            onClick={() => onDelete(entryDetails.id)}
+            onClick={() => onDelete(entryDetails.loreEntry.id)}
             className="text-red-500 hover:text-red-400 transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -115,7 +114,7 @@ export function ModeratedLoreEntry({ entryDetails, onDelete }: ModeratedLoreEntr
                 ref={contentRef}
                 className="text-xs sm:text-base text-[rgb(var(--text-primary))] leading-[1.5]"
               >
-                {entryDetails.content}
+                {entryDetails.loreEntry.content}
               </p>
               {!isExpanded && needsTruncation && (
                 <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[rgb(var(--bg-dark))] to-transparent pointer-events-none" />

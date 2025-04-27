@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { PurchaseDetails } from '@/types/FormattedData/purchase-details'
 import { OrderStatusType } from '@/types/enums/order-status'
+import { PlaceholderImage } from '../PlaceholderImage'
 
 interface PurchaseListProps {
   purchases: PurchaseDetails[]
@@ -13,7 +14,8 @@ interface PurchaseListProps {
 
 export function PurchaseList({ purchases, onStatusChange, onTitleClick }: PurchaseListProps) {
   const [searchQuery, setSearchQuery] = useState('')
-
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
+  console.log(purchases);
   const filteredPurchases = purchases.filter(purchase =>
     purchase.buyer.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     purchase.item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -30,6 +32,10 @@ export function PurchaseList({ purchases, onStatusChange, onTitleClick }: Purcha
       default:
         return 'bg-gray-500/20 text-gray-500'
     }
+  }
+
+  const handleImageError = (imageUrl: string) => {
+    setImageErrors(prev => new Set([...prev, imageUrl]))
   }
 
   return (
@@ -55,12 +61,17 @@ export function PurchaseList({ purchases, onStatusChange, onTitleClick }: Purcha
           >
             {/* NFT Image */}
             <div className="relative w-16 h-16 flex-shrink-0">
-              <Image
-                src={purchase.item.imageUrl}
-                alt={purchase.item.name}
-                fill
-                className="object-cover rounded-lg"
-              />
+              {imageErrors.has(purchase.item.imageUrl) ? (
+                <PlaceholderImage category={purchase.item.category} className="w-full h-full rounded-lg" />
+              ) : (
+                <Image
+                  src={purchase.item.imageUrl}
+                  alt={purchase.item.name}
+                  fill
+                  className="object-cover rounded-lg"
+                  onError={() => handleImageError(purchase.item.imageUrl)}
+                />
+              )}
             </div>
 
             {/* Purchase Details */}
