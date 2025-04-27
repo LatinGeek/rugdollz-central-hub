@@ -48,7 +48,7 @@ export function Notes({ notes, newNote, onNoteChange, onAddNote, showNoteAdditio
                 {note.user.username}
               </span>
               <span className="text-xs text-[rgb(var(--text-secondary))]">
-                {new Date(note.note.createdAt).toLocaleString()}
+                {new Date(note.note.createdAt).toLocaleString("en-US")}
               </span>
             </div>
             <p className="text-sm text-[rgb(var(--text-secondary))]">
