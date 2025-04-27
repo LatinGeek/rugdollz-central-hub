@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ExternalLink, ChevronDown, Sword, Rabbit } from 'lucide-react'
 
 const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
@@ -85,12 +85,21 @@ const adminNavigation = [
   { name: 'Lore Moderation', href: '/lore-moderation' },
 ]
 
-export function Navigation() {
+interface NavigationProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function Navigation({ isOpen = false, onClose }: NavigationProps) {
   const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(isOpen)
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const [isBuyMenuOpen, setIsBuyMenuOpen] = useState(false)
   const [isStakeMenuOpen, setIsStakeMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setIsMobileMenuOpen(isOpen)
+  }, [isOpen])
 
   const isAdminPath = pathname.startsWith('/admin') || 
                      pathname.startsWith('/badge-management') || 
@@ -99,7 +108,7 @@ export function Navigation() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+      <div className={`hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 ${isOpen ? 'flex' : 'hidden'}`}>
         <div className="flex-1 flex flex-col min-h-0 bg-[rgb(var(--bg-darker))] border-[rgb(var(--border-dark))]">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
@@ -273,7 +282,9 @@ export function Navigation() {
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="text-xl font-bold text-[rgb(var(--text-primary))]">RugDollz Hub</h1>
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => {
+              onClose();
+            }}
             className="p-2 rounded-md text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-light))] focus:outline-none"
           >
             <span className="sr-only">Open menu</span>
@@ -312,7 +323,7 @@ export function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => onClose()}
                   className={`block px-3 py-2 rounded-md text-base font-medium ${
                     isActive
                       ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
@@ -357,7 +368,7 @@ export function Navigation() {
                       <Link
                         key={item.name}
                         href={item.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={() => onClose()}
                         className={`block px-3 py-2 text-base font-medium rounded-md ${
                           isActive
                             ? 'bg-[rgb(var(--bg-light))] text-[rgb(var(--primary-orange))]'
