@@ -5,21 +5,18 @@ import { Inter } from 'next/font/google'
 import { Navigation } from './components/Navigation'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
+import { Providers } from './providers'
+import { useAuth } from './contexts/AuthContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const { isAuthenticated, user } = useAuth()
 
   const handleMenuClick = () => {
-    console.log('Menu clicked')
     setIsSidebarOpen(prev => !prev)
-    console.log('isSidebarOpen', isSidebarOpen)
   }
 
   return (
@@ -31,9 +28,9 @@ export default function RootLayout({
             {/* Main content */}
             <div className="md:pl-64 flex flex-col flex-1">
               <Header 
-                isAuthenticated={true}
-                userBalance={1000}
-                username="User"
+                isAuthenticated={isAuthenticated}
+                userBalance={user?.balance ? parseFloat(user.balance) : 0}
+                username={user?.address}
                 onMenuClick={handleMenuClick}
                 isOpen={isSidebarOpen}
               />
@@ -53,5 +50,17 @@ export default function RootLayout({
         </div>
       </body>
     </html>
+  )
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <Providers>
+      <RootLayoutContent>{children}</RootLayoutContent>
+    </Providers>
   )
 } 
