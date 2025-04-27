@@ -10,7 +10,7 @@ export default function RaffleDetailsPage() {
       </h1>
       
       <div className="bg-[rgb(var(--bg-dark))] rounded-lg p-6">
-        <RaffleDetailsInteractive initialRaffle={sampleRaffleDetails[0]} />
+        <RaffleDetailsInteractive initialRaffle={sampleRaffleDetails[0]} isAdmin={true} />
       </div>
     </div>
   )

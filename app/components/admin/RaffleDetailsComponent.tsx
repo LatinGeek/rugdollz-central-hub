@@ -12,6 +12,11 @@ interface RaffleDetailsComponentProps {
   newNote: string
   onNoteChange: (note: string) => void
   onAddNote: () => void
+  showStatusChange: boolean
+  showNoteAddition: boolean
+  showNotes: boolean
+  onJoin: () => void,
+  userJoined: boolean
 }
 
 export function RaffleDetailsComponent({
@@ -19,7 +24,12 @@ export function RaffleDetailsComponent({
   onStatusChange,
   newNote,
   onNoteChange,
-  onAddNote
+  onAddNote,
+  showStatusChange,
+  showNoteAddition,
+  showNotes,
+  onJoin,
+  userJoined
 }: RaffleDetailsComponentProps) {
   return (
     <div className="space-y-8">
@@ -29,6 +39,7 @@ export function RaffleDetailsComponent({
         status={raffle.raffle.raffleStatus}
         imageUrl={raffle.raffle.imageUrl}
         onStatusChange={onStatusChange}
+        showStatusChange={showStatusChange}
         details={[
           {
             label: 'Raffle Details',
@@ -47,15 +58,34 @@ export function RaffleDetailsComponent({
             ]
           }
         ]}
-      />
+      >
+        
+        {!showStatusChange && <div className="flex justify-end mt-4">
+           <button
+             onClick={onJoin}
+             disabled={userJoined}
+             className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+               userJoined
+                 ? 'bg-[rgba(var(--primary-orange))]/70 text-white cursor-not-allowed'
+                 : 'bg-[rgba(var(--primary-orange))] text-white hover:bg-[rgba(var(--primary-orange))]/40'
+             }`}
+           >
+             {userJoined ? 'Joined' : 'Join Raffle'}
+           </button>
+         </div>}
+
+         </TransactionInfo>
 
       {/* Notes Section */}
-      <Notes
-        notes={raffle.notes}
-        newNote={newNote}
-        onNoteChange={onNoteChange}
-        onAddNote={onAddNote}
-      />
+      {showNotes && (
+        <Notes
+          notes={raffle.notes}
+          newNote={newNote}
+          onNoteChange={onNoteChange}
+          onAddNote={onAddNote}
+          showNoteAddition={showNoteAddition}
+        />
+      )}
     </div>
   )
 } 

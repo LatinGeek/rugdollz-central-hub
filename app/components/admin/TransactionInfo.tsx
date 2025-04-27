@@ -24,7 +24,9 @@ interface TransactionInfoProps {
   imageUrl?: string
   status: OrderStatusType
   onStatusChange: (status: OrderStatusType) => void
-  details: DetailSection[]
+  details: DetailSection[],
+  showStatusChange: boolean,
+  children?: React.ReactNode
 }
 
 export function TransactionInfo({ 
@@ -32,9 +34,12 @@ export function TransactionInfo({
   description, 
   item, 
   imageUrl,
-  status, 
+  status,   
   onStatusChange, 
-  details 
+  details,
+  showStatusChange,
+  children
+
 }: TransactionInfoProps) {
   const formatValue = (value: string | number, format?: string, currency?: string) => {
     if (format === 'date') {
@@ -72,17 +77,19 @@ export function TransactionInfo({
               {description}
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <select
-              value={status}
-              onChange={(e) => onStatusChange(e.target.value as 'pending' | 'delivered' | 'cancelled')}
+          {showStatusChange && (
+            <div className="flex items-center gap-4">
+              <select
+                value={status}
+                onChange={(e) => onStatusChange(e.target.value as 'pending' | 'delivered' | 'cancelled')}
               className="bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-3 py-1 text-sm"
             >
               <option value="pending">Pending</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
             </select>
-          </div>
+          </div>)}
+          {children}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

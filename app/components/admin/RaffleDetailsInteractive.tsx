@@ -10,11 +10,13 @@ import { sampleUserDetails } from '@/types/FormattedData/user-details'
 
 interface RaffleDetailsInteractiveProps {
   initialRaffle: RaffleDetails
+  isAdmin: boolean
 }
 
-export function RaffleDetailsInteractive({ initialRaffle }: RaffleDetailsInteractiveProps) {
+export function RaffleDetailsInteractive({ initialRaffle, isAdmin }: RaffleDetailsInteractiveProps) {
   const [raffle, setRaffle] = useState<RaffleDetails>(initialRaffle)
   const [newNote, setNewNote] = useState('')
+  const userJoined = false;
 
   const handleStatusChange = (status: OrderStatusType) => {
     raffle.raffle.raffleStatus = status;
@@ -42,6 +44,10 @@ export function RaffleDetailsInteractive({ initialRaffle }: RaffleDetailsInterac
     setNewNote('')
   }
 
+  const handleJoin = () => {
+
+  }
+
   return (
     <RaffleDetailsComponent 
       raffle={raffle}
@@ -49,6 +55,11 @@ export function RaffleDetailsInteractive({ initialRaffle }: RaffleDetailsInterac
       newNote={newNote}
       onNoteChange={setNewNote}
       onAddNote={handleAddNote}
+      showStatusChange={isAdmin}
+      showNoteAddition={isAdmin}
+      showNotes={isAdmin}
+      onJoin={handleJoin}
+      userJoined={userJoined}
     />
   )
 } 
