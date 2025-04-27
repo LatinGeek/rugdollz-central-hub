@@ -82,7 +82,7 @@ export function TransactionInfo({
               <select
                 value={status}
                 onChange={(e) => onStatusChange(e.target.value as 'pending' | 'delivered' | 'cancelled')}
-              className="bg-[rgb(var(--bg-dark))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-3 py-1 text-sm"
+              className="bg-[rgb(var(--bg-light))] text-[rgb(var(--text-primary))] border border-[rgb(var(--border-dark))] rounded-lg px-4 py-3 text-md"
             >
               <option value="pending">Pending</option>
               <option value="delivered">Delivered</option>
