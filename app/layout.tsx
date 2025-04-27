@@ -37,7 +37,7 @@ export default function RootLayout({
                 onMenuClick={handleMenuClick}
                 isOpen={isSidebarOpen}
               />
-              <main className="flex-1 mt-10">
+              <main className="flex-1 mt-0 md:mt-6">
                 <div className="py-0 md:py-6">
                   <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8">
                     {/* Add top padding on mobile to account for the fixed header */}
