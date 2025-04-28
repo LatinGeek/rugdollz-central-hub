@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import { ProfileHeader } from '@/app/components/profile/ProfileHeader'
 import { Badges } from '@/app/components/profile/Badges'
 import { Highlights } from '@/app/components/profile/Highlights'
@@ -8,13 +8,13 @@ import { useProfileService } from '@/services/profile'
 import { UserProfileData } from '@/types/FormattedData/user-profile-data'
 
 interface ProfilePageProps {
-  params: {
+  params: Promise<{
     address: string
-  }
+  }>
 }
 
 export default function ProfilePage({ params }: ProfilePageProps) {
-  const { address } = params
+  const { address } = use(params)
   const { getProfile } = useProfileService()
   const [profile, setProfile] = useState<UserProfileData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
