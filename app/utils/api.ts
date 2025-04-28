@@ -1,3 +1,4 @@
+import { useAuthService } from '@/services/auth'
 import { useAuth } from '../contexts/AuthContext'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
@@ -11,13 +12,11 @@ interface ApiRequestOptions extends RequestInit {
   requireAuth?: boolean
 }
 
-interface TokenResponse {
-  token: string
-  expiresIn: number
-}
+
 
 export function useApi() {
   const auth = useAuth()
+  const { getAuthToken } = useAuthService();
 
   const handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
     if (!response.ok) {
@@ -28,42 +27,7 @@ export function useApi() {
     return { data }
   }
 
-  const getAuthToken = async (): Promise<string> => {
-    // Check if we have a valid token
-    const token = localStorage.getItem('auth_token')
-    const tokenExpiry = localStorage.getItem('auth_token_expiry')
 
-    if (token && tokenExpiry && new Date(tokenExpiry) > new Date()) {
-      return token
-    }
-
-    // If no valid token, get a new one
-    const message = `Authenticate to RugDollz Central Hub\nAddress: ${auth.user?.address}\nTimestamp: ${Date.now()}`
-    const signature = await auth.signMessage(message)
-
-    const response = await fetch(`${API_BASE_URL}/auth/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Message': btoa(message),
-        'X-Auth-Signature': signature,
-        'X-Auth-Address': auth.user?.address?.toLowerCase() || ''
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to get authentication token')
-    }
-
-    const { token: newToken, expiresIn } = await response.json() as TokenResponse
-
-    // Store the new token
-    const expiryDate = new Date(Date.now() + expiresIn * 1000)
-    localStorage.setItem('auth_token', newToken)
-    localStorage.setItem('auth_token_expiry', expiryDate.toISOString())
-
-    return newToken
-  }
 
   const getAuthHeaders = async (requireAuth: boolean): Promise<HeadersInit> => {
     const headers: HeadersInit = {
@@ -71,12 +35,12 @@ export function useApi() {
     }
 
     if (requireAuth) {
-      if (!auth.isAuthenticated) {
+      if (!auth.isAuthenticated || !auth.user?.address) {
         throw new Error('Authentication required')
       }
 
       try {
-        const token = await getAuthToken()
+        const token = await getAuthToken(auth.user.address )
         headers['Authorization'] = `Bearer ${token}`
       } catch (error) {
         console.error('Failed to get auth token:', error)
