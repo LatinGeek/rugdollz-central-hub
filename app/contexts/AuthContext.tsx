@@ -1,15 +1,11 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+import {  useDisconnect, useSignMessage } from 'wagmi'
 import { useRouter } from 'next/navigation'
-
-interface User {
-  address: string
-  balance: string
-  chainId: number
-}
+import { User } from '@/types/Entities/user'
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
+import { UserRole } from '@/types/enums/user-role'
 
 interface AuthContextType {
   user: User | null
@@ -26,33 +22,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const { open } = useAppKit()
 
-  const { address, isConnected, chainId } = useAccount()
-  const { connect: connectWallet } = useConnect()
+  const { address, isConnected } = useAppKitAccount()
   const { disconnect: disconnectWallet } = useDisconnect()
   const { signMessageAsync } = useSignMessage()
 
   useEffect(() => {
     if (isConnected && address) {
-      // Fetch user balance and other details
       fetchUserDetails()
     } else {
       setUser(null)
     }
     setIsLoading(false)
-  }, [isConnected, address, chainId])
+  }, [isConnected, address])
 
   const fetchUserDetails = async () => {
     if (!address) return
 
     try {
-      // Here you would typically fetch user details from your backend
-      // For now, we'll just set the basic wallet info
-      setUser({
+      console.log(address)
+      // Create a new user with the wallet address
+      const newUser: User = {
+        id: address, // Using address as ID for now
         address,
-        balance: '0', // You would fetch this from your backend
-        chainId: chainId || 1,
-      })
+        points: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        achievements: 0,
+        role: UserRole.user
+      }
+      setUser(newUser)
     } catch (error) {
       console.error('Error fetching user details:', error)
       setUser(null)
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const connect = async () => {
     try {
-      await connectWallet({ connector: injected() })
+      await open()
     } catch (error) {
       console.error('Error connecting wallet:', error)
     }
