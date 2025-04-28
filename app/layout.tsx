@@ -6,14 +6,12 @@ import { Navigation } from './components/Navigation'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { Providers } from './providers'
-import { useAuth } from './contexts/AuthContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const { isAuthenticated, user } = useAuth()
 
   const handleMenuClick = () => {
     setIsSidebarOpen(prev => !prev)
@@ -28,9 +26,6 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
             {/* Main content */}
             <div className="md:pl-64 flex flex-col flex-1">
               <Header 
-                isAuthenticated={isAuthenticated}
-                userBalance={user?.balance ? parseFloat(user.balance) : 0}
-                username={user?.address}
                 onMenuClick={handleMenuClick}
                 isOpen={isSidebarOpen}
               />

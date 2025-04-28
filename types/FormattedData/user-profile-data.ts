@@ -1,17 +1,17 @@
-import { Badge, sampleBadges } from "../Entities/badge";
 import { NFT, sampleNFTs } from "../nft";
+import { BadgeDetails, sampleBadgeDetails } from "./badge-details";
 import { sampleUserDetails, UserDetails } from "./user-details";
 
 export interface UserProfileData {
   user: UserDetails;
-  badges: Badge[];
+  badges: BadgeDetails[];
   nfts: NFT[];
 }
 
 export const sampleUserProfileData: UserProfileData[] = [
   {
     user: sampleUserDetails[0],
-    badges: sampleBadges,
+    badges: sampleBadgeDetails,
     nfts: sampleNFTs,
   },
 ];

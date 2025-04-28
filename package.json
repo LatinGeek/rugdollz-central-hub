@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.74.7",
     "@types/react-datepicker": "^7.0.0",
+    "ethers": "^6.13.7",
     "framer-motion": "^12.7.4",
     "lucide-react": "^0.501.0",
     "next": "15.3.1",

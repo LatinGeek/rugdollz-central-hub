@@ -1,32 +1,74 @@
 'use client'
 
-import { use } from 'react'
+import { useEffect, useState } from 'react'
 import { ProfileHeader } from '@/app/components/profile/ProfileHeader'
 import { Badges } from '@/app/components/profile/Badges'
 import { Highlights } from '@/app/components/profile/Highlights'
-import { sampleNFTs } from '@/types/nft'
-import { sampleBadgeDetails } from '@/types/FormattedData/badge-details'
+import { useProfileService } from '@/services/profile'
+import { UserProfileData } from '@/types/FormattedData/user-profile-data'
 
 interface ProfilePageProps {
-  params: Promise<{
+  params: {
     address: string
-  }>
+  }
 }
 
 export default function ProfilePage({ params }: ProfilePageProps) {
-  // Unwrap the params Promise using React.use()
-  const { address } = use(params)
+  const { address } = params
+  const { getProfile } = useProfileService()
+  const [profile, setProfile] = useState<UserProfileData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile(address)
+        if (data !== undefined) {
+          setProfile(data)
+        } else {
+          setProfile(null)
+        }
+      } catch (err) {
+        setError('Failed to load profile')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [address, getProfile])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
+        <div className="text-[rgb(var(--text-primary))]">Loading...</div>
+      </div>
+    )
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
+        <div className="text-[rgb(var(--text-primary))]">{error || 'Profile not found'}</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-darker))]">
-      <ProfileHeader walletAddress={address} username="LatinGeek"/>
+      <ProfileHeader 
+        walletAddress={profile.user?.address ?? ''} 
+        username={profile.user?.username ?? ''}
+      />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Badges badges={sampleBadgeDetails} />
+          <Badges badges={profile.badges} />
         </div>
         <div>
-          <Highlights nfts={sampleNFTs} />
+          <Highlights nfts={profile.nfts} />
         </div>
       </div>
     </div>

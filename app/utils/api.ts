@@ -1,5 +1,12 @@
 import { useAuth } from '../contexts/AuthContext'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+
+interface ApiResponse<T> {
+  data?: T
+  error?: string
+}
+
 interface ApiRequestOptions extends RequestInit {
   requireAuth?: boolean
 }
@@ -7,14 +14,18 @@ interface ApiRequestOptions extends RequestInit {
 export function useApi() {
   const auth = useAuth()
 
-  const apiRequest = async <T>(
-    endpoint: string,
-    options: ApiRequestOptions = {}
-  ): Promise<T> => {
-    const { requireAuth = true, ...fetchOptions } = options
+  const handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }))
+      return { error: error.message }
+    }
+    const data = await response.json()
+    return { data }
+  }
+
+  const getAuthHeaders = async (requireAuth: boolean) => {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
-      ...options.headers,
     }
 
     if (requireAuth) {
@@ -22,33 +33,66 @@ export function useApi() {
         throw new Error('Authentication required')
       }
 
-      // Sign the request timestamp
       const timestamp = Date.now().toString()
       const signature = await auth.signMessage(timestamp)
 
-      headers['X-Auth-Address'] = auth.user?.address
+      headers['X-Auth-Address'] = auth.user?.address || ''
       headers['X-Auth-Timestamp'] = timestamp
       headers['X-Auth-Signature'] = signature
     }
 
-    const response = await fetch(endpoint, {
-      ...fetchOptions,
-      headers,
-    })
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`)
-    }
-
-    return response.json()
+    return headers
   }
 
-  return { apiRequest }
+  const request = async <T>(
+    endpoint: string,
+    options: ApiRequestOptions = {}
+  ): Promise<ApiResponse<T>> => {
+    try {
+      const { requireAuth = true, ...fetchOptions } = options
+      const headers = await getAuthHeaders(requireAuth)
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...fetchOptions,
+        headers: {
+          ...headers,
+          ...options.headers,
+        },
+      })
+
+      return handleResponse<T>(response)
+    } catch (error) {
+      console.error(error)
+      return { error: 'Network error' }
+    }
+  }
+
+  return {
+    get: <T>(endpoint: string, options?: ApiRequestOptions) => 
+      request<T>(endpoint, { ...options, method: 'GET' }),
+    
+    post: <T, B = unknown>(endpoint: string, body: B, options?: ApiRequestOptions) =>
+      request<T>(endpoint, { ...options, method: 'POST', body: JSON.stringify(body) }),
+    
+    put: <T, B = unknown>(endpoint: string, body: B, options?: ApiRequestOptions) =>
+      request<T>(endpoint, { ...options, method: 'PUT', body: JSON.stringify(body) }),
+    
+    del: <T>(endpoint: string, options?: ApiRequestOptions) =>
+      request<T>(endpoint, { ...options, method: 'DELETE' }),
+  }
 }
 
 // Example usage:
-// const { apiRequest } = useApi()
-// const data = await apiRequest<YourDataType>('/api/endpoint', {
-//   method: 'POST',
-//   body: JSON.stringify({ ... }),
-// }) 
+// const { get, post, put, del } = useApi()
+// 
+// // Get data
+// const { data, error } = await get<UserProfile>('/users/profile')
+// 
+// // Post data with authentication
+// const response = await post<ResponseType, RequestType>('/users/profile', {
+//   name: 'John',
+//   // ... other data
+// })
+// 
+// // Make unauthenticated request
+// const publicData = await get<PublicData>('/public-endpoint', { requireAuth: false }) 
