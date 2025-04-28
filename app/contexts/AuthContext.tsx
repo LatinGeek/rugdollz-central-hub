@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import {  useDisconnect, useSignMessage } from 'wagmi'
+import { useDisconnect, useSignMessage } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { User } from '@/types/Entities/user'
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
@@ -41,18 +41,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!address) return
 
     try {
-      console.log(address)
-      // Create a new user with the wallet address
-      const newUser: User = {
-        id: address, // Using address as ID for now
-        address,
-        points: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        achievements: 0,
-        role: UserRole.user
+      // Create a message to sign
+      const message = `Authenticate to RugDollz Central Hub\nAddress: ${address}}`
+      
+      // Sign the message
+      const signature = await signMessageAsync({ message })
+
+      // Make the authenticated request
+      const response = await fetch(`/api/auth/user/${address}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Message': btoa(message),
+          'X-Auth-Address': address.toLowerCase(),
+          'X-Auth-Signature': signature
+        }
+      })
+      
+      if (!response.ok) {
+        console.log(response);
+
+        // If user doesn't exist, create a new one
+        const newUser: User = {
+          id: address,
+          address,
+          points: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          achievements: 0,
+          role: UserRole.user
+        }
+        setUser(newUser)
+        return
       }
-      setUser(newUser)
+
+      const userData = await response.json()
+      setUser(userData)
     } catch (error) {
       console.error('Error fetching user details:', error)
       setUser(null)

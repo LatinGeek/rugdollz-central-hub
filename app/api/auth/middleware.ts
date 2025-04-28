@@ -4,12 +4,12 @@ import { ethers } from 'ethers'
 
 export async function verifyWalletSignature(
   address: string,
-  timestamp: string,
+  message: string,
   signature: string
 ): Promise<boolean> {
   try {
     // Recover the address from the signature
-    const recoveredAddress = ethers.verifyMessage(timestamp, signature)
+    const recoveredAddress = ethers.verifyMessage(Buffer.from(message, 'base64').toString('utf-8'), signature)
     
     // Check if the recovered address matches the claimed address
     return recoveredAddress.toLowerCase() === address.toLowerCase()
@@ -23,22 +23,24 @@ export function withAuth(handler: (req: NextRequest, context: { user: { address:
   return async (req: NextRequest) => {
     const headers = req.headers
     const address = headers.get('x-auth-address')
-    const timestamp = headers.get('x-auth-timestamp')
+    const message = headers.get('x-auth-message')
     const signature = headers.get('x-auth-signature')
     
     // Check if all required headers are present
-    if (!address || !timestamp || !signature) {
+    if (!address || !message || !signature) {
+      console.log("Missing Auth headers");
       return NextResponse.json({ error: 'Missing authentication headers' }, { status: 401 })
     }
 
     // Verify the signature
     const isValid = await verifyWalletSignature(
       address,
-      timestamp,
+      message,
       signature
     )
 
     if (!isValid) {
+      console.log("Invalid Signature");
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
