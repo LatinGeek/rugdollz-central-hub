@@ -41,26 +41,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!address) return
 
     try {
-      // Create a message to sign
-      const message = `Authenticate to RugDollz Central Hub\nAddress: ${address}}`
+      // Check if we have a valid JWT token
+      const token = localStorage.getItem('auth_token')
+      const tokenExpiry = localStorage.getItem('auth_token_expiry')
       
-      // Sign the message
+      // If token exists and is not expired, use it
+      if (token && tokenExpiry && new Date(tokenExpiry) > new Date()) {
+        const response = await fetch(`/api/auth/user/${address}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData)
+          return
+        }
+      }
+
+      // If no valid token, request a new one with wallet signature
+      const message = `Authenticate to RugDollz Central Hub\nAddress: ${address}\nTimestamp: ${Date.now()}`
       const signature = await signMessageAsync({ message })
 
-      // Make the authenticated request
-      const response = await fetch(`/api/auth/user/${address}`, {
-        method: 'GET',
+      // Get new JWT token
+      const authResponse = await fetch('/api/auth/token', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Auth-Message': btoa(message),
-          'X-Auth-Address': address.toLowerCase(),
-          'X-Auth-Signature': signature
+          'X-Auth-Signature': signature,
+          'X-Auth-Address': address.toLowerCase()
+        }
+      })
+
+      if (!authResponse.ok) {
+        throw new Error('Failed to get authentication token')
+      }
+
+      const { token: newToken, expiresIn } = await authResponse.json()
+      
+      // Store the token and its expiry
+      const expiryDate = new Date(Date.now() + expiresIn * 1000)
+      localStorage.setItem('auth_token', newToken)
+      localStorage.setItem('auth_token_expiry', expiryDate.toISOString())
+
+      // Now fetch user details with the new token
+      const userResponse = await fetch(`/api/auth/user/${address}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${newToken}`
         }
       })
       
-      if (!response.ok) {
-        console.log(response);
-
+      if (!userResponse.ok) {
         // If user doesn't exist, create a new one
         const newUser: User = {
           id: address,
@@ -75,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const userData = await response.json()
+      const userData = await userResponse.json()
       setUser(userData)
     } catch (error) {
       console.error('Error fetching user details:', error)
@@ -94,6 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const disconnect = () => {
     disconnectWallet()
     setUser(null)
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_token_expiry')
     router.push('/')
   }
 

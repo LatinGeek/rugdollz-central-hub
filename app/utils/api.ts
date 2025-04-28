@@ -11,6 +11,11 @@ interface ApiRequestOptions extends RequestInit {
   requireAuth?: boolean
 }
 
+interface TokenResponse {
+  token: string
+  expiresIn: number
+}
+
 export function useApi() {
   const auth = useAuth()
 
@@ -23,7 +28,44 @@ export function useApi() {
     return { data }
   }
 
-  const getAuthHeaders = async (requireAuth: boolean) => {
+  const getAuthToken = async (): Promise<string> => {
+    // Check if we have a valid token
+    const token = localStorage.getItem('auth_token')
+    const tokenExpiry = localStorage.getItem('auth_token_expiry')
+
+    if (token && tokenExpiry && new Date(tokenExpiry) > new Date()) {
+      return token
+    }
+
+    // If no valid token, get a new one
+    const message = `Authenticate to RugDollz Central Hub\nAddress: ${auth.user?.address}\nTimestamp: ${Date.now()}`
+    const signature = await auth.signMessage(message)
+
+    const response = await fetch(`${API_BASE_URL}/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Message': btoa(message),
+        'X-Auth-Signature': signature,
+        'X-Auth-Address': auth.user?.address?.toLowerCase() || ''
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to get authentication token')
+    }
+
+    const { token: newToken, expiresIn } = await response.json() as TokenResponse
+
+    // Store the new token
+    const expiryDate = new Date(Date.now() + expiresIn * 1000)
+    localStorage.setItem('auth_token', newToken)
+    localStorage.setItem('auth_token_expiry', expiryDate.toISOString())
+
+    return newToken
+  }
+
+  const getAuthHeaders = async (requireAuth: boolean): Promise<HeadersInit> => {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     }
@@ -33,12 +75,13 @@ export function useApi() {
         throw new Error('Authentication required')
       }
 
-      const timestamp = Date.now().toString()
-      const signature = await auth.signMessage(timestamp)
-
-      headers['X-Auth-Address'] = auth.user?.address || ''
-      headers['X-Auth-Timestamp'] = timestamp
-      headers['X-Auth-Signature'] = signature
+      try {
+        const token = await getAuthToken()
+        headers['Authorization'] = `Bearer ${token}`
+      } catch (error) {
+        console.error('Failed to get auth token:', error)
+        throw new Error('Authentication failed')
+      }
     }
 
     return headers
@@ -63,7 +106,7 @@ export function useApi() {
       return handleResponse<T>(response)
     } catch (error) {
       console.error(error)
-      return { error: 'Network error' }
+      return { error: error instanceof Error ? error.message : 'Network error' }
     }
   }
 
