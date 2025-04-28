@@ -4,6 +4,7 @@ import { useEffect, useState, use } from 'react'
 import { ProfileHeader } from '@/app/components/profile/ProfileHeader'
 import { Badges } from '@/app/components/profile/Badges'
 import { Highlights } from '@/app/components/profile/Highlights'
+import { LoadingSpinner } from '@/app/components/ui/LoadingSpinner'
 import { useProfileService } from '@/services/profile'
 import { UserProfileData } from '@/types/FormattedData/user-profile-data'
 
@@ -41,11 +42,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   }, [address, getProfile])
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
-        <div className="text-[rgb(var(--text-primary))]">Loading...</div>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
   if (error || !profile) {
