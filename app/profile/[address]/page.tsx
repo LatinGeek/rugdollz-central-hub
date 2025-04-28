@@ -24,6 +24,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        console.log('fetching profile')
         const data = await getProfile(address)
         if (data !== undefined) {
           setProfile(data)
@@ -39,7 +40,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     }
 
     fetchProfile()
-  }, [address, getProfile])
+  }, [address])
 
   if (isLoading) {
     return <LoadingSpinner />

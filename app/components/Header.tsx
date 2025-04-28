@@ -45,7 +45,7 @@ export function Header({
           {isAuthenticated ? (
             <>
               <div className="font-bold text-sm text-[rgb(var(--text-primary))]">
-                {user?.balance} $RUGZ
+                100 $RUGZ
               </div>
               <div className="relative">
                 <button

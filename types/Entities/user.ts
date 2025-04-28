@@ -1,3 +1,4 @@
+import { UserRole, UserRoleType } from "../enums/user-role"
 
 export interface User {
   id: string
@@ -8,6 +9,7 @@ export interface User {
   createdAt: Date
   updatedAt: Date
   achievements: number
+  role: UserRoleType
 } 
 
 export const sampleUsers: User[] = [
@@ -19,6 +21,7 @@ export const sampleUsers: User[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
     points: 100,
-    achievements: 10
+    achievements: 10,
+    role: UserRole.user
   }];
 

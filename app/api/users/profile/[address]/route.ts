@@ -6,7 +6,8 @@ export async function GET(
   { params }: { params: { address: string } }
 ) {
   try {
-    const { address } = params
+    const resolvedParams = await params
+    const address = resolvedParams.address
     console.log(address)
     // Find the user profile in the sample data
     const profile = sampleUserProfileData[0]
