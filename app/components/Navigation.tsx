@@ -4,16 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { ExternalLink, ChevronDown, Sword, Rabbit } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
-const HARDCODED_ADDRESS = '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c'
-
-const navigation = [
+const baseNavigation = [
   { name: 'Home', href: '/home' },
   { name: 'About', href: '/about' },
   { name: 'Store', href: '/store' },
   { name: 'Badges', href: '/badges' },
   { name: 'Gaming', href: '/gaming' },
-  { name: 'User Profile', href: `/profile/${HARDCODED_ADDRESS}` },
   { name: 'NFT Customization', href: '/nft-customization' },
   { name: 'NFT Lore', href: '/nft-lore' },
   { name: 'Lore Discovery', href: '/lore-discovery' },
@@ -92,6 +90,7 @@ interface NavigationProps {
 
 export function Navigation({ isOpen = false, onClose }: NavigationProps) {
   const pathname = usePathname()
+  const { user } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(isOpen)
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const [isBuyMenuOpen, setIsBuyMenuOpen] = useState(false)
@@ -105,6 +104,13 @@ export function Navigation({ isOpen = false, onClose }: NavigationProps) {
                      pathname.startsWith('/badge-management') || 
                      pathname.startsWith('/raffle-management')
 
+  // Create navigation items with conditional profile link
+  const navigationItems = [
+    ...baseNavigation.slice(0, 5), // Home to Gaming
+    ...(user ? [{ name: 'User Profile', href: `/profile/${user.address}` }] : []),
+    ...baseNavigation.slice(5) // NFT Customization onwards
+  ]
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -115,7 +121,7 @@ export function Navigation({ isOpen = false, onClose }: NavigationProps) {
               <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">RugDollz Hub</h1>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
-              {navigation.map((item) => {
+              {navigationItems.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
@@ -317,7 +323,7 @@ export function Navigation({ isOpen = false, onClose }: NavigationProps) {
         {/* Mobile menu */}
         {isMobileMenuOpen && (
           <nav className="px-2 pt-2 pb-3 space-y-1 bg-[rgb(var(--bg-darker))] max-h-[calc(100vh-4rem)] overflow-y-auto z-1000">
-            {navigation.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
