@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import Image from "next/image";
@@ -17,6 +17,8 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, connect, disconnect, defaultAvatar } = useAuth();
   const { useTokenBalance } = useWalletService();
   const { balance, isLoading } = useTokenBalance(user?.address, "RUGZ");
@@ -24,6 +26,23 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
   useEffect(() => {
     setIsMenuOpen(isOpen);
   }, [isOpen]);
+
+  useEffect(() => {
+    setIsProfileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleProfileClick = () => {
     router.push(`/profile/${user?.address}`);
@@ -91,7 +110,7 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
                 </button>
 
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[rgb(var(--bg-dark))] rounded-lg shadow-lg border border-[rgb(var(--border-dark))] py-1">
+                  <div ref={menuRef} className="absolute right-0 mt-2 w-48 bg-[rgb(var(--bg-dark))] rounded-lg shadow-lg border border-[rgb(var(--border-dark))] py-1">
                     <div className="px-4 py-2 text-sm text-[rgb(var(--text-secondary))] border-b border-[rgb(var(--border-dark))]">
                       User Role: {user?.role || "User"}
                     </div>
