@@ -32,9 +32,9 @@ export const sampleUserDetails: UserDetails[] = [
   },
   {
     id: "2",
-    address: "0x2345678901234567890123456789012345678901",
-    username: "CryptoKing_21",
-    avatar: "https://i.pravatar.cc/150?img=1",
+    address: "0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c",
+    username: "LatinGeek",
+    avatar: "/images/sample-user-profile-images/latin2.webp",
     createdAt: new Date(),
     updatedAt: new Date(),
     points: 1234,

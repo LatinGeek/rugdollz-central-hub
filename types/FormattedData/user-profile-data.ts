@@ -10,7 +10,7 @@ export interface UserProfileData {
 
 export const sampleUserProfileData: UserProfileData[] = [
   {
-    user: sampleUserDetails[0],
+    user: sampleUserDetails[1],
     badges: sampleBadgeDetails,
     nfts: sampleNFTs,
   },

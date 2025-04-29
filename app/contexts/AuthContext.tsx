@@ -14,6 +14,7 @@ interface AuthContextType {
   connect: () => Promise<void>;
   disconnect: () => void;
   signMessage: (message: string) => Promise<string>;
+  defaultAvatar: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { open } = useAppKit();
+
+  const defaultAvatar = "/images/sample-user-profile-images/default-user.jpg";
 
   const { address, isConnected } = useAppKitAccount();
   const { disconnect: disconnectWallet } = useDisconnect();
@@ -87,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         connect,
         disconnect,
         signMessage,
+        defaultAvatar,
       }}
     >
       {children}

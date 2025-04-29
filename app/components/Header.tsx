@@ -1,60 +1,77 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Menu, X, ChevronDown, ChevronUp } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import Image from "next/image";
 
 interface HeaderProps {
-  onMenuClick?: () => void
-  isOpen?: boolean
+  onMenuClick?: () => void;
+  isOpen?: boolean;
 }
 
-export function Header({ 
-  onMenuClick,
-  isOpen = false
-}: HeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
-  const router = useRouter()
-  const { user, isAuthenticated, connect, disconnect } = useAuth()
+export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const router = useRouter();
+  const { user, isAuthenticated, connect, disconnect, defaultAvatar } =
+    useAuth();
+  const [avatarError, setAvatarError] = useState(false);
 
   useEffect(() => {
-    setIsMenuOpen(isOpen)
-  }, [isOpen])
+    setIsMenuOpen(isOpen);
+  }, [isOpen]);
 
   const handleProfileClick = () => {
-    router.push('/profile')
-    setIsMenuOpen(false)
-  }
+    router.push(`/profile/${user?.address}`);
+    setIsMenuOpen(false);
+  };
 
   const handleMenuClick = () => {
-    onMenuClick?.()
-  }
+    onMenuClick?.();
+  };
 
   const formatAddress = (address: string) => {
-    if (!address) return ''
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   return (
     <header className="fixed top-0 right-0 left-0 md:left-64 z-50 bg-[rgb(var(--bg-darker))] ">
       <div className="flex items-center  h-16 px-4 justify-end">
         <div className="flex items-center gap-4">
-          
           {isAuthenticated ? (
             <>
               <div className="font-bold text-sm text-[rgb(var(--text-primary))]">
                 100 $RUGZ
               </div>
-              <div className="relative">
+              <div className="relative bg-[rgb(var(--bg-light))] rounded-full py-1 px-2">
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center gap-2"
                 >
-                  <div className="font-bold px-3 py-1 rounded-full bg-[rgb(var(--accent))] flex items-center justify-center text-white text-sm">
-                    {formatAddress(user?.address || '')}
-                  </div>
+                  {user?.avatar ? (
+                    <div className="flex items-center justify-center gap-2 ">
+                      <Image
+                        src={avatarError ? defaultAvatar : user.avatar}
+                        alt="User Avatar"
+                        width={32}
+                        height={32}
+                        className="rounded-full mb-0.5"
+                        onError={() => {
+                          setAvatarError(true);
+                        }}
+                      />
+                      <div className="font-bold px-1 py-1 rounded-full bg-[rgb(var(--accent))] flex items-center justify-center text-white text-sm">
+                        {user?.username ? user.username : formatAddress(user?.address)}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="font-bold px-3 py-1 rounded-full bg-[rgb(var(--accent))] flex items-center justify-center text-white text-sm">
+                      {formatAddress(user?.address || "")}
+                    </div>
+                  )}
                   {isProfileMenuOpen ? (
                     <ChevronUp className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   ) : (
@@ -64,6 +81,9 @@ export function Header({
 
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-[rgb(var(--bg-dark))] rounded-lg shadow-lg border border-[rgb(var(--border-dark))] py-1">
+                    <div className="px-4 py-2 text-sm text-[rgb(var(--text-secondary))] border-b border-[rgb(var(--border-dark))]">
+                      User Role: {user?.role || "User"}
+                    </div>
                     <button
                       onClick={handleProfileClick}
                       className="w-full px-4 py-2 text-left text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-light))]"
@@ -101,5 +121,5 @@ export function Header({
         </div>
       </div>
     </header>
-  )
-} 
+  );
+}

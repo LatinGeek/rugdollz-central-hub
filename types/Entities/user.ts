@@ -15,9 +15,9 @@ export interface User {
 export const sampleUsers: User[] = [
   {
     id: '1',
-    address: '0x1234567890123456789012345678901234567890',
-    username: 'NFTCollector_42',
-    avatar: '/images/sample-avatars/avatar-1.png',
+    address: '0x158a9e87156B6605B6f23bb8f4A8E4F47fc67f1c',
+    username: 'LatinGeek',
+    avatar: '/images/sample-user-profile-images/latin2.webp',
     createdAt: new Date(),
     updatedAt: new Date(),
     points: 100,

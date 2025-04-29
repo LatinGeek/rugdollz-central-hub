@@ -10,7 +10,7 @@ export async function GET(
     const address = resolvedParams.address
     console.log(address)
     // Find the user profile in the sample data
-    const profile = sampleUserProfileData[0]
+    const profile = sampleUserProfileData.find(userProfileData => userProfileData.user.address === address);
 
     if (!profile) {
       return NextResponse.json(
