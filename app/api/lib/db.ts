@@ -29,38 +29,40 @@ if (!apps.length) {
 // Get Firestore instance
 export const db = getFirestore();
 
-// Collection references with their respective types
-export const collections = {
-  users: db.collection('users') as FirestoreCollection<User>,
-  purchases: db.collection('purchases') as FirestoreCollection<Purchase>,
-  storeItems: db.collection('storeItems') as FirestoreCollection<StoreItem>,
-  raffles: db.collection('raffles') as FirestoreCollection<Raffle>,
-  nftLayerOptions: db.collection('nftLayerOptions') as FirestoreCollection<NFTLayerOption>,
-  badgeRequirements: db.collection('badgeRequirements') as FirestoreCollection<BadgeRequirement>,
-  badges: db.collection('badges') as FirestoreCollection<Badge>,
-  nftLayerCategories: db.collection('nftLayerCategories') as FirestoreCollection<NFTLayerCategory>,
-  completedBadgeRequirements: db.collection('completedBadgeRequirements') as FirestoreCollection<CompletedBadgeRequirement>,
-  loreEntries: db.collection('loreEntries') as FirestoreCollection<LoreEntry>,
-  activities: db.collection('activities') as FirestoreCollection<Activity>,
-  notes: db.collection('notes') as FirestoreCollection<Note>
-} as const;
-
 // Types
 export type FirestoreDate = Timestamp;
-export type DocumentData = { id: string } & Record<string, unknown>;
-export type FirestoreCollection<T extends DocumentData> = ReturnType<typeof db.collection>;
+export type WithoutId<T> = Omit<T, 'id'>;
+export type FirestoreDoc<T> = WithoutId<T> & { id?: string };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type FirestoreCollection<T> = ReturnType<typeof db.collection>;
 
 // Query types
-export interface QueryCondition<T extends DocumentData> {
+export interface QueryCondition<T> {
   field: keyof T;
   operator: WhereFilterOp;
   value: T[keyof T] | null;
 }
 
-export interface OrderByOption<T extends DocumentData> {
+export interface OrderByOption<T> {
   field: keyof T;
   direction: 'asc' | 'desc';
 }
+
+// Collection references with their respective types
+export const collections = {
+  users: db.collection('users') as FirestoreCollection<FirestoreDoc<User>>,
+  purchases: db.collection('purchases') as FirestoreCollection<FirestoreDoc<Purchase>>,
+  storeItems: db.collection('storeItems') as FirestoreCollection<FirestoreDoc<StoreItem>>,
+  raffles: db.collection('raffles') as FirestoreCollection<FirestoreDoc<Raffle>>,
+  nftLayerOptions: db.collection('nftLayerOptions') as FirestoreCollection<FirestoreDoc<NFTLayerOption>>,
+  badgeRequirements: db.collection('badgeRequirements') as FirestoreCollection<FirestoreDoc<BadgeRequirement>>,
+  badges: db.collection('badges') as FirestoreCollection<FirestoreDoc<Badge>>,
+  nftLayerCategories: db.collection('nftLayerCategories') as FirestoreCollection<FirestoreDoc<NFTLayerCategory>>,
+  completedBadgeRequirements: db.collection('completedBadgeRequirements') as FirestoreCollection<FirestoreDoc<CompletedBadgeRequirement>>,
+  loreEntries: db.collection('loreEntries') as FirestoreCollection<FirestoreDoc<LoreEntry>>,
+  activities: db.collection('activities') as FirestoreCollection<FirestoreDoc<Activity>>,
+  notes: db.collection('notes') as FirestoreCollection<FirestoreDoc<Note>>
+} as const;
 
 // Utility functions
 export async function handleDatabaseError(error: unknown): Promise<string> {
@@ -80,7 +82,7 @@ export function convertDateToTimestamp(date: Date): Timestamp {
 }
 
 // Query helpers
-export async function getDocumentById<T extends DocumentData>(
+export async function getDocumentById<T>(
   collection: FirestoreCollection<T>,
   id: string
 ): Promise<T | null> {
@@ -93,7 +95,7 @@ export async function getDocumentById<T extends DocumentData>(
   }
 }
 
-export async function queryCollection<T extends DocumentData>(
+export async function queryCollection<T>(
   collection: FirestoreCollection<T>,
   conditions: QueryCondition<T>[] = [],
   orderBy?: OrderByOption<T>,
