@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import Image from "next/image";
+import { useWalletService } from "@/services/wallet";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -14,10 +15,11 @@ interface HeaderProps {
 export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const router = useRouter();
-  const { user, isAuthenticated, connect, disconnect, defaultAvatar } =
-    useAuth();
   const [avatarError, setAvatarError] = useState(false);
+  const router = useRouter();
+  const { user, isAuthenticated, connect, disconnect, defaultAvatar } = useAuth();
+  const { useTokenBalance } = useWalletService();
+  const { balance, isLoading } = useTokenBalance(user?.address, "RUGZ");
 
   useEffect(() => {
     setIsMenuOpen(isOpen);
@@ -43,8 +45,17 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
+            <div className="flex items-center">
               <div className="font-bold text-sm text-[rgb(var(--text-primary))]">
-                100 $RUGZ
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  balance !== null ? `${balance}` : "0"
+                )}
+              </div>
+              <div className="ml-1 font-bold text-sm text-[rgb(var(--primary-orange))]">
+                $RUGZ
+              </div>
               </div>
               <div className="relative bg-[rgb(var(--bg-light))] rounded-full py-1 px-2">
                 <button
