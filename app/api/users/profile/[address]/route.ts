@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sampleUserProfileData } from '@/types/FormattedData/user-profile-data'
+import { getUserDetailsByAddress } from '@/app/api/lib/services/users'
+import { getUserBadgeDetails } from '@/app/api/lib/services/badges'
+import { getNFTsByOwner } from '@/app/api/lib/services/nfts'
+import { UserProfileData } from '@/types/FormattedData/user-profile-data'
 
 export async function GET(
   req: NextRequest,
@@ -8,18 +11,25 @@ export async function GET(
   try {
     const resolvedParams = await params
     const address = resolvedParams.address
-    console.log(address)
-    // Find the user profile in the sample data
-    const profile = sampleUserProfileData.find(userProfileData => userProfileData.user.address === address);
+    console.log(`[GET /api/users/profile/${address}] Fetching user profile`)
 
-    if (!profile) {
+    // Fetch user from Firestore
+    const userDetails = await getUserDetailsByAddress(address)
+
+    if (!userDetails) {
       return NextResponse.json(
         { error: 'Profile not found' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json(profile)
+    //Fetch user BadgeDetails
+    const badgeDetails = await getUserBadgeDetails(userDetails.id)
+    const userNFTs = await getNFTsByOwner(address);
+
+    const userProfileData: UserProfileData = {user: userDetails, badges: badgeDetails, nfts: userNFTs};
+
+    return NextResponse.json(userProfileData)
   } catch (error) {
     console.error('Error fetching profile:', error)
     return NextResponse.json(
