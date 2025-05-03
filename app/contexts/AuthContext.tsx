@@ -35,10 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isConnected && address) {
       getUserDetails();
+
     } else {
       setUser(null);
     }
-    setIsLoading(false);
   }, [isConnected, address]);
 
   
@@ -47,10 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const getUserDetails = async () => {
     if (!address) return;
-
+    setIsLoading(true);
     try {
       debugger;
-      setIsLoading(true);
       const authResponse: AuthResponse = await fetchAuthUserDetails(address);
       if(authResponse.status != 200){
         disconnect();

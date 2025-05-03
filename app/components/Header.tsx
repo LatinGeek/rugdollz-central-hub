@@ -59,13 +59,7 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
   };
 
   return (
-    authIsLoading ? (
-      <header className="fixed top-0 right-0 left-0 md:left-64 z-50 bg-[rgb(var(--bg-darker))] ">
-        <div className="flex items-center h-16 px-4 justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-white" />
-        </div>
-      </header>
-    ) : (
+
       <header className="fixed top-0 right-0 left-0 md:left-64 z-50 bg-[rgb(var(--bg-darker))] ">
         <div className="flex items-center  h-16 px-4 justify-end">
           <div className="flex items-center gap-4">
@@ -138,12 +132,18 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
                 </div>
               </>
             ) : (
+              authIsLoading ? (
+                <div className="flex items-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-[rgb(var(--primary-orange))]"  strokeWidth={4} />
+
+                </div>
+              ):(
               <button
                 onClick={connect}
                 className="px-4 py-2 bg-[rgb(var(--primary-orange))] text-white rounded-lg hover:bg-[rgb(var(--primary-orange))]/90 transition-colors"
               >
                 Connect Wallet
-              </button>
+              </button>)
             )}
             <button
               onClick={handleMenuClick}
@@ -159,5 +159,4 @@ export function Header({ onMenuClick, isOpen = false }: HeaderProps) {
         </div>
       </header>
     )
-  );
 }
