@@ -1,6 +1,6 @@
 'use client'
 
-import { NFT } from "@/types/nft"
+import { NFT } from "@/types/Entities/nft"
 
 
 

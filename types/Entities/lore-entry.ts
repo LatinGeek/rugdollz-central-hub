@@ -1,5 +1,5 @@
 import { LoreEntryStatusType, LoreEntryStatus } from "../enums/lore-entry-status"
-import { sampleNFTs } from "../nft"
+import { sampleNFTs } from "./nft"
 
 export interface LoreEntry {
   id: string

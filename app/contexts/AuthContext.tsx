@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types/Entities/user";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { useAuthService } from "@/services/auth";
-
+import { AuthResponse } from "@/services/auth";
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -49,14 +49,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!address) return;
 
     try {
-      const userData: User | null = await fetchAuthUserDetails(address);
-      if(userData == null){
+      debugger;
+      setIsLoading(true);
+      const authResponse: AuthResponse = await fetchAuthUserDetails(address);
+      if(authResponse.status != 200){
         disconnect();
       }
-      setUser(userData);
+      setUser(authResponse.user);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching user details:", error);
       disconnect();
+      setIsLoading(false);
     }
   };
 

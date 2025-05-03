@@ -1,0 +1,63 @@
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "../middleware";
+import {
+  getNFTsFromProvider,
+  syncUserNFTsFromProvider,
+} from "@/app/api/lib/services/nfts";
+import { createUser, getUserByAddress } from "@/app/api/lib/services/users";
+import { User } from "@/types/Entities/user";
+import { UserRole } from "@/types/enums/user-role";
+
+
+export const GET = withAuth(async (req: NextRequest, { user }) => {
+  try {
+    const { address } = user;
+
+    // Check if user exists in database
+    let userData = await getUserByAddress(address);
+
+    if (userData) {
+      return NextResponse.json(userData);
+    } else {
+      // User doesn't exist, check for NFT ownership
+      const nfts = await getNFTsFromProvider(address);
+
+      // Check if user owns any NFTs from whitelisted collections
+      const hasWhitelistedNFT = nfts.length > 0;
+
+      if (!hasWhitelistedNFT) {
+        return NextResponse.json(
+          { error: "Access denied. No whitelisted NFTs found." },
+          { status: 403 }
+        );
+      }
+
+      // User has whitelisted NFT, create new user
+      const newUser: Omit<User, "id"> = {
+        address,
+        username: null,
+        avatar: null,
+        points: 0,
+        achievements: 0,
+        role: UserRole.user,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      userData = await createUser(newUser);
+
+      // Sync user's NFTs to database
+      await syncUserNFTsFromProvider(address);
+      
+      return NextResponse.json(userData);
+
+      
+    }
+  } catch (error) {
+    console.error("Error in user route:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+});

@@ -1,4 +1,4 @@
-import { NFT, sampleNFTs } from "../nft";
+import { NFT, sampleNFTs } from "../Entities/nft";
 import { BadgeDetails, sampleBadgeDetails } from "./badge-details";
 import { sampleUserDetails, UserDetails } from "./user-details";
 

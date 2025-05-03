@@ -12,6 +12,7 @@ import { CompletedBadgeRequirement } from '@/types/Entities/completed-badge-requ
 import { LoreEntry } from '@/types/Entities/lore-entry';
 import { Activity } from '@/types/Entities/activity';
 import { Note } from '@/types/Entities/note';
+import { NFT } from '@/types/Entities/nft';
 
 // Initialize Firebase Admin
 const apps = getApps();
@@ -21,8 +22,11 @@ if (!apps.length) {
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY 
+        ? process.env.FIREBASE_PRIVATE_KEY.includes('\\n')
+          ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+          : process.env.FIREBASE_PRIVATE_KEY
+        : undefined,    }),
   });
 }
 
@@ -61,7 +65,8 @@ export const collections = {
   completedBadgeRequirements: db.collection('completedBadgeRequirements') as FirestoreCollection<FirestoreDoc<CompletedBadgeRequirement>>,
   loreEntries: db.collection('loreEntries') as FirestoreCollection<FirestoreDoc<LoreEntry>>,
   activities: db.collection('activities') as FirestoreCollection<FirestoreDoc<Activity>>,
-  notes: db.collection('notes') as FirestoreCollection<FirestoreDoc<Note>>
+  notes: db.collection('notes') as FirestoreCollection<FirestoreDoc<Note>>,
+  nfts: db.collection('nfts') as FirestoreCollection<FirestoreDoc<NFT>>,
 } as const;
 
 // Utility functions

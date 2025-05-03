@@ -1,7 +1,7 @@
 import { User, sampleUsers } from "../Entities/user";
-import { NFT } from "../nft"
+import { NFT } from "../Entities/nft"
 
-import { sampleNFTs } from "../nft"
+import { sampleNFTs } from "../Entities/nft"
 
 export interface AuthenticatedUser {
   user: User,

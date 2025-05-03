@@ -7,7 +7,13 @@ interface TokenResponse {
     expiresIn: number
   }
 
+export interface AuthResponse {
+  user: User | null;
+  message: string;
+  status: number;
+}
 export function useAuthService() {
+
   const { signMessageAsync } = useSignMessage();
 
   const retrieveTokenFromStorage = (): string | null => {
@@ -57,14 +63,13 @@ export function useAuthService() {
     return getNewToken(address);
   };
 
-  const fetchAuthUserDetails = async (address: string): Promise<User | null> => {
-    if (!address) return null;
+  const fetchAuthUserDetails = async (address: string): Promise<AuthResponse> => {
+    if (!address) return {status: 401, user: null, message: "No wallet connected"};
 
     try {
       const token = await getAuthToken(address);
-
       // Fetch user details with the token
-      const userResponse = await fetch(`/api/auth/user/${address}`, {
+      const userResponse = await fetch(`/api/auth/user`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -72,10 +77,11 @@ export function useAuthService() {
         },
       });
 
-      if (userResponse.status == 404) {
-        // If user doesn't exist, create a new one
+      if (userResponse.status == 403) {
+        // If user doesn't have whitelisted NFTs, create a guest user
         const guestUser: User = createGuestUser(address);
-        return guestUser;
+
+        return {status: 200, user: guestUser, message: "No whitelisted NFTs found, Guest user created"};
       }
 
       if(!userResponse.ok){
@@ -83,10 +89,10 @@ export function useAuthService() {
       }
 
       const userData: User = await userResponse.json();
-      return userData;
+      return {status: 200, user: userData, message: "User details retrieved"};
     } catch (error) {
       console.error("Error fetching user details:", error);
-      return null;
+      return {status: 500, user: null, message: "Internal server error"};
     }
   };
 
@@ -97,8 +103,8 @@ export function useAuthService() {
       role: UserRole.guest,
       points: 0,
       achievements: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: null,
+      updatedAt: null,
     };
 
     return guestUser;

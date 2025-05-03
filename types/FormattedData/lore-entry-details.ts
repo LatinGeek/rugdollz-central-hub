@@ -1,5 +1,5 @@
 import { LoreEntry, sampleLoreEntries } from "../Entities/lore-entry"
-import { NFT, sampleNFTs } from "../nft"
+import { NFT, sampleNFTs } from "../Entities/nft"
 import { sampleUserDetails, UserDetails } from "./user-details"
 
 export interface LoreEntryDetails {

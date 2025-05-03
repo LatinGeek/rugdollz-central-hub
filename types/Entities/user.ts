@@ -3,11 +3,11 @@ import { UserRole, UserRoleType } from "../enums/user-role"
 export interface User {
   id: string | null
   address: string
-  username?: string
-  avatar?: string
+  username?: string | null
+  avatar?: string | null
   points: number,
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | null
+  updatedAt: Date | null
   achievements: number
   role: UserRoleType
 } 

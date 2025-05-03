@@ -2,9 +2,9 @@ import {
   CompletedBadgeRequirement,
   sampleCompletedBadgeRequirements,
 } from "../Entities/completed-badge-requirement";
-import { NFT } from "../nft";
+import { NFT } from "../Entities/nft";
 
-import { sampleNFTs } from "../nft";
+import { sampleNFTs } from "../Entities/nft";
 
 export interface UserDetails {
   id: string;

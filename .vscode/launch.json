@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "userDataDir": false,
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}",
+            "port": 9222
+        },
+        
+        {
             "name": "Next.js: debug",
             "type": "node-terminal",
             "request": "launch",
@@ -16,16 +26,6 @@
                 "pattern": "started server on .+, url: (https?://.+)",
                 "uriFormat": "%s",
                 "action": "debugWithChrome"
-            }
-        },
-        {
-            "name": "Next.js: debug browser",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}",
-            "sourceMapPathOverrides": {
-                "webpack://_N_E/*": "${webRoot}/*"
             }
         }
     ]
