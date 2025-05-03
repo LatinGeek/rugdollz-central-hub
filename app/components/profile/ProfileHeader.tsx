@@ -29,7 +29,7 @@ export function ProfileHeader({ walletAddress, username }: ProfileHeaderProps) {
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-end pb-16">
         <div className="flex flex-col">
           <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-wider font-mono">
-            {username}
+            {username ? username : "Unknown User"}
           </h1>
           <div className="mt-4 flex items-center space-x-2">
             <svg
