@@ -9,12 +9,12 @@ import { sampleNFTs } from "../Entities/nft";
 export interface UserDetails {
   id: string;
   address: string;
-  username?: string;
-  avatar?: string;
+  username?: string | null;
+  avatar?: string | null;
   points: number;
   nfts: NFT[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | null;
+  updatedAt: Date | null;
   achievements: CompletedBadgeRequirement[];
 }
 
