@@ -18,12 +18,16 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
     return a.badge.isActive ? -1 : 1
   })
 
+  const maxVisible = 8;
+  const visibleBadges = sortedBadges.slice(0, maxVisible);
+  const hiddenCount = sortedBadges.length > maxVisible ? sortedBadges.length - maxVisible : 0;
+
   return (
     <>
       <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-6">
         <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-4">{title}</h2>
         <div className="grid grid-cols-4 sm:grid-cols-8 md:grid-cols-12 gap-4">
-          {sortedBadges.map((badge) => (
+          {visibleBadges.map((badge) => (
             <div
               key={badge.badge.id}
               className="relative group aspect-square rounded-lg overflow-visible transition-all duration-300 cursor-pointer"
@@ -87,11 +91,11 @@ export function Badges({ badges, title = 'BADGES' }: BadgesProps) {
               </div>
             </div>
           ))}
-          
-          {/* Show more button */}
-          <button className="aspect-square rounded-lg bg-[rgb(var(--bg-darker))] flex items-center justify-center text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors duration-200">
-            <span className="text-lg">+23</span>
-          </button>
+          {hiddenCount > 0 && (
+            <button className="aspect-square rounded-lg bg-[rgb(var(--bg-darker))] flex items-center justify-center text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors duration-200">
+              <span className="text-lg">+{hiddenCount}</span>
+            </button>
+          )}
         </div>
       </div>
 
