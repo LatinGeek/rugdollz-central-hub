@@ -98,7 +98,7 @@ export function useAuthService() {
 
   const createGuestUser = (address: string) => {
     const guestUser: User = {
-      id: null,
+      id: 'guest',
       address: address,
       role: UserRole.guest,
       points: 0,

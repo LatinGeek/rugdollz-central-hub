@@ -1,7 +1,7 @@
 import { UserRole, UserRoleType } from "../enums/user-role"
 
 export interface User {
-  id: string | null
+  id: string
   address: string
   username?: string | null
   avatar?: string | null
