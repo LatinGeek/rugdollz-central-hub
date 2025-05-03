@@ -1,5 +1,10 @@
 import { Badge } from '@/types/Entities/badge';
 import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection } from '../db';
+import { BadgeDetails } from '@/types/FormattedData/badge-details';
+import { UserBadgeRequirement } from '@/types/FormattedData/user-badge-requirement';
+import { CompletedBadgeRequirement } from '@/types/Entities/completed-badge-requirement';
+import { getUserCompletedBadgeRequirements } from './completed-badge-requirements';
+import { BadgeRequirement } from '@/types/Entities/badge-requirement';
 
 export async function createBadge(badgeData: Omit<Badge, 'id'>): Promise<FirestoreDoc<Badge>> {
   try {
@@ -70,4 +75,42 @@ export async function getActiveBadges(): Promise<FirestoreDoc<Badge>[]> {
   } catch (error) {
     throw new Error(`Failed to get active badges: ${error}`);
   }
+}
+
+export async function getUserBadgeDetails(userId: string): Promise<BadgeDetails[]> {
+  // Fetch all badges
+  const badgeSnapshot = await collections.badges.get();
+  const badges: Badge[] = badgeSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Badge);
+
+  // Fetch all badge requirements
+  const badgeReqSnapshot = await collections.badgeRequirements.get();
+  const allBadgeRequirements: BadgeRequirement[] = badgeReqSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as BadgeRequirement);
+
+  // Fetch user's completed badge requirements
+  const completedRequirements: CompletedBadgeRequirement[] = await getUserCompletedBadgeRequirements(userId);
+
+  // Map completed requirements to UserBadgeRequirement, only if BadgeRequirement exists
+  const userBadgeRequirements: UserBadgeRequirement[] = completedRequirements
+    .map(completed => {
+      const requirement = allBadgeRequirements.find(r => r.id === completed.requirementId);
+      if (!requirement) return null;
+      // Merge BadgeRequirement and CompletedBadgeRequirement
+      const mergedRequirement = { ...requirement, ...completed };
+      return {
+        requirement: mergedRequirement as BadgeRequirement,
+        isCompleted: true
+      };
+    })
+    .filter((ubr): ubr is UserBadgeRequirement => ubr !== null);
+
+  // Build BadgeDetails for each badge
+  const badgeDetails: BadgeDetails[] = badges.map(badge => {
+    const requirementsForBadge = userBadgeRequirements.filter(ubr => badge.requirementsIds.includes(ubr.requirement.id));
+    return {
+      badge,
+      userBadgeRequirements: requirementsForBadge,
+    };
+  });
+
+  return badgeDetails;
 } 
