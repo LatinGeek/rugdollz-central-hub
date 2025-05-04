@@ -49,7 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!address) return;
     setIsLoading(true);
     try {
-      debugger;
       const authResponse: AuthResponse = await fetchAuthUserDetails(address);
       if(authResponse.status != 200){
         disconnect();
