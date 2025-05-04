@@ -2,7 +2,8 @@ import { collections } from '../db';
 import { NFT, NFTAttribute } from '@/types/Entities/nft';
 import { handleDatabaseError } from '../db';
 import { QueryDocumentSnapshot, Query } from 'firebase-admin/firestore';
-import { getNFTsFromCollections, NFTMetadata } from './alchemy';
+import { getNFTsFromCollections } from './alchemy';
+import { CollectionNFTs } from '@/types/FormattedData/collection-nfts';
 
 /**
  * Creates a new NFT in the database
@@ -34,6 +35,7 @@ export async function createNFT(nft: Omit<NFT, 'id'>): Promise<NFT> {
  */
 export async function updateNFT(id: string, nft: Partial<Omit<NFT, 'id'>>): Promise<NFT> {
   try {
+    debugger;
     const docRef = collections.nfts.doc(id);
     const updateData = {
       ...nft,
@@ -158,10 +160,10 @@ export async function transferNFT(id: string, newOwner: string): Promise<NFT> {
  * @param walletAddress The wallet address to fetch NFTs for
  * @returns Array of NFT metadata from the provider
  */
-export async function getNFTsFromProvider(walletAddress: string): Promise<NFTMetadata[]> {
+export async function getNFTsFromProvider(walletAddress: string): Promise<NFT[]> {
   try {
     // Get NFTs from Alchemy
-    const collectionNFTs = await getNFTsFromCollections(walletAddress);
+    const collectionNFTs : CollectionNFTs[] = await getNFTsFromCollections(walletAddress);
     
     // Flatten the collection NFTs into a single array
     return collectionNFTs.flatMap(collection => collection.nfts);
@@ -178,39 +180,33 @@ export async function getNFTsFromProvider(walletAddress: string): Promise<NFTMet
 export async function syncUserNFTsFromProvider(walletAddress: string): Promise<NFT[]> {
   try {
     // Get NFTs from provider
-    const providerNFTs = await getNFTsFromProvider(walletAddress);
+    const providerNFTs: NFT[] = await getNFTsFromProvider(walletAddress);
     const storedNFTs: NFT[] = [];
 
     // Get existing NFTs from database
     const existingNFTs = await getNFTsByOwner(walletAddress);
     const existingNFTsMap = new Map(existingNFTs.map(nft => [nft.tokenId, nft]));
-
+    debugger;
     // Process each NFT from the provider
     for (const nftData of providerNFTs) {
-      const existingNFT = existingNFTsMap.get(nftData.id.tokenId);
+      const existingNFT = existingNFTsMap.get(nftData.tokenId);
 
       if (existingNFT) {
         // Update existing NFT if needed
         const needsUpdate = 
-          existingNFT.name !== nftData.title ||
+          existingNFT.name !== nftData.name ||
           existingNFT.description !== nftData.description ||
-          existingNFT.imageUrl !== nftData.metadata.image ||
+          existingNFT.imageUrl !== nftData.imageUrl ||
           JSON.stringify(existingNFT.attributes) !== JSON.stringify(
-            nftData.metadata.attributes?.map(attr => ({
-              traitType: attr.trait_type,
-              value: attr.value.toString(),
-            })) || []
+            nftData.attributes
           );
 
         if (needsUpdate) {
           const updatedNFT = await updateNFT(existingNFT.id, {
-            name: nftData.title,
+            name: nftData.name,
             description: nftData.description,
-            imageUrl: nftData.metadata.image,
-            attributes: nftData.metadata.attributes?.map(attr => ({
-              traitType: attr.trait_type,
-              value: attr.value.toString(),
-            })) || [],
+            imageUrl: nftData.imageUrl,
+            attributes: nftData.attributes,
             updatedAt: new Date(),
           });
           storedNFTs.push(updatedNFT);
@@ -220,16 +216,13 @@ export async function syncUserNFTsFromProvider(walletAddress: string): Promise<N
       } else {
         // Create new NFT
         const newNFT = await createNFT({
-          tokenId: nftData.id.tokenId,
-          name: nftData.title,
+          tokenId: nftData.id,
+          name: nftData.name,
           description: nftData.description,
-          imageUrl: nftData.metadata.image,
-          collection: nftData.contract.name,
+          imageUrl: nftData.imageUrl,
+          collection: nftData.collection,
           owner: walletAddress,
-          attributes: nftData.metadata.attributes?.map(attr => ({
-            traitType: attr.trait_type,
-            value: attr.value.toString(),
-          })) || [],
+          attributes: nftData.attributes,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -239,7 +232,7 @@ export async function syncUserNFTsFromProvider(walletAddress: string): Promise<N
 
     // Handle NFTs that are in the database but not in the provider
     // (e.g., if they were transferred out)
-    const providerTokenIds = new Set(providerNFTs.map(nft => nft.id.tokenId));
+    const providerTokenIds = new Set(providerNFTs.map(nft => nft.tokenId));
     for (const existingNFT of existingNFTs) {
       if (!providerTokenIds.has(existingNFT.tokenId)) {
         // NFT is no longer owned by the user

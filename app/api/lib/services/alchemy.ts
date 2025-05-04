@@ -1,44 +1,13 @@
 import { Network, Alchemy, Nft } from 'alchemy-sdk';
 import { handleDatabaseError } from '../db';
+import { NFT } from '@/types/Entities/nft';
+import { CollectionNFTs } from '@/types/FormattedData/collection-nfts';
 
 // Alchemy API key should be in environment variables
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
 if (!ALCHEMY_API_KEY) {
   throw new Error('ALCHEMY_API_KEY is not defined in environment variables');
-}
-
-// Types
-export interface NFTMetadata {
-  contract: {
-    address: string;
-    name: string;
-    symbol: string;
-  };
-  id: {
-    tokenId: string;
-    tokenMetadata?: {
-      tokenType: string;
-    };
-  };
-  title: string;
-  description: string;
-  media: Array<{
-    gateway: string;
-    thumbnail: string;
-    raw: string;
-    format: string;
-    bytes: number;
-  }>;
-  metadata: {
-    name: string;
-    description: string;
-    image: string;
-    attributes?: Array<{
-      trait_type: string;
-      value: string | number;
-    }>;
-  };
 }
 
 export interface GetNFTsForContractParams {
@@ -70,12 +39,6 @@ const NFT_COLLECTIONS = {
     },
   ],
 } as const;
-
-export interface CollectionNFTs {
-  network: Network;
-  collectionName: string;
-  nfts: NFTMetadata[];
-}
 
 /**
  * Retrieves NFTs from multiple collections across different networks for a wallet
@@ -127,7 +90,7 @@ export async function getNFTsForContract({
   walletAddress,
   contractAddress,
   network = Network.ETH_MAINNET,
-}: GetNFTsForContractParams): Promise<NFTMetadata[]> {
+}: GetNFTsForContractParams): Promise<NFT[]> {
   try {
     // Create a new Alchemy instance with the specified network
     const alchemyInstance = new Alchemy({
@@ -137,35 +100,23 @@ export async function getNFTsForContract({
 
     // Get NFTs for the wallet
     const nfts = await alchemyInstance.nft.getNftsForOwner(walletAddress, {
-      contractAddresses: [contractAddress],
+      contractAddresses: [contractAddress], 
     });
-
-    // Transform the response to our NFTMetadata type
+    // Transform the response to our NFT type
     return nfts.ownedNfts.map((nft: Nft) => ({
-      contract: {
-        address: nft.contract.address,
-        name: nft.contract.name || '',
-        symbol: nft.contract.symbol || '',
-      },
-      id: {
-        tokenId: nft.tokenId,
-        tokenMetadata: nft.tokenType ? { tokenType: nft.tokenType } : undefined,
-      },
-      title: nft.name || '',
+      id: nft.tokenId, // or another unique identifier if available
+      tokenId: nft.tokenId,
+      name: nft.name || '',
       description: nft.description || '',
-      media: nft.image ? [{
-        gateway: nft.image.originalUrl || '',
-        thumbnail: nft.image.thumbnailUrl || '',
-        raw: nft.image.originalUrl || '',
-        format: 'image/png', // Default format since it's not provided by the SDK
-        bytes: 0,
-      }] : [],
-      metadata: {
-        name: nft.name || '',
-        description: nft.description || '',
-        image: nft.image?.originalUrl || '',
-        attributes: [], // Default empty array since attributes are not provided by the SDK
-      },
+      imageUrl: nft.image?.originalUrl || '',
+      collection: nft.contract.name || '',
+      owner: walletAddress, // or nft.owner if available
+      attributes: nft.raw?.metadata?.attributes?.map((attr: { trait_type: string; value: string; }) => ({
+        traitType: attr.trait_type,
+        value: attr.value
+      })) || [],
+      createdAt: new Date(), // or use a real date if available
+      updatedAt: new Date(), // or use a real date if available
     }));
   } catch (error) {
     throw new Error(await handleDatabaseError(error));
