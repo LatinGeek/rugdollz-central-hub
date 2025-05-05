@@ -1,4 +1,4 @@
-import { collections, db, getDocumentById } from '@/app/api/lib/db';
+import { collections, db, getDocumentById, FirestoreDoc } from '@/app/api/lib/db';
 import { Badge } from '@/types/Entities/badge';
 import { BadgeRequirement } from '@/types/Entities/badge-requirement';
 import { DocumentReference } from 'firebase-admin/firestore';
@@ -28,10 +28,21 @@ export class BadgeUploadService {
   /**
    * Compare two objects and return true if they have different values
    */
-  private static hasChanges(obj1: any, obj2: any): boolean {
-    // Convert both objects to strings for deep comparison
-    const str1 = JSON.stringify(obj1);
-    const str2 = JSON.stringify(obj2);
+  private static hasChanges<T extends Badge | BadgeRequirement>(obj1: T | null | FirestoreDoc<T>, obj2: T): boolean {
+    if (!obj1) return true;
+    
+    // Convert both objects to strings for deep comparison, excluding the id field
+    const { ...rest1 } = obj1;
+    const { ...rest2 } = obj2;
+    
+    // Remove id from comparison using type-safe approach
+    const rest1WithoutId = { ...rest1 } as Partial<T | FirestoreDoc<T>>;
+    const rest2WithoutId = { ...rest2 } as Partial<T>;
+    delete rest1WithoutId.id;
+    delete rest2WithoutId.id;
+    
+    const str1 = JSON.stringify(rest1WithoutId);
+    const str2 = JSON.stringify(rest2WithoutId);
     return str1 !== str2;
   }
 
@@ -70,14 +81,14 @@ export class BadgeUploadService {
     
     // Check for changes and update/add as needed
     for (const requirement of allRequirements) {
-      const existingDoc = await getDocumentById(collections.badgeRequirements, requirement.id);
+      const existingDoc = await getDocumentById<BadgeRequirement>(collections.badgeRequirements, requirement.id);
       
       if (!existingDoc) {
         // New requirement
         const docRef = collections.badgeRequirements.doc(requirement.id);
         batch.set(docRef, requirement);
         stats.added++;
-      } else if (this.hasChanges(existingDoc, requirement)) {
+      } else if (this.hasChanges<BadgeRequirement>(existingDoc, requirement)) {
         // Changed requirement
         const docRef = collections.badgeRequirements.doc(requirement.id);
         batch.set(docRef, requirement, { merge: true });
@@ -131,14 +142,14 @@ export class BadgeUploadService {
 
     // Check for changes and update/add as needed
     for (const badge of allBadges) {
-      const existingDoc = await getDocumentById(collections.badges, badge.id);
+      const existingDoc = await getDocumentById<Badge>(collections.badges, badge.id);
       
       if (!existingDoc) {
         // New badge
         const docRef = collections.badges.doc(badge.id);
         batch.set(docRef, badge);
         stats.added++;
-      } else if (this.hasChanges(existingDoc, badge)) {
+      } else if (this.hasChanges<Badge>(existingDoc, badge)) {
         // Changed badge
         const docRef = collections.badges.doc(badge.id);
         batch.set(docRef, badge, { merge: true });
