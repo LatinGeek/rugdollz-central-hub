@@ -1,26 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PurchaseConfirmDialog } from '../components/ui/PurchaseConfirmDialog'
-import { sampleStoreItems, StoreItem } from '@/types/Entities/store-item'
+import { StoreItem } from '@/types/Entities/store-item'
 import { StoreItemComponent } from '../components/StoreItemComponent'
-
-
+import { useStoreService } from '@/services/store'
+import { LoadingSpinner } from '@/app/components/ui/LoadingSpinner'
 
 export default function StorePage() {
   const [selectedItem, setSelectedItem] = useState<StoreItem | null>(null)
   const [currentBalance] = useState(5000) // This would come from your wallet/backend
+  const [storeItems, setStoreItems] = useState<StoreItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  
+  const { getStoreItems, purchaseItem } = useStoreService()
 
-  const storeItems = sampleStoreItems;
+  useEffect(() => {
+    const fetchStoreItems = async () => {
+      try {
+        setIsLoading(true)
+        const items = await getStoreItems()
+        console.log(items)
+        setStoreItems(items)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load store items')
+        console.error('Error loading store items:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchStoreItems()
+  }, [])
   
   const handlePurchase = (item: StoreItem) => {
     setSelectedItem(item)
   }
 
-  const handleConfirmPurchase = () => {
-    // Here you would handle the actual purchase logic
-    console.log('Purchasing item:', selectedItem)
-    setSelectedItem(null)
+  const handleConfirmPurchase = async () => {
+    if (!selectedItem) return
+
+    try {
+      await purchaseItem(selectedItem.id)
+      // Here you would update the user's balance and inventory
+      console.log('Successfully purchased item:', selectedItem)
+      setSelectedItem(null)
+    } catch (err) {
+      console.error('Error purchasing item:', err)
+      // Handle purchase error (show error message to user)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
+        <div className="text-[rgb(var(--text-primary))]">{error}</div>
+      </div>
+    )
   }
 
   return (
