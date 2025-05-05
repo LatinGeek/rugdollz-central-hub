@@ -1,8 +1,36 @@
 import { NextResponse } from 'next/server'
+import { getLoreEntryDetailsByUser } from '../lib/services/lore-entries'
 
-export async function GET() {
-  // Get all lore entries
-  return NextResponse.json({ message: 'Get all lore entries' })
+export async function GET(request: Request) {
+  try {
+    // Get userId from query parameters
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Get lore entries for the user
+    const loreEntries = await getLoreEntryDetailsByUser(userId);
+
+    return NextResponse.json(
+      loreEntries,
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Failed to get lore entries:', error);
+    return NextResponse.json(
+      { 
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get lore entries' 
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
