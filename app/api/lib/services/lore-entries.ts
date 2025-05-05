@@ -1,6 +1,18 @@
 import { LoreEntry } from '@/types/Entities/lore-entry';
 import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection } from '../db';
 import { FieldValue } from 'firebase-admin/firestore';
+import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details';
+import { User } from '@/types/Entities/user';
+import { NFT } from '@/types/Entities/nft';
+import { UserDetails } from '@/types/FormattedData/user-details';
+import { ActivityName } from '@/types/enums/activity-name';
+import { ActivityAction } from '@/types/enums/activity-action';
+import { getFilteredActivities } from './activities';
+
+const unwrapFirestoreDoc = <T>(doc: FirestoreDoc<T>): T => {
+  const { ...data } = doc;
+  return data as T;
+};
 
 export async function createLoreEntry(entryData: Omit<LoreEntry, 'id'>): Promise<FirestoreDoc<LoreEntry>> {
   try {
@@ -124,5 +136,125 @@ export async function getLoreEntriesByStatus(status: string): Promise<FirestoreD
     );
   } catch (error) {
     throw new Error(`Failed to get lore entries by status: ${error}`);
+  }
+}
+
+export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEntryDetails[]> {
+  try {
+    // Get all lore entries by the user
+    const userEntries = await getLoreEntriesByAuthor(userId);
+    
+    // Get user details
+    const userDoc = await collections.users.doc(userId).get();
+    if (!userDoc.exists) {
+      throw new Error('User not found');
+    }
+    const userData = { id: userDoc.id, ...userDoc.data() } as FirestoreDoc<User>;
+
+    if (!userData.id) {
+      throw new Error('User data is missing ID');
+    }
+
+    // Get all unique NFT IDs from the entries
+    const nftIds = [...new Set(userEntries.map(entry => entry.nftId))];
+    
+    // Fetch all related NFTs
+    const nftPromises = nftIds.map(async (nftId) => {
+      const nftDoc = await collections.nfts.doc(nftId).get();
+      return nftDoc.exists ? { id: nftDoc.id, ...nftDoc.data() } as FirestoreDoc<NFT> : null;
+    });
+    const nfts = (await Promise.all(nftPromises)).filter((nft): nft is FirestoreDoc<NFT> => nft !== null);
+
+    // Create a map of NFTs for quick lookup
+    const nftMap = new Map(nfts.map(nft => [nft.id, nft]));
+
+    // Get all vote activities for the user's lore entries
+    const entryIds = userEntries.map(entry => entry.id!);
+    const voteActivities = await Promise.all(
+      entryIds.map(async (entryId) => {
+        return await getFilteredActivities({
+          type: ActivityName.lore,
+          action: ActivityAction.loreEntryVoted,
+          loreEntryId: entryId
+        });
+      })
+    );
+
+    // Create a map of vote counts and user votes
+    const voteMap = new Map<string, { totalVotes: number; userVote: 1 | -1 | null }>();
+    
+    // Process vote activities for each lore entry
+    entryIds.forEach((entryId, index) => {
+      const entryVotes = voteActivities[index];
+      
+      // Get the latest vote from each user
+      const latestUserVotes = new Map<string, number>();
+      entryVotes.forEach(activity => {
+        if (activity.voteValue !== undefined && activity.voteValue !== null) {
+          latestUserVotes.set(activity.userId, activity.voteValue);
+        }
+      });
+      
+      // Calculate total votes
+      const totalVotes = Array.from(latestUserVotes.values()).reduce((sum, vote) => sum + vote, 0);
+      
+      // Get the current user's vote (if any)
+      const userVoteActivity = entryVotes
+        .filter(activity => activity.userId === userId)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+      
+      voteMap.set(entryId, {
+        totalVotes,
+        userVote: userVoteActivity?.voteValue ?? null
+      });
+    });
+
+    // Combine the data into LoreEntryDetails format
+    const loreEntryDetails: LoreEntryDetails[] = userEntries.map(entry => {
+      if (!entry.id) {
+        throw new Error('Lore entry is missing ID');
+      }
+
+      const nft = nftMap.get(entry.nftId);
+      if (!nft || !nft.id) {
+        throw new Error(`NFT not found for entry ${entry.id}`);
+      }
+
+      const userDetails: UserDetails = {
+        id: userData.id!,
+        address: userData.address,
+        username: userData.username || null,
+        avatar: userData.avatar || null,
+        points: userData.points || 0,
+        nfts: [],
+        createdAt: userData.createdAt || null,
+        updatedAt: userData.updatedAt || null,
+        achievements: []
+      };
+
+      // Convert FirestoreDoc<NFT> to NFT
+      const nftDetails = unwrapFirestoreDoc(nft);
+
+      // Convert FirestoreDoc<LoreEntry> to LoreEntry
+      const loreEntry = unwrapFirestoreDoc(entry);
+
+      // Get vote information
+      const voteInfo = voteMap.get(entry.id) || { totalVotes: 0, userVote: null };
+
+      return {
+        loreEntry: {
+          ...loreEntry,
+          votes: voteInfo.totalVotes
+        },
+        userDetails,
+        nft: nftDetails,
+        userVote: voteInfo.userVote,
+        votes: voteInfo.totalVotes
+      };
+    });
+
+    return loreEntryDetails;
+  } catch (error) {
+    throw new Error(`Failed to get lore entry details by user: ${error}`);
   }
 } 
