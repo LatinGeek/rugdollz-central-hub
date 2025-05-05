@@ -34,10 +34,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isConnected && address) {
+      console.log("user is connected, fetching user details...");
       getUserDetails();
 
     } else {
       setUser(null);
+      setIsLoading(false);
     }
   }, [isConnected, address]);
 

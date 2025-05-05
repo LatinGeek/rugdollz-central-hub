@@ -1,24 +1,35 @@
 import { NextResponse } from 'next/server'
+import { getUserBadgeDetails } from '../lib/services/badges'
+import { withAuth } from '../auth/middleware'
 
-export async function GET() {
-  // Get all badges
-  return NextResponse.json({ message: 'Get all badges' })
-}
+// Wrap the GET handler with withAuth middleware
+export const GET = withAuth(async (req, { user }) => {
+  try {
+    // Get user's badge details using their wallet address
+    const badgeDetails = await getUserBadgeDetails(user.address)
+    return NextResponse.json({ badgeDetails })
+  } catch (error) {
+    console.error('Error fetching badge details:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch badge details' },
+      { status: 500 }
+    )
+  }
+})
 
-export async function POST(request: Request) {
-  // Create new badge
-  const body = await request.json()
+// Wrap other methods with withAuth as well
+export const POST = withAuth(async (req, { }) => {
+  const body = await req.json()
   return NextResponse.json({ message: 'Create badge', data: body })
-}
+})
 
-export async function PUT(request: Request) {
-  // Update badge
-  const body = await request.json()
+export const PUT = withAuth(async (req, { }) => {
+
+  const body = await req.json()
   return NextResponse.json({ message: 'Update badge', data: body })
-}
+})
 
-export async function DELETE(request: Request) {
-  // Delete badge
-  const body = await request.json()
+export const DELETE = withAuth(async (req, { }) => {
+  const body = await req.json()
   return NextResponse.json({ message: 'Delete badge', data: body })
-} 
+}) 
