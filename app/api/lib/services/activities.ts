@@ -109,4 +109,57 @@ export async function getActivitiesByDateRange(startDate: Date, endDate: Date): 
   } catch (error) {
     throw new Error(`Failed to get activities by date range: ${error}`);
   }
+}
+
+export interface ActivityFilterOptions {
+  userId?: string;
+  type?: ActivityNameType;
+  action?: ActivityActionType;
+  nftId?: string;
+  raffleId?: string;
+  loreEntryId?: string;
+}
+
+export async function getFilteredActivities(
+  filters: ActivityFilterOptions,
+  limit?: number
+): Promise<FirestoreDoc<Activity>[]> {
+  try {
+    const conditions: QueryCondition<FirestoreDoc<Activity>>[] = [];
+
+    // Add conditions based on provided filters
+    if (filters.userId) {
+      conditions.push({ field: 'userId', operator: '==', value: filters.userId });
+    }
+    if (filters.type) {
+      conditions.push({ field: 'type', operator: '==', value: filters.type });
+    }
+    if (filters.action) {
+      conditions.push({ field: 'action', operator: '==', value: filters.action });
+    }
+    if (filters.nftId) {
+      conditions.push({ field: 'nftId', operator: '==', value: filters.nftId });
+    }
+    if (filters.raffleId) {
+      conditions.push({ field: 'raffleId', operator: '==', value: filters.raffleId });
+    }
+    if (filters.loreEntryId) {
+      conditions.push({ field: 'loreEntryId', operator: '==', value: filters.loreEntryId });
+    }
+
+    // Always sort by createdAt in descending order (most recent first)
+    const orderBy: OrderByOption<FirestoreDoc<Activity>> = {
+      field: 'createdAt',
+      direction: 'desc'
+    };
+
+    return await queryCollection(
+      collections.activities,
+      conditions,
+      orderBy,
+      limit
+    );
+  } catch (error) {
+    throw new Error(`Failed to get filtered activities: ${error}`);
+  }
 } 
