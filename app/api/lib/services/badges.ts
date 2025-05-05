@@ -89,26 +89,20 @@ export async function getUserBadgeDetails(userId: string): Promise<BadgeDetails[
   // Fetch user's completed badge requirements
   const completedRequirements: CompletedBadgeRequirement[] = await getUserCompletedBadgeRequirements(userId);
 
-  // Map completed requirements to UserBadgeRequirement, only if BadgeRequirement exists
-  const userBadgeRequirements: UserBadgeRequirement[] = completedRequirements
-    .map(completed => {
-      const requirement = allBadgeRequirements.find(r => r.id === completed.requirementId);
-      if (!requirement) return null;
-      // Merge BadgeRequirement and CompletedBadgeRequirement
-      const mergedRequirement = { ...requirement, ...completed };
-      return {
-        requirement: mergedRequirement as BadgeRequirement,
-        isCompleted: true
-      };
-    })
-    .filter((ubr): ubr is UserBadgeRequirement => ubr !== null);
-
   // Build BadgeDetails for each badge
   const badgeDetails: BadgeDetails[] = badges.map(badge => {
-    const requirementsForBadge = userBadgeRequirements.filter(ubr => badge.requirementsIds.includes(ubr.requirement.id));
+    // Get all requirements for this badge
+    const badgeRequirements = allBadgeRequirements.filter(req => badge.requirementsIds.includes(req.id));
+    
+    // Create UserBadgeRequirement for each requirement, marking as completed if found in completedRequirements
+    const userBadgeRequirements: UserBadgeRequirement[] = badgeRequirements.map(requirement => ({
+      requirement,
+      isCompleted: completedRequirements.some(completed => completed.requirementId === requirement.id)
+    }));
+
     return {
       badge,
-      userBadgeRequirements: requirementsForBadge,
+      userBadgeRequirements,
     };
   });
 

@@ -3,6 +3,7 @@
 import { BadgeDetails } from '@/types/FormattedData/badge-details'
 import { UserBadgeRequirement } from '@/types/FormattedData/user-badge-requirement'
 import { useEffect, useState } from 'react'
+import { Award, X } from 'lucide-react'
 
 
 interface BadgeDetailsComponentProps {
@@ -61,20 +62,40 @@ export function BadgeDetailsComponent({ badges, selectedBadge, onClose, onSelect
         </div>
 
         {/* Left sidebar with all emblems */}
-        <div className="w-full md:w-72 bg-[rgb(var(--bg-darker))] p-4 md:p-6 overflow-x-auto md:overflow-y-auto">
+        <div className="h-1/3 md:h-full w-full md:w-72 bg-[rgb(var(--bg-darker))] p-4 md:p-6 overflow-x-auto md:overflow-y-auto">
           <div className="hidden md:block text-sm font-medium text-[rgb(var(--text-secondary))] mb-4">BADGES</div>
           <div className="grid grid-cols-6 md:grid-cols-4 gap-2 min-w-fit md:min-w-0">
             {badges.map((badge: BadgeDetails) => (
               <div
                 key={badge.badge.id}
-                className={`aspect-square w-12 md:w-auto rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
+                className={`aspect-square w-12 md:w-16 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-200 ${
                   badge.badge.id === selectedBadge.badge.id
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-dark))] hover:bg-opacity-80'
-                } ${!badge.badge.isActive && 'grayscale opacity-50'}`}
-                onClick={() => onSelect(badge)}
-                dangerouslySetInnerHTML={{ __html: badge.badge.icon }}
-              />
+                }`}
+              >
+                <div
+                  className={`w-full h-full flex items-center justify-center transition-all duration-300 ${
+                    badge.badge.isActive 
+                      ? 'opacity-100' 
+                      : 'opacity-30 group-hover:opacity-50'
+                  }`}
+                  onClick={() => onSelect(badge)}
+                  dangerouslySetInnerHTML={{ __html: badge.badge.icon }}
+                  style={{ 
+                    filter: (() => {
+                      const completedRequirements = badge.userBadgeRequirements.filter(req => req.isCompleted).length;
+                      const totalRequirements = badge.userBadgeRequirements.length;
+                      
+                      if (completedRequirements === 0) return 'brightness(0) invert(0.3)'; // Dark gray
+                      if (completedRequirements === totalRequirements) return 'invert(84%) sepia(44%) saturate(850%) hue-rotate(359deg) brightness(105%) contrast(107%)'; // Gold
+                      return 'brightness(0) invert(0.9)'; // Light gray, almost white
+                    })(),
+                    width: '75%',
+                    height: '75%'
+                  }}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -87,13 +108,33 @@ export function BadgeDetailsComponent({ badges, selectedBadge, onClose, onSelect
             {/* Selected emblem header */}
             <div className="flex items-center gap-4 md:gap-6 mb-6 md:mb-8">
               <div 
-                className={`w-16 h-16 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${
+                className={`aspect-square w-16 h-16 md:w-24 md:h-24 rounded-xl flex items-center justify-center ${
                   selectedBadge.badge.isActive
                     ? 'bg-[rgb(var(--accent))] bg-opacity-20'
                     : 'bg-[rgb(var(--bg-darker))] grayscale'
                 }`}
-                dangerouslySetInnerHTML={{ __html: selectedBadge.badge.icon }}
-              />
+              >
+                <div
+                  className={`w-full h-full flex items-center justify-center transition-all duration-300 ${
+                    selectedBadge.badge.isActive 
+                      ? 'opacity-100' 
+                      : 'opacity-30'
+                  }`}
+                  dangerouslySetInnerHTML={{ __html: selectedBadge.badge.icon }}
+                  style={{ 
+                    filter: (() => {
+                      const completedRequirements = selectedBadge.userBadgeRequirements.filter(req => req.isCompleted).length;
+                      const totalRequirements = selectedBadge.userBadgeRequirements.length;
+                      
+                      if (completedRequirements === 0) return 'brightness(0) invert(0.3)'; // Dark gray
+                      if (completedRequirements === totalRequirements) return 'invert(84%) sepia(44%) saturate(850%) hue-rotate(359deg) brightness(105%) contrast(107%)'; // Gold
+                      return 'brightness(0) invert(0.9)'; // Light gray, almost white
+                    })(),
+                    width: '80%',
+                    height: '80%'
+                  }}
+                />
+              </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-[rgb(var(--text-primary))]">
                   {selectedBadge.badge.name}
@@ -115,23 +156,23 @@ export function BadgeDetailsComponent({ badges, selectedBadge, onClose, onSelect
                 {requirements.map((req, index) => (
                   <div 
                     key={index}
-                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg bg-[rgb(var(--bg-darker))]"
+                    className={`flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-lg ${
+                      req.isCompleted
+                        ? 'bg-[rgba(var(--primary-orange))]/10'
+                        : 'bg-[rgb(var(--bg-darker))]'
+                    }`}
                   >
                     <div 
                       className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center ${
                         req.isCompleted
-                          ? 'bg-[rgb(var(--accent))] bg-opacity-20 text-[rgb(var(--accent))]'
-                          : 'bg-[rgb(var(--text-secondary))] bg-opacity-10 text-[rgb(var(--text-secondary))]'
+                          ? 'bg-[rgb(var(--primary-orange))] bg-opacity-10 text-[rgb(var(--bg-darker))]'
+                          : 'bg-[rgb(var(--bg-light))] bg-opacity-10 text-[rgb(var(--text-secondary))]'
                       }`}
                     >
                       {req.isCompleted ? (
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor">
-                          <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
-                        </svg>
+                        <Award className="w-4 h-4 md:w-5 md:h-5" />
                       ) : (
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5" fill="currentColor">
-                          <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-                        </svg>
+                        <X className="w-4 h-4 md:w-5 md:h-5" />
                       )}
                     </div>
                     <div className="flex-1">

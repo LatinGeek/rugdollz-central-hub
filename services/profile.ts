@@ -8,7 +8,7 @@ export function useProfileService() {
     const { data, error } = await get<UserProfileData>(`/users/profile/${address}`, {
       requireAuth: false
     })
-
+console.log(data);
     if (error) {
       console.error('Error fetching profile:', error)
       return null
