@@ -4,9 +4,13 @@ import { ActivityName, ActivityNameType } from "../enums/activity-name"
 export interface Activity {
   id: string
   type: ActivityNameType
-  action: ActivityActionType
+  action: ActivityActionType,
+  nftId?: string,
+  loreEntryId?: string,
+  raffleId?: string,
   userId: string
   createdAt: Date
+  voteValue?: 1 | -1 | null
 } 
 
 export const sampleActivities: Activity[] = [
