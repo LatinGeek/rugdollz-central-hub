@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ExternalLink, ChevronDown, Sword, Rabbit } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -165,17 +165,21 @@ export function Navigation({ isOpen = false, onClose }: NavigationProps) {
     pathname.startsWith("/badge-management") ||
     pathname.startsWith("/raffle-management");
 
-  // Create navigation items with conditional profile link
-  const navigationItems = [
-    ...baseNavigation.slice(0, 5), // Home to Gaming
-    ...(user
-      ? [
-          { name: "User Profile", href: `/profile/${user.address}` },
-          { name: "Badges", href: "/badges" },
-        ]
-      : []),
-    ...baseNavigation.slice(5), // NFT Customization onwards
-  ];
+  // Memoize navigation items to ensure consistent rendering
+  const navigationItems = useMemo(() => {
+    const items = [...baseNavigation];
+    
+    // Insert user-specific items after "NFT Customization"
+    if (user) {
+      const insertIndex = items.findIndex(item => item.href === "/nft-customization") + 1;
+      items.splice(insertIndex, 0,
+        { name: "User Profile", href: `/profile/${user.address}` },
+        { name: "Badges", href: "/badges" }
+      );
+    }
+    
+    return items;
+  }, [user]);
 
   return (
     <>
