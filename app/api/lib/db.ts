@@ -40,6 +40,31 @@ export type FirestoreDoc<T> = WithoutId<T> & { id?: string };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type FirestoreCollection<T> = ReturnType<typeof db.collection>;
 
+// Convert Firestore Timestamps to Date objects recursively
+export const convertTimestamps = (obj: unknown): unknown => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  if (obj instanceof Timestamp) {
+    return obj.toDate();
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(convertTimestamps);
+  }
+  
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    result[key] = convertTimestamps(value);
+  }
+  return result;
+};
+
+// Unwrap Firestore document and convert timestamps
+export const unwrapFirestoreDoc = <T>(doc: FirestoreDoc<T>): T => {
+  const { ...data } = doc;
+  return convertTimestamps(data) as T;
+};
+
 // Query types
 export interface QueryCondition<T> {
   field: keyof T;
