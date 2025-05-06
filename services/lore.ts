@@ -19,6 +19,32 @@ interface VoteRequest {
 export function useLoreService() {
   const { get, post } = useApi();
 
+  const getAllLoreEntries = async (limit: number = 50): Promise<LoreEntryDetails[] | null> => {
+    try {
+      const { data, error } = await get<LoreEntryDetails[]>(`/lore?limit=${limit}`,{requireAuth: false}
+      );
+
+      if (error) {
+        console.error('Error fetching all lore entries:', error);
+        return null;
+      }
+
+      // Sort by most recent if data exists
+      if (data) {
+        return data.sort((a, b) => {
+          const dateA = new Date(a.loreEntry.createdAt);
+          const dateB = new Date(b.loreEntry.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error in getAllLoreEntries:', error);
+      return null;
+    }
+  };
+
   const getUserLoreEntries = async (userId: string): Promise<LoreEntryDetails[] | null> => {
     try {
       const { data, error } = await get<LoreEntryDetails[]>(`/lore?userId=${userId}`, {
@@ -50,7 +76,6 @@ export function useLoreService() {
         throw new Error(error);
       }
 
-      // Convert date strings to Date objects in the response
       return data?.data ?? null;
     } catch (error) {
       console.error('Error in createLoreEntry:', error);
@@ -85,6 +110,7 @@ export function useLoreService() {
   };
 
   return {
+    getAllLoreEntries,
     getUserLoreEntries,
     createLoreEntry,
     voteLoreEntry
