@@ -1,17 +1,18 @@
+import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection, unwrapFirestoreDoc } from '../db';
 import { StoreItem } from '@/types/Entities/store-item';
-import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection } from '../db';
-
-const unwrapFirestoreDoc = <T>(doc: FirestoreDoc<T>): T => {
-  const { ...data } = doc;
-  return data as T;
-};
 
 export async function createStoreItem(storeItemData: Omit<StoreItem, 'id'>): Promise<StoreItem> {
   try {
+    // First create the document to get the ID
     const docRef = await collections.storeItems.add({
       ...storeItemData,
       createdAt: new Date(),
       updatedAt: new Date()
+    });
+
+    // Then update the document to include its own ID
+    await docRef.update({
+      id: docRef.id
     });
     
     const newStoreItem = await docRef.get();
@@ -60,8 +61,8 @@ export async function listStoreItems(
   limit?: number
 ): Promise<StoreItem[]> {
   try {
-    const docs = await queryCollection<FirestoreDoc<StoreItem>>(collections.storeItems, conditions, orderBy, limit);
-    return docs.map(doc => unwrapFirestoreDoc(doc));
+    const items = await queryCollection(collections.storeItems, conditions, orderBy, limit);
+    return items.map(item => unwrapFirestoreDoc(item));
   } catch (error) {
     throw new Error(`Failed to list store items: ${error}`);
   }
@@ -69,42 +70,26 @@ export async function listStoreItems(
 
 export async function getStoreItemsByCategory(category: string): Promise<StoreItem[]> {
   try {
-    const docs = await queryCollection<FirestoreDoc<StoreItem>>(
+    const items = await queryCollection<FirestoreDoc<StoreItem>>(
       collections.storeItems,
       [{ field: 'category', operator: '==', value: category }],
       { field: 'createdAt', direction: 'desc' }
     );
-    return docs.map(doc => unwrapFirestoreDoc(doc));
+    return items.map(item => unwrapFirestoreDoc(item));
   } catch (error) {
     throw new Error(`Failed to get store items by category: ${error}`);
   }
 }
 
-export async function getFeaturedStoreItems(limit: number = 6): Promise<StoreItem[]> {
+export async function getActiveStoreItems(): Promise<StoreItem[]> {
   try {
-    const docs = await queryCollection<FirestoreDoc<StoreItem>>(
+    const items = await queryCollection<FirestoreDoc<StoreItem>>(
       collections.storeItems,
-      [],
-      { field: 'createdAt', direction: 'desc' },
-      limit
+      [{ field: 'active', operator: '==', value: true }],
+      { field: 'createdAt', direction: 'desc' }
     );
-    return docs.map(doc => unwrapFirestoreDoc(doc));
+    return items.map(item => unwrapFirestoreDoc(item));
   } catch (error) {
-    throw new Error(`Failed to get featured store items: ${error}`);
-  }
-}
-
-export async function searchStoreItems(searchTerm: string): Promise<StoreItem[]> {
-  try {
-    // Note: Firestore doesn't support full-text search directly
-    // This is a simple implementation that searches in name and description
-    const docs = await queryCollection<FirestoreDoc<StoreItem>>(collections.storeItems);
-    const items = docs.map(doc => unwrapFirestoreDoc(doc));
-    return items.filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  } catch (error) {
-    throw new Error(`Failed to search store items: ${error}`);
+    throw new Error(`Failed to get active store items: ${error}`);
   }
 } 
