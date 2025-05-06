@@ -309,4 +309,47 @@ export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEnt
     console.error('[LoreDetails] Error in getLoreEntryDetailsByUser:', error);
     throw new Error(`Failed to get lore entry details by user: ${error}`);
   }
+}
+
+export async function getLoreEntryDetails(entry: LoreEntry): Promise<LoreEntryDetails> {
+  try {
+    // Get author details
+    const userDoc = await collections.users.doc(entry.authorId).get();
+    if (!userDoc.exists) {
+      throw new Error('Author not found');
+    }
+    const userData = unwrapFirestoreDoc({ id: userDoc.id, ...userDoc.data() } as FirestoreDoc<User>);
+
+    // Get NFT details
+    const nftDoc = await collections.nfts.doc(entry.nftId).get();
+    if (!nftDoc.exists) {
+      throw new Error('NFT not found');
+    }
+    const nftData = unwrapFirestoreDoc({ id: nftDoc.id, ...nftDoc.data() } as FirestoreDoc<NFT>);
+
+    // Get user's vote for this entry
+    const userVote = await getUserVote(entry.id, entry.authorId);
+
+    const userDetails: UserDetails = {
+      id: userData.id!,
+      address: userData.address,
+      username: userData.username || null,
+      avatar: userData.avatar || null,
+      points: userData.points || 0,
+      nfts: [],
+      createdAt: userData.createdAt || null,
+      updatedAt: userData.updatedAt || null,
+      achievements: []
+    };
+
+    return {
+      loreEntry: entry,
+      userDetails,
+      nft: nftData,
+      userVote
+    };
+  } catch (error) {
+    console.error(`Failed to get lore entry details: ${error}`);
+    throw error;
+  }
 } 
