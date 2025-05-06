@@ -8,10 +8,16 @@ import { getUserCompletedBadgeRequirements } from './completed-badge-requirement
 
 export async function createUser(userData: Omit<User, 'id'>): Promise<FirestoreDoc<User>> {
   try {
+    // First create the document to get the ID
     const docRef = await collections.users.add({
       ...userData,
       createdAt: new Date(),
       updatedAt: new Date()
+    });
+
+    // Then update the document to include its own ID
+    await docRef.update({
+      id: docRef.id
     });
     
     const newUser = await docRef.get();
