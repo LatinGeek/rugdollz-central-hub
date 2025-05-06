@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getLoreEntryDetailsByUser, createLoreEntry } from '../lib/services/lore-entries'
+import { 
+  getLoreEntryDetailsByUser, 
+  listLoreEntries, 
+  getLoreEntryDetails,
+  createLoreEntry 
+} from '../lib/services/lore-entries'
 import { getNFTsByOwner } from '../lib/services/nfts'
 import { withAuth } from '../auth/middleware'
 import { LoreEntry } from '@/types/Entities/lore-entry'
@@ -13,20 +18,25 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
+    if (userId) {
+      // Get lore entries for the specific user
+      const loreEntries: LoreEntryDetails[] = await getLoreEntryDetailsByUser(userId);
+      return NextResponse.json(loreEntries, { status: 200 });
     }
 
-    // Get lore entries for the user
-    const loreEntries: LoreEntryDetails[] = await getLoreEntryDetailsByUser(userId);
-
-    return NextResponse.json(
-      loreEntries,
-      { status: 200 }
+    // If no userId provided, get all lore entries sorted by most recent
+    const loreEntries = await listLoreEntries(
+      [], // no conditions
+      { field: 'createdAt', direction: 'desc' }, // sort by most recent
+      50 // limit to 50 entries for performance
     );
+
+    // Get full details for each entry
+    const loreEntryDetails = await Promise.all(
+      loreEntries.map(entry => getLoreEntryDetails(entry))
+    );
+
+    return NextResponse.json(loreEntryDetails, { status: 200 });
   } catch (error) {
     console.error('Failed to get lore entries:', error);
     return NextResponse.json(
