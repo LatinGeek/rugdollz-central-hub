@@ -186,11 +186,7 @@ export default function NFTLorePage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    )
+    return <LoadingSpinner fullScreen />;
   }
 
   if (error) {
@@ -198,7 +194,7 @@ export default function NFTLorePage() {
       <div className="min-h-screen bg-[rgb(var(--bg-darker))] flex items-center justify-center">
         <div className="text-[rgb(var(--text-primary))]">{error}</div>
       </div>
-    )
+    );
   }
 
   return (
