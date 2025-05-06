@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { LoreEntry } from './LoreEntry'
 import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
+
 interface LoreFeedProps {
   loreEntryDetails: LoreEntryDetails[]
+  onVote: (entryId: string, voteValue: 1 | -1 | null) => Promise<void>
 }
 
-export function LoreFeed({ loreEntryDetails }: LoreFeedProps) {
+export function LoreFeed({ loreEntryDetails, onVote }: LoreFeedProps) {
   const [entries, setEntries] = useState<LoreEntryDetails[]>(loreEntryDetails)
   
   useEffect(() => {
@@ -50,7 +52,7 @@ export function LoreFeed({ loreEntryDetails }: LoreFeedProps) {
         <LoreEntry
           key={entry.loreEntry.id}
           loreEntryDetails={entry}
-          onVote={handleVote}
+          onVote={onVote}
         />
       ))}
     </div>

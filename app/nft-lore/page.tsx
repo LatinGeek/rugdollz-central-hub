@@ -6,8 +6,6 @@ import { LoreFeed } from '@/app/components/nft-lore/LoreFeed'
 import { WriteLore } from '@/app/components/nft-lore/WriteLore'
 import { NFT } from '@/types/Entities/nft'
 import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
-import { LoreEntry } from '@/types/Entities/lore-entry'
-import { LoreEntryStatus } from '@/types/enums/lore-entry-status'
 import { useNFTService } from '@/services/nft'
 import { useLoreService } from '@/services/lore'
 import { useAuth } from '@/app/contexts/AuthContext'
@@ -19,9 +17,10 @@ export default function NFTLorePage() {
   const [nfts, setNFTs] = useState<NFT[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const writeLoreRef = useRef<HTMLDivElement>(null)
   const { getUserNFTs } = useNFTService()
-  const { getUserLoreEntries } = useLoreService()
+  const { getUserLoreEntries, createLoreEntry, voteLoreEntry } = useLoreService()
   const { user, connect } = useAuth()
 
   useEffect(() => {
@@ -37,6 +36,8 @@ export default function NFTLorePage() {
           getUserNFTs(user.address),
           getUserLoreEntries(user.id)
         ]);
+
+        console.log(loreEntries)
         
         setNFTs(userNFTs)
         if (loreEntries === null) {
@@ -66,39 +67,123 @@ export default function NFTLorePage() {
   const handleSubmitLore = async (content: string) => {
     if (!selectedNFT || !user) return
 
-    // In a real app, this would be an API call
-    const newEntry: LoreEntry = {
-      id: Date.now().toString(),
-      title: selectedNFT.name,
-      nftId: selectedNFT.id,
-      content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: LoreEntryStatus.published,
-      authorId: user.id,
-      votes: 0,
-    }
+    try {
+      setIsSubmitting(true)
+      setError(null)
 
-    const newEntryDetails: LoreEntryDetails = {
-      loreEntry: newEntry,
-      userDetails: {
-        id: user.id,
-        address: user.address,
-        username: user.username || null,
-        avatar: user.avatar || null,
-        points: user.points || 0,
-        nfts: [],
-        createdAt: user.createdAt || null,
-        updatedAt: user.updatedAt || null,
-        achievements: []
-      },
-      nft: selectedNFT,
-      userVote: null,
-      votes: 0
-    }
+      // Create the lore entry
+      const newEntry = await createLoreEntry({
+        title: selectedNFT.name,
+        content,
+        nftId: selectedNFT.id
+      });
 
-    setEntries(prev => [newEntryDetails, ...prev])
+      if (!newEntry) {
+        throw new Error('Failed to create lore entry');
+      }
+
+      // Create the full lore entry details
+      const newEntryDetails: LoreEntryDetails = {
+        loreEntry: newEntry,
+        userDetails: {
+          id: user.id,
+          address: user.address,
+          username: user.username || null,
+          avatar: user.avatar || null,
+          points: user.points || 0,
+          nfts: [],
+          createdAt: user.createdAt || null,
+          updatedAt: user.updatedAt || null,
+          achievements: []
+        },
+        nft: selectedNFT,
+        userVote: null,
+      }
+
+      // Update the UI
+      setEntries(prev => [newEntryDetails, ...prev])
+      setSelectedNFT(null) // Close the write form
+    } catch (err) {
+      console.error('Error creating lore entry:', err)
+      setError('Failed to create lore entry. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
+  const handleVote = async (entryId: string, voteValue: 1 | -1 | null) => {
+    if (!user) return;
+
+    try {
+      // Calculate vote change for optimistic update
+      const entry = entries.find(e => e.loreEntry.id === entryId);
+      if (!entry) return;
+
+      const oldVote = entry.userVote;
+      let voteChange = 0;
+
+      // Calculate vote change
+      if (voteValue === null && oldVote === 1) voteChange = -1;
+      if (voteValue === null && oldVote === -1) voteChange = 1;
+      if (voteValue === 1 && oldVote === null) voteChange = 1;
+      if (voteValue === 1 && oldVote === -1) voteChange = 2;
+      if (voteValue === -1 && oldVote === null) voteChange = -1;
+      if (voteValue === -1 && oldVote === 1) voteChange = -2;
+
+      // Optimistically update UI
+      setEntries(prev => prev.map(entry => {
+        if (entry.loreEntry.id === entryId) {
+          return {
+            ...entry,
+            loreEntry: {
+              ...entry.loreEntry,
+              votes: entry.loreEntry.votes + voteChange
+            },
+            userVote: voteValue
+          };
+        }
+        return entry;
+      }));
+
+      // Make API call
+      const updatedVotes = await voteLoreEntry(entryId, voteValue);
+      if (updatedVotes === null) {
+        // If API call fails, revert the optimistic update
+        setEntries(prev => prev.map(entry => {
+          if (entry.loreEntry.id === entryId) {
+            return {
+              ...entry,
+              loreEntry: {
+                ...entry.loreEntry,
+                votes: entry.loreEntry.votes - voteChange
+              },
+              userVote: oldVote
+            };
+          }
+          return entry;
+        }));
+        throw new Error('Failed to update vote');
+      }
+
+      // Update with actual vote count from server (in case of race conditions)
+      setEntries(prev => prev.map(entry => {
+        if (entry.loreEntry.id === entryId) {
+          return {
+            ...entry,
+            loreEntry: {
+              ...entry.loreEntry,
+              votes: updatedVotes
+            },
+            userVote: voteValue
+          };
+        }
+        return entry;
+      }));
+    } catch (err) {
+      console.error('Error voting on lore entry:', err);
+      setError('Failed to update vote. Please try again.');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -162,6 +247,7 @@ export default function NFTLorePage() {
               nft={selectedNFT}
               onClose={() => setSelectedNFT(null)}
               onSubmit={handleSubmitLore}
+              isSubmitting={isSubmitting}
             />
           </div>
         )}
@@ -184,7 +270,10 @@ export default function NFTLorePage() {
               )}
             </div>
           ) : (
-            <LoreFeed loreEntryDetails={entries} />
+            <LoreFeed 
+              loreEntryDetails={entries} 
+              onVote={handleVote}
+            />
           )}
         </div>
       </div>

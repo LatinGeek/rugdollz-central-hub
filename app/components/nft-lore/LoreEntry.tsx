@@ -3,31 +3,30 @@
 import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details'
 import { useState, useRef, useEffect } from 'react'
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+function formatDate(date: Date | string): string {
+  const dateObj = date instanceof Date ? date : new Date(date);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
-    return 'just now'
+    return 'just now';
   } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60)
-    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
   } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600)
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
   } else if (diffInSeconds < 2592000) {
-    const days = Math.floor(diffInSeconds / 86400)
-    return `${days} ${days === 1 ? 'day' : 'days'} ago`
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
   } else {
-    return date.toLocaleDateString('en-US', {
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
-    })
+    });
   }
 }
-
 
 interface LoreEntryProps {
   loreEntryDetails: LoreEntryDetails
@@ -65,6 +64,17 @@ export function LoreEntry({ loreEntryDetails, onVote }: LoreEntryProps) {
     }
   }
 
+  // Format the date for the tooltip
+  const fullDateString = new Date(loreEntryDetails.loreEntry.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
   return (
     <div className="bg-[rgb(var(--bg-dark))] rounded-xl p-4 sm:p-4 space-y-4">
       {/* Author and timestamp */}
@@ -72,22 +82,14 @@ export function LoreEntry({ loreEntryDetails, onVote }: LoreEntryProps) {
         <span className="text-sm text-[rgb(var(--text-primary))]">{loreEntryDetails.userDetails.username}</span>
         <span 
           className="text-xs sm:text-sm text-[rgb(var(--text-secondary))]" 
-          title={new Date(loreEntryDetails.loreEntry.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-          })}
+          title={fullDateString}
         >
-          {formatDate(loreEntryDetails.loreEntry.createdAt.toISOString())}
+          {formatDate(loreEntryDetails.loreEntry.createdAt)}
         </span>
       </div>
 
       {/* NFT Preview */}
-      <div className="flex gap-2 sm:gap-4">
+      <div className="flex gap-4">
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden flex-shrink-0">
           <img
             src={loreEntryDetails.nft.imageUrl}
@@ -134,7 +136,7 @@ export function LoreEntry({ loreEntryDetails, onVote }: LoreEntryProps) {
       <div className="flex items-center gap-4">
         <button
           onClick={() => handleVote(1)}
-          className={`flex items-center gap-1 transition-colors ${
+          className={`p-1 rounded ${
             loreEntryDetails.userVote === 1
               ? 'text-[rgb(var(--primary-orange))]'
               : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
@@ -147,7 +149,7 @@ export function LoreEntry({ loreEntryDetails, onVote }: LoreEntryProps) {
         <span className="text-[rgb(var(--text-primary))]">{loreEntryDetails.loreEntry.votes}</span>
         <button
           onClick={() => handleVote(-1)}
-          className={`flex items-center gap-1 transition-colors ${
+          className={`p-1 rounded ${
             loreEntryDetails.userVote === -1
               ? 'text-[rgb(var(--primary-orange))]'
               : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
