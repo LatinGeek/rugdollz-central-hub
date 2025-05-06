@@ -35,7 +35,7 @@ export function RaffleCard({ raffleDetails, onJoin, isJoined }: RaffleCardProps)
               {raffleDetails.winner.avatar ? (
                 <img 
                   src={raffleDetails.winner.avatar} 
-                  alt={raffleDetails.winner.username}
+                  alt={raffleDetails.winner.username ?? ''}
                   className="w-4 h-4 rounded-full"
                 />
               ) : (

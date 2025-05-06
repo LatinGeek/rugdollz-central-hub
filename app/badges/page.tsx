@@ -7,6 +7,7 @@ import { Collection, CollectionType } from '@/types/enums/collection'
 import { BadgeDetails } from '@/types/FormattedData/badge-details'
 import { useBadgeService } from '@/services/badges'
 import { LoadingSpinner } from '@/app/components/ui/LoadingSpinner'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function BadgePage() {
   const [activeTab, setActiveTab] = useState<CollectionType>(Collection.rugDollzOG)
@@ -17,6 +18,7 @@ export default function BadgePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
+  const { user } = useAuth()
   const { getBadgeDetails } = useBadgeService()
 
   useEffect(() => {
@@ -33,8 +35,10 @@ export default function BadgePage() {
       }
     }
 
-    fetchBadges()
-  }, [])
+    if(user) {
+      fetchBadges()
+    }
+  }, [user])
 
   // Get collection types from the Collection object
   const tabs: CollectionType[] = Object.values(Collection)
@@ -57,7 +61,7 @@ export default function BadgePage() {
   }, [])
 
   if (isLoading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner fullScreen />
   }
 
   if (error || !badgeDetails) {

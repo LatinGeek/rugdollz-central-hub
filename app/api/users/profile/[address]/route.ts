@@ -6,7 +6,7 @@ import { UserProfileData } from '@/types/FormattedData/user-profile-data'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   try {
     const resolvedParams = await params

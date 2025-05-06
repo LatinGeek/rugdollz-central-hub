@@ -83,7 +83,7 @@ export default function LeadershipPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--accent))] to-[rgb(var(--accent-dark))] 
                     rounded-full blur-xl opacity-30" />
                   <img 
-                    src={user.userDetails.avatar} 
+                    src={user.userDetails.avatar ?? ''} 
                     alt={user.userDetails.username || 'User Avatar'}
                     className="w-full h-full rounded-full object-cover border-4 border-[rgb(var(--accent))] 
                       shadow-lg relative z-10"

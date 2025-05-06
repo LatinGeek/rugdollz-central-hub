@@ -43,7 +43,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
   }, [address])
 
   if (isLoading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner fullScreen />;
   }
 
   if (error || !profile) {
