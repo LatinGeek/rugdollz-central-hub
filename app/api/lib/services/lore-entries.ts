@@ -9,7 +9,7 @@ import { ActivityName } from '@/types/enums/activity-name';
 import { ActivityAction } from '@/types/enums/activity-action';
 import { getFilteredActivities } from './activities';
 
-export async function createLoreEntry(entryData: Omit<LoreEntry, 'id'>): Promise<FirestoreDoc<LoreEntry>> {
+export async function createLoreEntry(entryData: Omit<LoreEntry, 'id'>): Promise<LoreEntry> {
   try {
     // First create the document to get the ID
     const docRef = await collections.loreEntries.add({
@@ -25,13 +25,13 @@ export async function createLoreEntry(entryData: Omit<LoreEntry, 'id'>): Promise
     });
     
     const newEntry = await docRef.get();
-    return { id: newEntry.id, ...newEntry.data() } as FirestoreDoc<LoreEntry>;
+    return unwrapFirestoreDoc({ id: newEntry.id, ...newEntry.data() } as FirestoreDoc<LoreEntry>);
   } catch (error) {
     throw new Error(`Failed to create lore entry: ${error}`);
   }
 }
 
-export async function updateLoreEntry(id: string, entryData: Partial<LoreEntry>): Promise<FirestoreDoc<LoreEntry>> {
+export async function updateLoreEntry(id: string, entryData: Partial<LoreEntry>): Promise<LoreEntry> {
   try {
     const docRef = collections.loreEntries.doc(id);
     await docRef.update({
@@ -40,7 +40,7 @@ export async function updateLoreEntry(id: string, entryData: Partial<LoreEntry>)
     });
     
     const updatedEntry = await docRef.get();
-    return { id: updatedEntry.id, ...updatedEntry.data() } as FirestoreDoc<LoreEntry>;
+    return unwrapFirestoreDoc({ id: updatedEntry.id, ...updatedEntry.data() } as FirestoreDoc<LoreEntry>);
   } catch (error) {
     throw new Error(`Failed to update lore entry: ${error}`);
   }
@@ -54,11 +54,11 @@ export async function deleteLoreEntry(id: string): Promise<void> {
   }
 }
 
-export async function getLoreEntryById(id: string): Promise<FirestoreDoc<LoreEntry> | null> {
+export async function getLoreEntryById(id: string): Promise<LoreEntry | null> {
   try {
     const doc = await collections.loreEntries.doc(id).get();
     if (!doc.exists) return null;
-    return { id: doc.id, ...doc.data() } as FirestoreDoc<LoreEntry>;
+    return unwrapFirestoreDoc({ id: doc.id, ...doc.data() } as FirestoreDoc<LoreEntry>);
   } catch (error) {
     throw new Error(`Failed to get lore entry: ${error}`);
   }
@@ -68,52 +68,56 @@ export async function listLoreEntries(
   conditions?: QueryCondition<FirestoreDoc<LoreEntry>>[],
   orderBy?: OrderByOption<FirestoreDoc<LoreEntry>>,
   limit?: number
-): Promise<FirestoreDoc<LoreEntry>[]> {
+): Promise<LoreEntry[]> {
   try {
-    return await queryCollection(collections.loreEntries, conditions, orderBy, limit);
+    const entries = await queryCollection(collections.loreEntries, conditions, orderBy, limit);
+    return entries.map(entry => unwrapFirestoreDoc(entry));
   } catch (error) {
     throw new Error(`Failed to list lore entries: ${error}`);
   }
 }
 
-export async function getLoreEntriesByNFT(nftId: string): Promise<FirestoreDoc<LoreEntry>[]> {
+export async function getLoreEntriesByNFT(nftId: string): Promise<LoreEntry[]> {
   try {
-    return await queryCollection(
+    const entries = await queryCollection<FirestoreDoc<LoreEntry>>(
       collections.loreEntries,
       [{ field: 'nftId', operator: '==', value: nftId }],
       { field: 'createdAt', direction: 'desc' }
     );
+    return entries.map(entry => unwrapFirestoreDoc(entry));
   } catch (error) {
     throw new Error(`Failed to get lore entries for NFT: ${error}`);
   }
 }
 
-export async function getLoreEntriesByAuthor(authorId: string): Promise<FirestoreDoc<LoreEntry>[]> {
+export async function getLoreEntriesByAuthor(authorId: string): Promise<LoreEntry[]> {
   try {
-    return await queryCollection(
+    const entries = await queryCollection<FirestoreDoc<LoreEntry>>(
       collections.loreEntries,
       [{ field: 'authorId', operator: '==', value: authorId }],
       { field: 'createdAt', direction: 'desc' }
     );
+    return entries.map(entry => unwrapFirestoreDoc(entry));
   } catch (error) {
     throw new Error(`Failed to get lore entries by author: ${error}`);
   }
 }
 
-export async function getPopularLoreEntries(limit: number = 10): Promise<FirestoreDoc<LoreEntry>[]> {
+export async function getPopularLoreEntries(limit: number = 10): Promise<LoreEntry[]> {
   try {
-    return await queryCollection(
+    const entries = await queryCollection<FirestoreDoc<LoreEntry>>(
       collections.loreEntries,
       [],
       { field: 'votes', direction: 'desc' },
       limit
     );
+    return entries.map(entry => unwrapFirestoreDoc(entry));
   } catch (error) {
     throw new Error(`Failed to get popular lore entries: ${error}`);
   }
 }
 
-export async function updateLoreEntryVotes(id: string, voteChange: number): Promise<FirestoreDoc<LoreEntry>> {
+export async function updateLoreEntryVotes(id: string, voteChange: number): Promise<LoreEntry> {
   try {
     const docRef = collections.loreEntries.doc(id);
     await docRef.update({
@@ -122,19 +126,20 @@ export async function updateLoreEntryVotes(id: string, voteChange: number): Prom
     });
     
     const updatedEntry = await docRef.get();
-    return { id: updatedEntry.id, ...updatedEntry.data() } as FirestoreDoc<LoreEntry>;
+    return unwrapFirestoreDoc({ id: updatedEntry.id, ...updatedEntry.data() } as FirestoreDoc<LoreEntry>);
   } catch (error) {
     throw new Error(`Failed to update lore entry votes: ${error}`);
   }
 }
 
-export async function getLoreEntriesByStatus(status: string): Promise<FirestoreDoc<LoreEntry>[]> {
+export async function getLoreEntriesByStatus(status: string): Promise<LoreEntry[]> {
   try {
-    return await queryCollection(
+    const entries = await queryCollection<FirestoreDoc<LoreEntry>>(
       collections.loreEntries,
       [{ field: 'status', operator: '==', value: status }],
       { field: 'createdAt', direction: 'desc' }
     );
+    return entries.map(entry => unwrapFirestoreDoc(entry));
   } catch (error) {
     throw new Error(`Failed to get lore entries by status: ${error}`);
   }
@@ -223,7 +228,7 @@ export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEnt
       console.error(`[LoreDetails] User not found: ${userId}`);
       throw new Error('User not found');
     }
-    const userData = { id: userDoc.id, ...userDoc.data() } as FirestoreDoc<User>;
+    const userData = unwrapFirestoreDoc({ id: userDoc.id, ...userDoc.data() } as FirestoreDoc<User>);
     console.log(`[LoreDetails] Retrieved user data for: ${userData.username || userData.address}`);
 
     if (!userData.id) {
@@ -290,11 +295,8 @@ export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEnt
       // Convert FirestoreDoc<NFT> to NFT
       const nftDetails = unwrapFirestoreDoc(nft);
 
-      // Convert FirestoreDoc<LoreEntry> to LoreEntry
-      const loreEntry = unwrapFirestoreDoc(entry);
-
       return {
-        loreEntry,
+        loreEntry: entry,
         userDetails,
         nft: nftDetails,
         userVote: userVotes[index]
