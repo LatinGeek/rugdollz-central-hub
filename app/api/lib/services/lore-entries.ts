@@ -1,5 +1,5 @@
 import { LoreEntry } from '@/types/Entities/lore-entry';
-import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection } from '../db';
+import { collections, FirestoreDoc, QueryCondition, OrderByOption, queryCollection, unwrapFirestoreDoc } from '../db';
 import { FieldValue } from 'firebase-admin/firestore';
 import { LoreEntryDetails } from '@/types/FormattedData/lore-entry-details';
 import { User } from '@/types/Entities/user';
@@ -9,18 +9,19 @@ import { ActivityName } from '@/types/enums/activity-name';
 import { ActivityAction } from '@/types/enums/activity-action';
 import { getFilteredActivities } from './activities';
 
-const unwrapFirestoreDoc = <T>(doc: FirestoreDoc<T>): T => {
-  const { ...data } = doc;
-  return data as T;
-};
-
 export async function createLoreEntry(entryData: Omit<LoreEntry, 'id'>): Promise<FirestoreDoc<LoreEntry>> {
   try {
+    // First create the document to get the ID
     const docRef = await collections.loreEntries.add({
       ...entryData,
       createdAt: new Date(),
       updatedAt: new Date(),
       votes: 0
+    });
+
+    // Then update the document to include its own ID
+    await docRef.update({
+      id: docRef.id
     });
     
     const newEntry = await docRef.get();
@@ -139,84 +140,138 @@ export async function getLoreEntriesByStatus(status: string): Promise<FirestoreD
   }
 }
 
+export async function processVotes(entryId: string): Promise<number> {
+  // Get all vote activities for the lore entry
+  const voteActivities = await getFilteredActivities({
+    type: ActivityName.lore,
+    action: ActivityAction.loreEntryVoted,
+    loreEntryId: entryId
+  });
+
+  // Group activities by user and sort by timestamp
+  const userActivitiesMap = new Map<string, typeof voteActivities>();
+  voteActivities.forEach(activity => {
+    if (activity.voteValue !== undefined && activity.voteValue !== null) {
+      const activities = userActivitiesMap.get(activity.userId) || [];
+      activities.push(activity);
+      activities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      userActivitiesMap.set(activity.userId, activities);
+    }
+  });
+
+  // Get only the latest vote from each user
+  const latestUserVotes = new Map<string, number>();
+  userActivitiesMap.forEach((activities, userId) => {
+    const latestActivity = activities[0];
+    if (latestActivity?.voteValue !== undefined && latestActivity?.voteValue !== null) {
+      latestUserVotes.set(userId, latestActivity.voteValue);
+    }
+  });
+
+  // Calculate total votes
+  const totalVotes = Array.from(latestUserVotes.values()).reduce((sum, vote) => sum + vote, 0);
+
+  // Update the lore entry's vote count in the database
+  await updateLoreEntryVotes(entryId, totalVotes);
+
+  return totalVotes;
+}
+
+export async function getUserVote(entryId: string, userId: string): Promise<1 | -1 | null> {
+  console.log(`[UserVote] Getting vote for entry ${entryId} by user ${userId}`);
+  
+  try {
+    const voteActivities = await getFilteredActivities({
+      type: ActivityName.lore,
+      action: ActivityAction.loreEntryVoted,
+      loreEntryId: entryId
+    });
+    console.log(`[UserVote] Found ${voteActivities.length} vote activities for entry`);
+
+    // Get the current user's vote (if any)
+    const userVoteActivities = voteActivities.filter(activity => activity.userId === userId);
+    console.log(`[UserVote] Found ${userVoteActivities.length} vote activities for user`);
+
+    if (userVoteActivities.length === 0) {
+      console.log(`[UserVote] No votes found for user ${userId} on entry ${entryId}`);
+      return null;
+    }
+
+    // Sort by timestamp and get the latest
+    const sortedActivities = userVoteActivities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const latestVote = sortedActivities[0];
+    console.log(`[UserVote] Latest vote for user ${userId}: ${latestVote.voteValue} (from ${latestVote.createdAt})`);
+
+    return latestVote?.voteValue ?? null;
+  } catch (error) {
+    console.error(`[UserVote] Error getting vote for entry ${entryId} by user ${userId}:`, error);
+    return null;
+  }
+}
+
 export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEntryDetails[]> {
   try {
+    console.log(`[LoreDetails] Fetching lore entries for user: ${userId}`);
+    
     // Get all lore entries by the user
     const userEntries = await getLoreEntriesByAuthor(userId);
+    console.log(`[LoreDetails] Found ${userEntries.length} entries by user`);
     
     // Get user details
     const userDoc = await collections.users.doc(userId).get();
     if (!userDoc.exists) {
+      console.error(`[LoreDetails] User not found: ${userId}`);
       throw new Error('User not found');
     }
     const userData = { id: userDoc.id, ...userDoc.data() } as FirestoreDoc<User>;
+    console.log(`[LoreDetails] Retrieved user data for: ${userData.username || userData.address}`);
 
     if (!userData.id) {
+      console.error(`[LoreDetails] User data is missing ID: ${userId}`);
       throw new Error('User data is missing ID');
     }
 
     // Get all unique NFT IDs from the entries
     const nftIds = [...new Set(userEntries.map(entry => entry.nftId))];
+    console.log(`[LoreDetails] Found ${nftIds.length} unique NFTs to fetch`);
     
     // Fetch all related NFTs
     const nftPromises = nftIds.map(async (nftId) => {
       const nftDoc = await collections.nfts.doc(nftId).get();
+      if (!nftDoc.exists) {
+        console.warn(`[LoreDetails] NFT not found: ${nftId}`);
+      }
       return nftDoc.exists ? { id: nftDoc.id, ...nftDoc.data() } as FirestoreDoc<NFT> : null;
     });
     const nfts = (await Promise.all(nftPromises)).filter((nft): nft is FirestoreDoc<NFT> => nft !== null);
+    console.log(`[LoreDetails] Successfully fetched ${nfts.length} NFTs`);
 
     // Create a map of NFTs for quick lookup
     const nftMap = new Map(nfts.map(nft => [nft.id, nft]));
 
-    // Get all vote activities for the user's lore entries
-    const entryIds = userEntries.map(entry => entry.id!);
-    const voteActivities = await Promise.all(
-      entryIds.map(async (entryId) => {
-        return await getFilteredActivities({
-          type: ActivityName.lore,
-          action: ActivityAction.loreEntryVoted,
-          loreEntryId: entryId
-        });
-      })
-    );
-
-    // Create a map of vote counts and user votes
-    const voteMap = new Map<string, { totalVotes: number; userVote: 1 | -1 | null }>();
-    
-    // Process vote activities for each lore entry
-    entryIds.forEach((entryId, index) => {
-      const entryVotes = voteActivities[index];
-      
-      // Get the latest vote from each user
-      const latestUserVotes = new Map<string, number>();
-      entryVotes.forEach(activity => {
-        if (activity.voteValue !== undefined && activity.voteValue !== null) {
-          latestUserVotes.set(activity.userId, activity.voteValue);
-        }
-      });
-      
-      // Calculate total votes
-      const totalVotes = Array.from(latestUserVotes.values()).reduce((sum, vote) => sum + vote, 0);
-      
-      // Get the current user's vote (if any)
-      const userVoteActivity = entryVotes
-        .filter(activity => activity.userId === userId)
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
-      
-      voteMap.set(entryId, {
-        totalVotes,
-        userVote: userVoteActivity?.voteValue ?? null
-      });
+    // Get user votes for each lore entry
+    console.log(`[LoreDetails] Fetching votes for ${userEntries.length} entries`);
+    const userVotePromises = userEntries.map(entry => {
+      if (!entry.id) {
+        console.error(`[LoreDetails] Lore entry is missing ID: ${JSON.stringify(entry)}`);
+        throw new Error('Lore entry is missing ID');
+      }
+      return getUserVote(entry.id, userId);
     });
+    const userVotes = await Promise.all(userVotePromises);
+    console.log('[LoreDetails] User votes:', userVotes);
 
     // Combine the data into LoreEntryDetails format
-    const loreEntryDetails: LoreEntryDetails[] = userEntries.map(entry => {
+    console.log('[LoreDetails] Combining data into LoreEntryDetails format');
+    const loreEntryDetails: LoreEntryDetails[] = userEntries.map((entry, index) => {
       if (!entry.id) {
+        console.error(`[LoreDetails] Entry missing ID during mapping: ${JSON.stringify(entry)}`);
         throw new Error('Lore entry is missing ID');
       }
 
       const nft = nftMap.get(entry.nftId);
       if (!nft || !nft.id) {
+        console.error(`[LoreDetails] NFT not found for entry ${entry.id} (NFT ID: ${entry.nftId})`);
         throw new Error(`NFT not found for entry ${entry.id}`);
       }
 
@@ -238,23 +293,18 @@ export async function getLoreEntryDetailsByUser(userId: string): Promise<LoreEnt
       // Convert FirestoreDoc<LoreEntry> to LoreEntry
       const loreEntry = unwrapFirestoreDoc(entry);
 
-      // Get vote information
-      const voteInfo = voteMap.get(entry.id) || { totalVotes: 0, userVote: null };
-
       return {
-        loreEntry: {
-          ...loreEntry,
-          votes: voteInfo.totalVotes
-        },
+        loreEntry,
         userDetails,
         nft: nftDetails,
-        userVote: voteInfo.userVote,
-        votes: voteInfo.totalVotes
+        userVote: userVotes[index]
       };
     });
 
+    console.log(`[LoreDetails] Successfully created ${loreEntryDetails.length} lore entry details`);
     return loreEntryDetails;
   } catch (error) {
+    console.error('[LoreDetails] Error in getLoreEntryDetailsByUser:', error);
     throw new Error(`Failed to get lore entry details by user: ${error}`);
   }
 } 
