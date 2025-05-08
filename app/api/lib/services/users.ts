@@ -61,15 +61,26 @@ export async function getUserById(id: string): Promise<FirestoreDoc<User> | null
 }
 
 export async function getUserByAddress(address: string): Promise<FirestoreDoc<User> | null> {
+  console.log(`[getUserByAddress] Starting to fetch user for address: ${address}`);
   try {
+    console.log(`[getUserByAddress] Querying users collection for address: ${address}`);
+    debugger;
     const users = await queryCollection<FirestoreDoc<User>>(
       collections.users,
-      [{ field: 'address', operator: '==', value: address }],
+      [{ field: 'address', operator: '==', value: address.toLowerCase() }],
       undefined,
       1
     );
-    return users[0] || null;
+    
+    if (users.length === 0) {
+      console.error(`[getUserByAddress] No user found for address: ${address}`);
+      return null;
+    }
+    
+    console.log(`[getUserByAddress] Successfully found user with ID: ${users[0].id}`);
+    return users[0];
   } catch (error) {
+    console.error(`[getUserByAddress] Error fetching user for address ${address}:`, error);
     throw new Error(`Failed to get user by address: ${error}`);
   }
 }
@@ -112,26 +123,46 @@ export async function getTopUsers(limit: number = 10): Promise<FirestoreDoc<User
 }
 
 export async function getUserDetailsByAddress(address: string): Promise<UserDetails | null> {
-  // Get user
-  const user = await getUserByAddress(address);
-  if (!user) return null;
+  console.log(`[getUserDetailsByAddress] Starting to fetch user details for address: ${address}`);
   
-  // Get NFTs
-  const nfts: NFT[] = await getNFTsByOwner(address);
+  try {
+    // Get user
+    console.log(`[getUserDetailsByAddress] Fetching user by address...`);
+    const user = await getUserByAddress(address);
+    if (!user) {
+      console.log(`[getUserDetailsByAddress] No user found for address: ${address}`);
+      return null;
+    }
+    console.log(`[getUserDetailsByAddress] User found with ID: ${user.id}`);
+    
+    // Get NFTs
+    console.log(`[getUserDetailsByAddress] Fetching NFTs for address: ${address}`);
+    const nfts: NFT[] = await getNFTsByOwner(address);
+    console.log(`[getUserDetailsByAddress] Found ${nfts.length} NFTs for user`);
 
-  // Get achievements (completed badge requirements)
-  const achievements: CompletedBadgeRequirement[] = await getUserCompletedBadgeRequirements(user.id!)
+    // Get achievements (completed badge requirements)
+    console.log(`[getUserDetailsByAddress] Fetching completed badge requirements for user: ${user.id}`);
+    const achievements: CompletedBadgeRequirement[] = await getUserCompletedBadgeRequirements(user.id!);
+    console.log(`[getUserDetailsByAddress] Found ${achievements.length} achievements for user`);
 
-  // Build UserDetails object
-  return {
-    id: user.id!,
-    address: user.address,
-    username: user.username,
-    avatar: user.avatar,
-    points: user.points,
-    nfts,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    achievements,
-  };
+    // Build UserDetails object
+    console.log(`[getUserDetailsByAddress] Building UserDetails object for user: ${user.id}`);
+    const userDetails = {
+      id: user.id!,
+      address: user.address,
+      username: user.username,
+      avatar: user.avatar,
+      points: user.points,
+      nfts,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      achievements,
+    };
+    
+    console.log(`[getUserDetailsByAddress] Successfully built UserDetails for user: ${user.id}`);
+    return userDetails;
+  } catch (error) {
+    console.error(`[getUserDetailsByAddress] Error fetching user details for address ${address}:`, error);
+    throw new Error(`Failed to get user details: ${error}`);
+  }
 } 
