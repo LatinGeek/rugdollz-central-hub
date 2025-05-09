@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { verifyMessage } from 'viem'
+import { syncUserNFTsFromProvider } from '../../lib/services/nfts'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,9 @@ export async function POST(request: NextRequest) {
     if (!message || !signature || !address) {
       return new Response('Missing authentication headers', { status: 401 })
     }
-
+    syncUserNFTsFromProvider(address).then(() => {
+      console.log(`[GET /api/auth/token] Synced NFTs for address: ${address}`);
+    });
     // Verify the signature
     const isValid = await verifyMessage({
       address: address as `0x${string}`,

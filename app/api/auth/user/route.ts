@@ -18,9 +18,7 @@ export const GET = withAuth(async (req: NextRequest, { user }) => {
     if (userData) {
       console.log(`[GET /api/auth/user] User found in DB: ${address}`);
       // Sync user's NFTs to database
-      syncUserNFTsFromProvider(address).then(() => {
-        console.log(`[GET /api/auth/user] Synced NFTs for address: ${address}`);
-      });
+
       return NextResponse.json(userData);
     } else {
       console.log(
