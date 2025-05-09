@@ -14,7 +14,7 @@ export default function StorePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  const { getStoreItems, purchaseItem } = useStoreService()
+  const { getStoreItems } = useStoreService()
 
   useEffect(() => {
     const fetchStoreItems = async () => {
@@ -38,13 +38,12 @@ export default function StorePage() {
     setSelectedItem(item)
   }
 
-  const handleConfirmPurchase = async () => {
+  const handleConfirmPurchase = async (hash: string) => {
     if (!selectedItem) return
 
     try {
-      await purchaseItem(selectedItem.id)
       // Here you would update the user's balance and inventory
-      console.log('Successfully purchased item:', selectedItem)
+      console.log('Successfully purchased item:', selectedItem, hash)
       setSelectedItem(null)
     } catch (err) {
       console.error('Error purchasing item:', err)
@@ -93,9 +92,8 @@ export default function StorePage() {
         <PurchaseConfirmDialog
           isOpen={!!selectedItem}
           onClose={() => setSelectedItem(null)}
-          onConfirm={handleConfirmPurchase}
-          itemName={selectedItem.name}
-          itemPrice={selectedItem.price}
+          onSuccess={handleConfirmPurchase}
+          item ={selectedItem}
           currentBalance={currentBalance}
         />
       )}
